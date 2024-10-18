@@ -22,10 +22,6 @@ Python 3.12.
 
 Windows 10, 11 64-bit
 
-Raspberry Pi Buster
-
-(may work on Mac in non-GUI mode, but haven't tested yet)
-
 Note For test_program_for_IngeniaBLDC_ReubenPython3Class.py:
 
 1.Currently only runs at ~40-50Hz in the Tx and Rx loops on Windows 10 64-bit, Python 3.12.

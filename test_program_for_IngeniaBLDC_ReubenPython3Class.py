@@ -8,7 +8,7 @@ www.reubotics.com
 Apache 2 License
 Software Revision A, 10/17/2024
 
-Verified working on: Python 3.12 for Windows 10, 11 64-bit and Raspberry Pi Buster (may work on Mac in non-GUI mode, but haven't tested yet).
+Verified working on: Python 3.12 for Windows 10, 11 64-bit.
 '''
 
 __author__ = 'reuben.brewer'
