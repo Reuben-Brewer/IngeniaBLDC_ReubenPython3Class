@@ -6,7 +6,7 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision A, 10/17/2024
+Software Revision B, 11/01/2024
 
 Verified working on: Python 3.12 for Windows 10, 11 64-bit.
 '''

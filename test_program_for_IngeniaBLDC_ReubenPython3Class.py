@@ -6,7 +6,7 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision A, 10/17/2024
+Software Revision B, 11/01/2024
 
 Verified working on: Python 3.12 for Windows 10, 11 64-bit.
 '''
@@ -223,29 +223,36 @@ def ConvertFloatToStringWithNumberOfLeadingNumbersAndDecimalPlaces_NumberOrListI
 #######################################################################################################################
 def ConvertDictToProperlyFormattedStringForPrinting(DictToPrint, NumberOfDecimalsPlaceToUse = 3, NumberOfEntriesPerLine = 1, NumberOfTabsBetweenItems = 3):
 
-    ProperlyFormattedStringForPrinting = ""
-    ItemsPerLineCounter = 0
+    try:
+        ProperlyFormattedStringForPrinting = ""
+        ItemsPerLineCounter = 0
 
-    for Key in DictToPrint:
+        for Key in DictToPrint:
 
-        if isinstance(DictToPrint[Key], dict): #RECURSION
-            ProperlyFormattedStringForPrinting = ProperlyFormattedStringForPrinting + \
-                                                 Key + ":\n" + \
-                                                 ConvertDictToProperlyFormattedStringForPrinting(DictToPrint[Key], NumberOfDecimalsPlaceToUse, NumberOfEntriesPerLine, NumberOfTabsBetweenItems)
+            if isinstance(DictToPrint[Key], dict): #RECURSION
+                ProperlyFormattedStringForPrinting = ProperlyFormattedStringForPrinting + \
+                                                     str(Key) + ":\n" + \
+                                                     ConvertDictToProperlyFormattedStringForPrinting(DictToPrint[Key], NumberOfDecimalsPlaceToUse, NumberOfEntriesPerLine, NumberOfTabsBetweenItems)
 
-        else:
-            ProperlyFormattedStringForPrinting = ProperlyFormattedStringForPrinting + \
-                                                 Key + ": " + \
-                                                 ConvertFloatToStringWithNumberOfLeadingNumbersAndDecimalPlaces_NumberOrListInput(DictToPrint[Key], 0, NumberOfDecimalsPlaceToUse)
+            else:
+                ProperlyFormattedStringForPrinting = ProperlyFormattedStringForPrinting + \
+                                                     str(Key) + ": " + \
+                                                     ConvertFloatToStringWithNumberOfLeadingNumbersAndDecimalPlaces_NumberOrListInput(DictToPrint[Key], 0, NumberOfDecimalsPlaceToUse)
 
-        if ItemsPerLineCounter < NumberOfEntriesPerLine - 1:
-            ProperlyFormattedStringForPrinting = ProperlyFormattedStringForPrinting + "\t"*NumberOfTabsBetweenItems
-            ItemsPerLineCounter = ItemsPerLineCounter + 1
-        else:
-            ProperlyFormattedStringForPrinting = ProperlyFormattedStringForPrinting + "\n"
-            ItemsPerLineCounter = 0
+            if ItemsPerLineCounter < NumberOfEntriesPerLine - 1:
+                ProperlyFormattedStringForPrinting = ProperlyFormattedStringForPrinting + "\t"*NumberOfTabsBetweenItems
+                ItemsPerLineCounter = ItemsPerLineCounter + 1
+            else:
+                ProperlyFormattedStringForPrinting = ProperlyFormattedStringForPrinting + "\n"
+                ItemsPerLineCounter = 0
 
-    return ProperlyFormattedStringForPrinting
+        return ProperlyFormattedStringForPrinting
+
+    except:
+        exceptions = sys.exc_info()[0]
+        print("ConvertDictToProperlyFormattedStringForPrinting, Exceptions: %s" % exceptions)
+        return ""
+        # traceback.print_exc()
 #######################################################################################################################
 #######################################################################################################################
 
@@ -617,6 +624,9 @@ if __name__ == '__main__':
 
     global SinusoidalMotionInput_TimeGain
     SinusoidalMotionInput_TimeGain = math.pi / (2.0 * SinusoidalMotionInput_ROMtestTimeToPeakAngle)
+
+    global DesiredSlaveID_List
+    DesiredSlaveID_List = [1, 2]
     #################################################
     #################################################
 
@@ -775,9 +785,9 @@ if __name__ == '__main__':
     IngeniaBLDC_setup_dict = dict([("GUIparametersDict", IngeniaBLDC_GUIparametersDict),
                                     ("NameToDisplay_UserSet", "IngeniaBLDC"),
                                     ("DesiredInterfaceName", "Intel(R) Ethernet Connection (2) I219-LM"), #likely "Intel(R) Ethernet Connection (2) I219-LM" or "Realtek USB GbE Family Controller"
-                                    ("DesiredSerialNumber_USBtoSerialConverter", "FT8J8TNUA"),
-                                    ("DesiredSlaveID", 1),
-                                    ("XDFfileDictionaryPath", os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "den-xcr-e_eoe_2.5.0.xdf"),
+                                    ("DesiredSlaveID_List", DesiredSlaveID_List),
+                                    ("XDFfileDictionaryPath", os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "cap-xcr-e_eoe_2.4.1.xdf"), #"den-xcr-e_eoe_2.5.0.xdf" #"cap-xcr-e_eoe_2.4.1.xdf"
+                                    ("LaunchFlag_MotionLab3_IngEcatGateway_EoEservice", 0),
                                     ("MotionLab3_IngEcatGateway_EoEservice_EXEfullFilePath", "C:\\Program Files (x86)\\MotionLab3\\_internal\\eoe_service\\IngEcatGateway.exe"), #"C:\\Program Files (x86)\\MotionLab3\\eoe_service\\IngEcatGateway.exe"
                                     ("DedicatedRxThread_TimeToSleepEachLoop", 0.001),
                                     ("DedicatedTxThread_TimeToSleepEachLoop", 0.001),
@@ -794,7 +804,7 @@ if __name__ == '__main__':
         except:
             exceptions = sys.exc_info()[0]
             print("IngeniaBLDC_ReubenPython3ClassObject __init__, exceptions: %s" % exceptions)
-            #traceback.print_exc()
+            traceback.print_exc()
     #################################################
 
     #################################################
@@ -1061,11 +1071,13 @@ if __name__ == '__main__':
 
     #################################################
     #################################################
-
-    IngeniaBLDC_Object.SetPositionPIDgains_ExternalProgram(Kp_ToBeSet=0.005, Ki_ToBeSet=0.001, Kd_ToBeSet=0.001, PrintDebugFlag=1)
-    #IngeniaBLDC_Object.SetVelocityPIDgains_ExternalProgram(Kp_ToBeSet=0.0051, Ki_ToBeSet=0.0011, Kd_ToBeSet=0.0011, PrintDebugFlag=1)
-
-    IngeniaBLDC_Object.SetMaxCurrent_ExternalProgram(2.0, PrintDebugFlag=1)
+    if IngeniaBLDC_OPEN_FLAG == 1:
+        for SlaveID_Int in DesiredSlaveID_List:
+            IngeniaBLDC_Object.SetPositionPIDgains_ExternalProgram(SlaveID_Int, Kp_ToBeSet=0.005, Ki_ToBeSet=0.001, Kd_ToBeSet=0.001, PrintDebugFlag=1)
+            #IngeniaBLDC_Object.SetVelocityPIDgains_ExternalProgram(SlaveID_Int Kp_ToBeSet=0.0051, Ki_ToBeSet=0.0011, Kd_ToBeSet=0.0011, PrintDebugFlag=1)
+            IngeniaBLDC_Object.SetMaxCurrent_ExternalProgram(SlaveID_Int, 2.0, PrintDebugFlag=1)
+    #################################################
+    #################################################
 
     print("Starting main loop 'test_program_for_IngeniaBLDC_ReubenPython3Class.")
     StartingTime_MainLoopThread = getPreciseSecondsTimeStampString()
@@ -1114,10 +1126,10 @@ if __name__ == '__main__':
 
             if "Time" in IngeniaBLDC_MostRecentDict:
                 IngeniaBLDC_MostRecentDict_Time = IngeniaBLDC_MostRecentDict["Time"]
-                IngeniaBLDC_MostRecentDict_Position_Actual = IngeniaBLDC_MostRecentDict["Position_Actual"]
-                IngeniaBLDC_MostRecentDict_Velocity_Actual = IngeniaBLDC_MostRecentDict["Velocity_Actual"]
-                IngeniaBLDC_MostRecentDict_CurrentDirect_Actual = IngeniaBLDC_MostRecentDict["Current_Direct_Actual"]
-                IngeniaBLDC_MostRecentDict_CurrentQuadrature_Actual = IngeniaBLDC_MostRecentDict["Current_Quadrature_Actual"]
+                #IngeniaBLDC_MostRecentDict_Position_Actual = IngeniaBLDC_MostRecentDict["Position_Actual"]
+                #IngeniaBLDC_MostRecentDict_Velocity_Actual = IngeniaBLDC_MostRecentDict["Velocity_Actual"]
+                #IngeniaBLDC_MostRecentDict_CurrentDirect_Actual = IngeniaBLDC_MostRecentDict["Current_Direct_Actual"]
+                #IngeniaBLDC_MostRecentDict_CurrentQuadrature_Actual = IngeniaBLDC_MostRecentDict["Current_Quadrature_Actual"]
 
         ###################################################
         ###################################################
@@ -1146,7 +1158,8 @@ if __name__ == '__main__':
                 SinusoidalMotionInput_CommandedValue = (SinusoidalMotionInput_MaxValue_PositionControl + SinusoidalMotionInput_MinValue_PositionControl)/2.0 + \
                                                        0.5*abs(SinusoidalMotionInput_MaxValue_PositionControl - SinusoidalMotionInput_MinValue_PositionControl)*math.sin(SinusoidalMotionInput_TimeGain*CurrentTime_MainLoopThread)
 
-                IngeniaBLDC_Object.SetPosition_ExternalProgram(SinusoidalMotionInput_CommandedValue)
+                for SlaveID_Int in DesiredSlaveID_List:
+                    IngeniaBLDC_Object.SetPosition_ExternalProgram(SlaveID_Int, SinusoidalMotionInput_CommandedValue)
 
         ###################################################
         ###################################################
@@ -1160,10 +1173,10 @@ if __name__ == '__main__':
             ####################################################
             ListToWrite = []
             ListToWrite.append(CurrentTime_MainLoopThread)
-            ListToWrite.append(IngeniaBLDC_MostRecentDict_Position_Actual)
-            ListToWrite.append(IngeniaBLDC_MostRecentDict_Velocity_Actual)
-            ListToWrite.append(IngeniaBLDC_MostRecentDict_CurrentDirect_Actual)
-            ListToWrite.append(IngeniaBLDC_MostRecentDict_CurrentQuadrature_Actual)
+            #ListToWrite.append(IngeniaBLDC_MostRecentDict_Position_Actual)
+            #ListToWrite.append(IngeniaBLDC_MostRecentDict_Velocity_Actual)
+            #ListToWrite.append(IngeniaBLDC_MostRecentDict_CurrentDirect_Actual)
+            #ListToWrite.append(IngeniaBLDC_MostRecentDict_CurrentQuadrature_Actual)
 
             #print("ListToWrite: " + str(ListToWrite))
             ####################################################
@@ -1186,9 +1199,9 @@ if __name__ == '__main__':
 
                     if MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_MostRecentDict_StandAlonePlottingProcess_ReadyForWritingFlag == 1:
                         if CurrentTime_MainLoopThread - LastTime_MainLoopThread_MyPlotterPureTkinterStandAloneProcess >= 0.030:
-                            MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.ExternalAddPointOrListOfPointsToPlot(["Channel0"],
-                                                                                                                                    [CurrentTime_MainLoopThread]*1,
-                                                                                                                                    [IngeniaBLDC_MostRecentDict_CurrentQuadrature_Actual]) #IngeniaBLDC_MostRecentDict_Position_Actual
+                            MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.ExternalAddPointOrListOfPointsToPlot(["Channel0", "Channel1"],
+                                                                                                                                    [CurrentTime_MainLoopThread]*2,
+                                                                                                                                    [SinusoidalMotionInput_CommandedValue, IngeniaBLDC_MostRecentDict["IngeniaMotionController_MainDict"][1]["Position_Actual"]])
 
 
                             LastTime_MainLoopThread_MyPlotterPureTkinterStandAloneProcess = CurrentTime_MainLoopThread
@@ -1197,7 +1210,7 @@ if __name__ == '__main__':
             except:
                 exceptions = sys.exc_info()[0]
                 print("test_program_for_IngeniaBLDC_ReubenPython3Class, if MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG == 1: SET's, Exceptions: %s" % exceptions)
-                # traceback.print_exc()
+                traceback.print_exc()
         ####################################################
         ####################################################
 
