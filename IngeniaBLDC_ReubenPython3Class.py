@@ -5,7 +5,7 @@ Reuben Brewer, Ph.D.
 reuben.brewer@gmail.com
 www.reubotics.com
 
-Software Revision B, 11/01/2024
+Software Revision C, 11/02/2024
 
 Verified working on: Python 3.12 for Windows 10, 11 64-bit.
 '''
@@ -68,6 +68,10 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
 
         self.DedicatedTxThread_TxMessageToSend_Queue = Queue.Queue()
 
+        self.DetectedSlaveID_List = []
+
+        self.AskForInfrequentDataReadLoopCounter = 0
+
         self.STO_EstopPRESSEDValue = 0x4
         self.STO_EstopNOTpressedValue = 0x17
 
@@ -118,6 +122,21 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
         TORQUE = 0x05
         CYCLIC_TORQUE = 0x25]
         '''
+
+        '''
+        self.OperatingMode_AcceptableList = ["CurrentControl",
+                                             "VelocityControl",
+                                             "PositionControl",
+                                             "ExtendedPositionControlMultiTurn",
+                                             "CurrentBasedPositionControl",
+                                             "PWMcontrol"]
+        '''
+
+        self.ListOfAcceptableVariableNameStringsForReading = ["Position_Actual",
+                                                                "Velocity_Actual",
+                                                                "Current_Direct_Actual",
+                                                                "Current_Quadrature_Actual",
+                                                                "EnabledState_Actual"] #unicorn
         #########################################################
         #########################################################
 
@@ -381,7 +400,10 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                                                                             ("MaxCurrent_ToBeSet", -11111.0),
                                                                             ("MaxCurrent_NeedsToBeSetFlag", 0),
                                                                             ("Position_ToBeSet", 0.0),
-                                                                            ("Position_NeedsToBeSetFlag", 0)])
+                                                                            ("Position_NeedsToBeSetFlag", 0),
+                                                                            ("Current_Quadrature_ToBeSet", 0.0),
+                                                                            ("Current_Quadrature_NeedsToBeSetFlag", 0)
+            ])
 
             self.IngeniaMotionController_MainDict[1]["AliasOrServoName_String"] = "default" #This is a requirement of the "ingeniamotion" module. Can use any alias after "default" has been set for one controller.
             #########################################################
@@ -470,6 +492,39 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
             self.EnableMotorAtStartOfProgramFlag = 0
 
         print("IngeniaBLDC_ReubenPython3Class __init__: EnableMotorAtStartOfProgramFlag: " + str(self.EnableMotorAtStartOfProgramFlag))
+        #########################################################
+        #########################################################
+
+        #########################################################
+        #########################################################
+        if "GetVariablesEveryNloopsCycles" in setup_dict:
+            self.GetVariablesEveryNloopsCycles = self.PassThroughFloatValuesInRange_ExitProgramOtherwise("GetVariablesEveryNloopsCycles", setup_dict["GetVariablesEveryNloopsCycles"], 0, 1000000000)
+        else:
+            self.GetVariablesEveryNloopsCycles = -1
+
+        print("IngeniaBLDC_ReubenPython3Class __init__: GetVariablesEveryNloopsCycles: " + str(self.GetVariablesEveryNloopsCycles))
+        #########################################################
+        #########################################################
+
+        #########################################################
+        #########################################################
+        self.ListOfVariableNameStringsToGet = []
+        if "ListOfVariableNameStringsToGet" in setup_dict:
+            ListOfVariableNameStringsToGet_temp = setup_dict["ListOfVariableNameStringsToGet"]
+
+            for VariableNameString in ListOfVariableNameStringsToGet_temp:
+                if VariableNameString in self.ListOfAcceptableVariableNameStringsForReading:
+                    self.ListOfVariableNameStringsToGet.append(VariableNameString)
+                else:
+                    print("ERROR: VariableNameString no an acceptable value.")
+
+        if "STO_status" not in self.ListOfVariableNameStringsToGet:
+            self.ListOfVariableNameStringsToGet.append("STO_status") #Required for the motors to to be detected as connected and then be drive.
+
+        if "EnabledState_Actual" not in self.ListOfVariableNameStringsToGet:
+            self.ListOfVariableNameStringsToGet.append("EnabledState_Actual") #Required for the motors to to be detected as connected and then be drive.
+
+        print("IngeniaBLDC_ReubenPython3Class __init__: ListOfVariableNameStringsToGet: " + str(self.ListOfVariableNameStringsToGet))
         #########################################################
         #########################################################
 
@@ -1049,15 +1104,20 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
         try:
             if self.IngeniaMotionController_MainDict[SlaveID_Int]["MotorConnectedFlag"] == 1:
                 if EnabledState in [0, 1]:
+                    N = 1
 
                     ##########################################################################################################
                     if EnabledState == 0:
-                        self.IngeniaMotionControllerObject.motion.motor_disable(servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+                        for Counter in range(0, N):
+                            self.IngeniaMotionControllerObject.motion.motor_disable(servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+                            time.sleep(0.001)
                     ##########################################################################################################
 
                     ##########################################################################################################
                     if EnabledState == 1:
-                        self.IngeniaMotionControllerObject.motion.motor_enable(servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+                        for Counter in range(0, N):
+                            self.IngeniaMotionControllerObject.motion.motor_enable(servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+                            time.sleep(0.001)
                     ##########################################################################################################
 
                     ##########################################################################################################
@@ -1370,7 +1430,8 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                             self.__SetPositionPIDgains(SlaveID_Int,
                                                        self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionPIDgains_Kp_ToBeSet"],
                                                        self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionPIDgains_Ki_ToBeSet"],
-                                                       self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionPIDgains_Kd_ToBeSet"], PrintDebugFlag=1)
+                                                       self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionPIDgains_Kd_ToBeSet"],
+                                                       PrintDebugFlag=0)
 
                             self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionPIDgains_NeedsToBeSetFlag"] = 0
                         ##########################################################################################################
@@ -1382,7 +1443,7 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                                                        self.IngeniaMotionController_MainDict[SlaveID_Int]["VelocityPIDgains_Kp_ToBeSet"],
                                                        self.IngeniaMotionController_MainDict[SlaveID_Int]["VelocityPIDgains_Ki_ToBeSet"],
                                                        self.IngeniaMotionController_MainDict[SlaveID_Int]["VelocityPIDgains_Kd_ToBeSet"],
-                                                       PrintDebugFlag=1)
+                                                       PrintDebugFlag=0)
 
                             self.IngeniaMotionController_MainDict[SlaveID_Int]["VelocityPIDgains_NeedsToBeSetFlag"] = 0
                         ##########################################################################################################
@@ -1409,6 +1470,20 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                                 self.IngeniaMotionController_MainDict[SlaveID_Int]["Position_NeedsToBeSetFlag"] = 0
                         ##########################################################################################################
 
+                        '''
+                        ########################################################################################################## REPLACE WITH CURRENT
+                        if self.IngeniaMotionController_MainDict[SlaveID_Int]["EnabledState_Actual"] == 1:
+
+                            if self.IngeniaMotionController_MainDict[SlaveID_Int]["Current_Quadrature_NeedsToBeSetFlag"] == 1:
+
+                                self.__SetCurrent_Quadrature(SlaveID_Int,
+                                                   self.IngeniaMotionController_MainDict[SlaveID_Int]["Current_Quadrature_ToBeSet"],
+                                                   PrintDebugFlag=0)
+
+                                self.IngeniaMotionController_MainDict[SlaveID_Int]["Current_Quadrature_NeedsToBeSetFlag"] = 0
+                        ##########################################################################################################
+                        '''
+                        
                         #IngeniaMotionControllerObject.motion.set_voltage_direct() #PWM control
                         #IngeniaMotionControllerObject.motion.set_velocity() #velocity control
                         #IngeniaMotionControllerObject.motion.set_current_quadrature(current) #torque control, don't use set_current_direct()
@@ -1422,8 +1497,8 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
 
             except:
                 exceptions = sys.exc_info()[0]
-                print("DedicatedTxThread, exceptions on SlaveID_Int = " + str(SlaveID_Int) + ": %s" % exceptions)
-                traceback.print_exc()
+                #print("DedicatedTxThread, exceptions on SlaveID_Int = " + str(SlaveID_Int) + ": %s" % exceptions)
+                #traceback.print_exc()
 
             ##########################################################################################################
             ##########################################################################################################
@@ -1492,6 +1567,7 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
     ##########################################################################################################
     ##########################################################################################################
     ##########################################################################################################
+    ##########################################################################################################
     def DedicatedRxThread(self):
 
         self.MyPrint_WithoutLogFile("Started DedicatedRxThread for IngeniaBLDC_ReubenPython3Class object.")
@@ -1504,8 +1580,10 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
         ##########################################################################################################
         ##########################################################################################################
         ##########################################################################################################
+        ##########################################################################################################
         while self.EXIT_PROGRAM_FLAG == 0:
 
+            ##########################################################################################################
             ##########################################################################################################
             ##########################################################################################################
             ##########################################################################################################
@@ -1515,7 +1593,9 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
             ##########################################################################################################
             ##########################################################################################################
             ##########################################################################################################
+            ##########################################################################################################
 
+            ##########################################################################################################
             ##########################################################################################################
             ##########################################################################################################
             ##########################################################################################################
@@ -1525,51 +1605,90 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                 ##########################################################################################################
                 ##########################################################################################################
                 ##########################################################################################################
-                for SlaveID_Int in self.DetectedSlaveID_List:
+                ##########################################################################################################
+                if self.GetVariablesEveryNloopsCycles >= 0:
+
+                    if self.AskForInfrequentDataReadLoopCounter == 0:
+
+                        self.AskForInfrequentDataReadLoopCounter = self.AskForInfrequentDataReadLoopCounter + 1
+
+                        ##########################################################################################################
+                        ##########################################################################################################
+                        ##########################################################################################################
+                        for SlaveID_Int in self.DetectedSlaveID_List:
+
+                            ##########################################################################################################
+                            ##########################################################################################################
+                            if self.IngeniaMotionController_MainDict[SlaveID_Int]["MotorConnectedFlag"] == 1:
+
+                                ##########################################################################################################
+
+                                if "STO_status" in self.ListOfVariableNameStringsToGet:
+                                    self.IngeniaMotionController_MainDict[SlaveID_Int]["STO_status"] = self.IngeniaMotionControllerObject.configuration.get_sto_status(servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+
+                                if "Status_Word" in self.ListOfVariableNameStringsToGet:
+                                    self.IngeniaMotionController_MainDict[SlaveID_Int]["Status_Word"] = self.IngeniaMotionControllerObject.configuration.get_status_word(servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+
+                                if "Position_Actual" in self.ListOfVariableNameStringsToGet:
+                                    self.IngeniaMotionController_MainDict[SlaveID_Int]["Position_Actual"] = self.IngeniaMotionControllerObject.motion.get_actual_position(servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+
+                                if "Velocity_Actual" in self.ListOfVariableNameStringsToGet:
+                                    self.IngeniaMotionController_MainDict[SlaveID_Int]["Velocity_Actual"] = self.IngeniaMotionControllerObject.motion.get_actual_velocity(servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+
+                                if "Current_Direct_Actual" in self.ListOfVariableNameStringsToGet:
+                                    self.IngeniaMotionController_MainDict[SlaveID_Int]["Current_Direct_Actual"] = self.IngeniaMotionControllerObject.motion.get_actual_current_direct(servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+
+                                if "Current_Quadrature_Actual" in self.ListOfVariableNameStringsToGet:
+                                    self.IngeniaMotionController_MainDict[SlaveID_Int]["Current_Quadrature_Actual"] = self.IngeniaMotionControllerObject.motion.get_actual_current_quadrature(servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+
+                                if "EnabledState_Actual" in self.ListOfVariableNameStringsToGet:
+                                    self.IngeniaMotionController_MainDict[SlaveID_Int]["EnabledState_Actual"] = self.IngeniaMotionControllerObject.configuration.is_motor_enabled(servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+
+                                ##########################################################################################################
+
+                                ##########################################################################################################
+                                self.IngeniaMotionController_MainDict[SlaveID_Int]["STO_status_last"] = self.IngeniaMotionController_MainDict[SlaveID_Int]["STO_status"]
+                                ##########################################################################################################
+
+                            ##########################################################################################################
+                            ##########################################################################################################
+
+                        ##########################################################################################################
+                        ##########################################################################################################
+                        ##########################################################################################################
+
+                        ##########################################################################################################
+                        ##########################################################################################################
+                        ##########################################################################################################
+                        self.UpdateFrequencyCalculation_DedicatedRxThread_Filtered()
+                        ##########################################################################################################
+                        ##########################################################################################################
+                        ##########################################################################################################
 
                     ##########################################################################################################
                     ##########################################################################################################
-                    if self.IngeniaMotionController_MainDict[SlaveID_Int]["MotorConnectedFlag"] == 1:
+                    ##########################################################################################################
+                    ##########################################################################################################
 
-                        ##########################################################################################################
-                        #self.IngeniaMotionController_MainDict[SlaveID_Int]["STO_status"] = self.IngeniaMotionControllerObject.configuration.get_sto_status(servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
-                        #self.IngeniaMotionController_MainDict[SlaveID_Int]["Status_Word"] = self.IngeniaMotionControllerObject.configuration.get_status_word(servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
-                        self.IngeniaMotionController_MainDict[SlaveID_Int]["Position_Actual"] = self.IngeniaMotionControllerObject.motion.get_actual_position(servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
-                        self.IngeniaMotionController_MainDict[SlaveID_Int]["Velocity_Actual"] = self.IngeniaMotionControllerObject.motion.get_actual_velocity(servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
-                        self.IngeniaMotionController_MainDict[SlaveID_Int]["Current_Direct_Actual"] = self.IngeniaMotionControllerObject.motion.get_actual_current_direct(servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
-                        self.IngeniaMotionController_MainDict[SlaveID_Int]["Current_Quadrature_Actual"] = self.IngeniaMotionControllerObject.motion.get_actual_current_quadrature(servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
-                        self.IngeniaMotionController_MainDict[SlaveID_Int]["EnabledState_Actual"]= self.IngeniaMotionControllerObject.configuration.is_motor_enabled(servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+                    ##########################################################################################################
+                    ##########################################################################################################
+                    ##########################################################################################################
+                    ##########################################################################################################
+                    else:
 
-                        '''
-                        #self.IngeniaMotionControllerObject.configuration.is_sto1_active(servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
-                        #self.IngeniaMotionControllerObject.configuration.is_motor_enabled(servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
-                        #self.IngeniaMotionControllerObject.configuration.load_configuration(servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
-                        '''
-                        ##########################################################################################################
+                        self.AskForInfrequentDataReadLoopCounter = self.AskForInfrequentDataReadLoopCounter + 1
 
-                        ##########################################################################################################
-                        self.IngeniaMotionController_MainDict[SlaveID_Int]["STO_status_last"] = self.IngeniaMotionController_MainDict[SlaveID_Int]["STO_status"]
-                        ##########################################################################################################
-
+                        if self.AskForInfrequentDataReadLoopCounter >= self.GetVariablesEveryNloopsCycles:
+                            self.AskForInfrequentDataReadLoopCounter = 0
+                    ##########################################################################################################
+                    ##########################################################################################################
                     ##########################################################################################################
                     ##########################################################################################################
 
                 ##########################################################################################################
                 ##########################################################################################################
                 ##########################################################################################################
-
                 ##########################################################################################################
-                ##########################################################################################################
-                ##########################################################################################################
-                self.UpdateFrequencyCalculation_DedicatedRxThread_Filtered()
-                ##########################################################################################################
-                ##########################################################################################################
-                ##########################################################################################################
-
-                ##########################################################################################################
-                ##########################################################################################################
-                ##########################################################################################################
-
                 self.MostRecentDataDict["IngeniaMotionController_MainDict"] = self.IngeniaMotionController_MainDict.copy()  # Don't need deepcopy as there are only numbers being copied
 
                 self.MostRecentDataDict["Time"] = self.CurrentTime_CalculatedFromDedicatedRxThread
@@ -1580,7 +1699,9 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                 ##########################################################################################################
                 ##########################################################################################################
                 ##########################################################################################################
+                ##########################################################################################################
 
+                ##########################################################################################################
                 ##########################################################################################################
                 ##########################################################################################################
                 ##########################################################################################################
@@ -1592,17 +1713,20 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                 ##########################################################################################################
                 ##########################################################################################################
                 ##########################################################################################################
+                ##########################################################################################################
 
             except:
                 exceptions = sys.exc_info()[0]
-                print("DedicatedRxThread, exceptions: %s" % exceptions)
-                traceback.print_exc()
+                #print("DedicatedRxThread, exceptions: %s" % exceptions)
+                #traceback.print_exc()
 
             ##########################################################################################################
             ##########################################################################################################
             ##########################################################################################################
             ##########################################################################################################
+            ##########################################################################################################
 
+        ##########################################################################################################
         ##########################################################################################################
         ##########################################################################################################
         ##########################################################################################################
@@ -1612,6 +1736,7 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
         self.MyPrint_WithoutLogFile("Finished DedicatedRxThread for IngeniaBLDC_ReubenPython3Class object.")
         self.DedicatedRxThread_StillRunningFlag = 0
 
+    ##########################################################################################################
     ##########################################################################################################
     ##########################################################################################################
     ##########################################################################################################
@@ -1694,14 +1819,14 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
         #################################################
         #################################################
         self.Data_Label = Label(self.myFrame, text="Data_Label", width=120)
-        self.Data_Label.grid(row=0, column=1, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
+        self.Data_Label.grid(row=1, column=0, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
         #################################################
         #################################################
 
         #################################################
         #################################################
         self.ButtonsFrame = Frame(self.myFrame)
-        self.ButtonsFrame.grid(row = 1, column = 0, padx = self.GUI_PADX, pady = self.GUI_PADY, rowspan = 1, columnspan = 2)
+        self.ButtonsFrame.grid(row = 2, column = 0, padx = self.GUI_PADX, pady = self.GUI_PADY, rowspan = 1, columnspan = 2)
         #################################################
         #################################################
 
@@ -1716,7 +1841,7 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
         #################################################
         self.PrintToGui_Label = Label(self.myFrame, text="PrintToGui_Label", width=75)
         if self.EnableInternal_MyPrint_Flag == 1:
-            self.PrintToGui_Label.grid(row=2, column=0, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=10, rowspan=10)
+            self.PrintToGui_Label.grid(row=3, column=0, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=10, rowspan=10)
         #################################################
         #################################################
 
@@ -1733,12 +1858,14 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
     ##########################################################################################################
     def EnabledState_Button_Response(self):
 
-        if self.EnabledState == 1:
-            self.EnabledState_ToBeSet = 0
-        else:
-            self.EnabledState_ToBeSet = 1
+        for SlaveID_Int in self.DetectedSlaveID_List:
 
-        self.EnabledState_NeedsToBeSetFlag = 1
+            if self.IngeniaMotionController_MainDict[SlaveID_Int]["EnabledState"] == 1:
+                self.IngeniaMotionController_MainDict[SlaveID_Int]["EnabledState_ToBeSet"] = 0
+            else:
+                self.IngeniaMotionController_MainDict[SlaveID_Int]["EnabledState_ToBeSet"] = 1
+
+            self.IngeniaMotionController_MainDict[SlaveID_Int]["EnabledState_NeedsToBeSetFlag"] = 1
 
         self.MyPrint_WithoutLogFile("EnabledState_Button_Response: Event fired!")
 
@@ -1765,10 +1892,16 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                 try:
 
                     #######################################################
-                    self.Data_Label["text"] = self.ConvertDictToProperlyFormattedStringForPrinting(self.MostRecentDataDict,
-                                                                                                    NumberOfDecimalsPlaceToUse = 5,
-                                                                                                    NumberOfEntriesPerLine = 1,
-                                                                                                    NumberOfTabsBetweenItems = 3)
+                    self.Data_Label["text"] = "Time, Tx: " + self.ConvertFloatToStringWithNumberOfLeadingNumbersAndDecimalPlaces_NumberOrListInput(self.CurrentTime_CalculatedFromDedicatedTxThread, 0, 3) +\
+                                                "\t\tTime, Rx: " + self.ConvertFloatToStringWithNumberOfLeadingNumbersAndDecimalPlaces_NumberOrListInput(self.CurrentTime_CalculatedFromDedicatedRxThread, 0, 3) +\
+                                                "\nFrequency, Tx: " + self.ConvertFloatToStringWithNumberOfLeadingNumbersAndDecimalPlaces_NumberOrListInput(self.DataStreamingFrequency_CalculatedFromDedicatedTxThread, 0, 3) +\
+                                                "\t\tFrequency, Rx: " + self.ConvertFloatToStringWithNumberOfLeadingNumbersAndDecimalPlaces_NumberOrListInput(self.DataStreamingFrequency_CalculatedFromDedicatedRxThread, 0, 3)
+
+                    self.Data_Label["text"] = self.Data_Label["text"] + self.ConvertDictToProperlyFormattedStringForPrinting(self.MostRecentDataDict["IngeniaMotionController_MainDict"],
+                                                                                                    NumberOfDecimalsPlaceToUse = 3,
+                                                                                                    NumberOfEntriesPerLine = 2,
+                                                                                                    NumberOfTabsBetweenItems = 2)
+
                     #######################################################
 
                     #######################################################

@@ -6,9 +6,9 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision B, 11/01/2024
+Software Revision C, 11/02/2024
 
-Verified working on: Python 3.12 for Windows 10, 11 64-bit.
+Verified working on: Python 3.12 for Windows 11 64-bit and Raspberry Pi Buster (may work on Mac in non-GUI mode, but haven't tested yet).
 '''
 
 __author__ = 'reuben.brewer'
@@ -112,11 +112,11 @@ def CreateExcelChart(FileName_to_save_full_path, DataOrderedDictToWrite):
     
         #print("FileName_to_save_full_path: " + FileName_to_save_full_path)
 
-        CSVdataLogger_VariableNamesForHeaderList = ["Time (S)",
-                                                    "Position_Actual",
-                                                    "Velocity_Actual",
-                                                    "CurrentDirect_Actual",
-                                                    "CurrentQuadrature_Actual"]
+        CSVdataLogger_VariableNamesForHeaderList = ["Time",
+                                                    "AngleFloatDegrees",
+                                                    "AnalogSensor_Value_AO0",
+                                                    "DebugVar",
+                                                    "DebugVar_Filtered"]
     
         workbook = xlsxwriter.Workbook(FileName_to_save_full_path)
         worksheet = workbook.add_worksheet()
@@ -146,14 +146,14 @@ def CreateExcelChart(FileName_to_save_full_path, DataOrderedDictToWrite):
         ##########################################################################################################
         ##########################################################################################################
         ##########################################################################################################
-        VariableNamesListToInludeOnSinglePlotVsTime = ["CurrentQuadrature_Actual"]
+        VariableNamesListToInludeOnSinglePlotVsTime = ["DebugVar", "DebugVar_Filtered"] #["AngleFloatDegrees"]#["AnalogSensor_Value_AO0"]#["DebugVar]#[DebugVar_Filtered]
 
         ##########################################################################################################
         LengthMax = 31 - 10  # Excel worksheet name must be <= 31 chars.
         VariableNamesListToInludeOnSinglePlotVsTime_NameLengthLimited = list()
         SumOfAllVariableNamesAsString = ""
         for index, VariableName in enumerate(VariableNamesListToInludeOnSinglePlotVsTime):
-            if len(VariableName) >= LengthMax:
+            if len(VariableName) >= LengthMax: #Limit each, individual name for when it's printed on the plot
                 VariableNamesListToInludeOnSinglePlotVsTime_NameLengthLimited.append(VariableName[0:LengthMax])
             else:
                 VariableNamesListToInludeOnSinglePlotVsTime_NameLengthLimited.append(VariableName)
@@ -162,17 +162,19 @@ def CreateExcelChart(FileName_to_save_full_path, DataOrderedDictToWrite):
                 SumOfAllVariableNamesAsString = SumOfAllVariableNamesAsString + VariableNamesListToInludeOnSinglePlotVsTime_NameLengthLimited[index] + ", "
             else:
                 SumOfAllVariableNamesAsString = SumOfAllVariableNamesAsString + VariableNamesListToInludeOnSinglePlotVsTime_NameLengthLimited[index]
+
+        SumOfAllVariableNamesAsString = SumOfAllVariableNamesAsString[0:LengthMax] #Limit the overall Plot title length
         ##########################################################################################################
 
         print("VariableNamesListToInludeOnSinglePlotVsTime_NameLengthLimited: " + str(VariableNamesListToInludeOnSinglePlotVsTime_NameLengthLimited))
-        print("SumOfAllVariableNamesAsString: " + str(SumOfAllVariableNamesAsString))
+        print("SumOfAllVariableNamesAsString: " + str(SumOfAllVariableNamesAsString) + ", Length = " + str(len(SumOfAllVariableNamesAsString)))
 
         VariableName_vs_Time_Xaxis_Chart_sheet = workbook.add_chartsheet(SumOfAllVariableNamesAsString + " vs Time")
         VariableName_vs_Time_Xaxis_Chart = workbook.add_chart({'type': 'scatter'}) #http://xlsxwriter.readthedocs.io/example_chart_scatter.html
 
         ##########################################################################################################
         for index, VariableName in enumerate(VariableNamesListToInludeOnSinglePlotVsTime):
-            VariableName_vs_Time_Xaxis_Chart.add_series({'name': VariableNamesListToInludeOnSinglePlotVsTime_NameLengthLimited[index] + ' vs Time','categories': "=Sheet1!$" + VariableNameVsExcelColumnLetterDict["Time (S)"] + "$2:$" + VariableNameVsExcelColumnLetterDict["Time (S)"] + "$"+str(NumberOfDataRows+1),'values': "=Sheet1!$" + VariableNameVsExcelColumnLetterDict[VariableName] + "$2:$" + VariableNameVsExcelColumnLetterDict[VariableName] + "$" + str(NumberOfDataRows+1)}) #X VALUES FIRST, THEN Y
+            VariableName_vs_Time_Xaxis_Chart.add_series({'name': VariableNamesListToInludeOnSinglePlotVsTime_NameLengthLimited[index] + ' vs Time','categories': "=Sheet1!$" + VariableNameVsExcelColumnLetterDict["Time"] + "$2:$" + VariableNameVsExcelColumnLetterDict["Time"] + "$"+str(NumberOfDataRows+1),'values': "=Sheet1!$" + VariableNameVsExcelColumnLetterDict[VariableName] + "$2:$" + VariableNameVsExcelColumnLetterDict[VariableName] + "$" + str(NumberOfDataRows+1)}) #X VALUES FIRST, THEN Y
         ##########################################################################################################
 
         VariableName_vs_Time_Xaxis_Chart.set_title ({'name': SumOfAllVariableNamesAsString + ' vs Time'})

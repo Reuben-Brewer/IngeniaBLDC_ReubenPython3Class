@@ -6,7 +6,7 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision B, 11/01/2024
+Software Revision C, 11/02/2024
 
 Verified working on: Python 3.12 for Windows 10, 11 64-bit.
 '''
@@ -18,7 +18,6 @@ from CSVdataLogger_ReubenPython3Class import *
 from ElevatePythonPermission_ReubenPython3Class import *
 from EntryListWithBlinking_ReubenPython2and3Class import *
 from IngeniaBLDC_ReubenPython3Class import *
-from LowPassFilterForDictsOfLists_ReubenPython2and3Class import *
 from MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class import *
 from MyPrint_ReubenPython2and3Class import *
 ##########################################
@@ -485,7 +484,7 @@ if __name__ == '__main__':
     USE_IngeniaBLDC_FLAG = 1
 
     global USE_EntryListWithBlinking_FLAG
-    USE_EntryListWithBlinking_FLAG = 0
+    USE_EntryListWithBlinking_FLAG = 1
 
     global USE_MyPrint_FLAG
     USE_MyPrint_FLAG = 0
@@ -494,7 +493,7 @@ if __name__ == '__main__':
     USE_MyPlotterPureTkinterStandAloneProcess_FLAG = 1
 
     global USE_CSVdataLogger_FLAG
-    USE_CSVdataLogger_FLAG = 1
+    USE_CSVdataLogger_FLAG = 0
 
     global USE_KEYBOARD_FLAG
     USE_KEYBOARD_FLAG = 1
@@ -617,13 +616,16 @@ if __name__ == '__main__':
     SinusoidalMotionInput_MinValue_PositionControl = 0
 
     global SinusoidalMotionInput_MaxValue_PositionControl
-    SinusoidalMotionInput_MaxValue_PositionControl = 10.0*(2048*4)
+    SinusoidalMotionInput_MaxValue_PositionControl = (36.0/360.0)
 
     global SinusoidalMotionInput_ROMtestTimeToPeakAngle
-    SinusoidalMotionInput_ROMtestTimeToPeakAngle = 1.0
+    SinusoidalMotionInput_ROMtestTimeToPeakAngle = 0.25
 
     global SinusoidalMotionInput_TimeGain
     SinusoidalMotionInput_TimeGain = math.pi / (2.0 * SinusoidalMotionInput_ROMtestTimeToPeakAngle)
+
+    global SinusoidalMotionInput_CommandedValue
+    SinusoidalMotionInput_CommandedValue = 0.0
 
     global DesiredSlaveID_List
     DesiredSlaveID_List = [1, 2]
@@ -654,6 +656,30 @@ if __name__ == '__main__':
 
     global IngeniaBLDC_MostRecentDict_CurrentQuadrature_Actual
     IngeniaBLDC_MostRecentDict_CurrentQuadrature_Actual = -11111.0
+    
+    global IngeniaBLDC_PositionPIDgains_Kp_1
+    IngeniaBLDC_PositionPIDgains_Kp_1 = 0.005
+    
+    global IngeniaBLDC_PositionPIDgains_Ki_1
+    IngeniaBLDC_PositionPIDgains_Ki_1 = 0.010
+    
+    global IngeniaBLDC_PositionPIDgains_Kd_1
+    IngeniaBLDC_PositionPIDgains_Kd_1 = 0.005
+
+    global IngeniaBLDC_PositionPIDgains_Kp_2
+    IngeniaBLDC_PositionPIDgains_Kp_2 = 0.005
+
+    global IngeniaBLDC_PositionPIDgains_Ki_2
+    IngeniaBLDC_PositionPIDgains_Ki_2 = 0.010
+
+    global IngeniaBLDC_PositionPIDgains_Kd_2
+    IngeniaBLDC_PositionPIDgains_Kd_2 = 0.005
+
+    global IngeniaBLDC_NeedToUpdatePositionPIDgainsFlag
+    IngeniaBLDC_NeedToUpdatePositionPIDgainsFlag = 1
+
+    global MotorCPR
+    MotorCPR = (2048*4)
     #################################################
     #################################################
 
@@ -680,27 +706,6 @@ if __name__ == '__main__':
     CSVdataLogger_MostRecentDict_Time = -11111.0
     #################################################
     #################################################
-
-    ####################################################
-    ####################################################
-    global LowPassFilterForDictsOfLists_ReubenPython2and3ClassObject
-
-    global LOWPASSFILTER_OPEN_FLAG
-    LOWPASSFILTER_OPEN_FLAG = -1
-
-    global LowPassFilterForDictsOfLists_ReubenPython2and3ClassObject_MostRecentDict
-    LowPassFilterForDictsOfLists_ReubenPython2and3ClassObject_MostRecentDict = dict()
-
-    global Raw_1
-    Raw_1 = 0.0
-
-    global Filtered_1
-    Filtered_1 = 0.0
-
-    global Velocity_LowPassFilterForDictsOfLists_ExponentialSmoothingFilterLambda
-    Velocity_LowPassFilterForDictsOfLists_ExponentialSmoothingFilterLambda = 0.98
-    ####################################################
-    ####################################################
 
     #################################################
     #################################################
@@ -784,7 +789,7 @@ if __name__ == '__main__':
     global IngeniaBLDC_setup_dict
     IngeniaBLDC_setup_dict = dict([("GUIparametersDict", IngeniaBLDC_GUIparametersDict),
                                     ("NameToDisplay_UserSet", "IngeniaBLDC"),
-                                    ("DesiredInterfaceName", "Intel(R) Ethernet Connection (2) I219-LM"), #likely "Intel(R) Ethernet Connection (2) I219-LM" or "Realtek USB GbE Family Controller"
+                                    ("DesiredInterfaceName", "Realtek USB GbE Family Controller"), #likely "Intel(R) Ethernet Connection (2) I219-LM" or "Realtek USB GbE Family Controller"
                                     ("DesiredSlaveID_List", DesiredSlaveID_List),
                                     ("XDFfileDictionaryPath", os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "cap-xcr-e_eoe_2.4.1.xdf"), #"den-xcr-e_eoe_2.5.0.xdf" #"cap-xcr-e_eoe_2.4.1.xdf"
                                     ("LaunchFlag_MotionLab3_IngEcatGateway_EoEservice", 0),
@@ -792,7 +797,9 @@ if __name__ == '__main__':
                                     ("DedicatedRxThread_TimeToSleepEachLoop", 0.001),
                                     ("DedicatedTxThread_TimeToSleepEachLoop", 0.001),
                                     ("EnableMotorAutomaticallyAfterEstopRestorationFlag", 1),
-                                    ("EnableMotorAtStartOfProgramFlag", 1)])
+                                    ("EnableMotorAtStartOfProgramFlag", 1),
+                                    ("GetVariablesEveryNloopsCycles", 1),
+                                    ("ListOfVariableNameStringsToGet", ["Position_Actual", "Current_Quadrature_Actual"])])
     #################################################
 
     #################################################
@@ -869,29 +876,10 @@ if __name__ == '__main__':
     #################################################
     #################################################
 
-    ####################################################
-    ####################################################
-    try:
-        global LowPassFilterForDictsOfLists_DictOfVariableFilterSettings
-        LowPassFilterForDictsOfLists_DictOfVariableFilterSettings = dict([("Velocity", dict([("UseMedianFilterFlag", 1),
-                                                              ("UseExponentialSmoothingFilterFlag", 1),
-                                                              ("ExponentialSmoothingFilterLambda", Velocity_LowPassFilterForDictsOfLists_ExponentialSmoothingFilterLambda)]))]) #new_filtered_value = k * raw_sensor_value + (1 - k) * old_filtered_value
-
-        LowPassFilterForDictsOfLists_ReubenPython2and3ClassObject_setup_dict = dict([("DictOfVariableFilterSettings", LowPassFilterForDictsOfLists_DictOfVariableFilterSettings)])
-
-        LowPassFilterForDictsOfLists_ReubenPython2and3ClassObject = LowPassFilterForDictsOfLists_ReubenPython2and3Class(LowPassFilterForDictsOfLists_ReubenPython2and3ClassObject_setup_dict)
-        LOWPASSFILTER_OPEN_FLAG = LowPassFilterForDictsOfLists_ReubenPython2and3ClassObject.OBJECT_CREATED_SUCCESSFULLY_FLAG
-
-    except:
-        exceptions = sys.exc_info()[0]
-        print("LowPassFilterForDictsOfLists_ReubenPython2and3Class __init__: Exceptions: %s" % exceptions)
-    ####################################################
-    ####################################################
-
     #################################################
     #################################################
     global EntryListWithBlinking_ReubenPython2and3ClassObject_GUIparametersDict
-    EntryListWithBlinking_ReubenPython2and3ClassObject_GUIparametersDict = dict([("root", Tab_MainControls),
+    EntryListWithBlinking_ReubenPython2and3ClassObject_GUIparametersDict = dict([("root", Tab_IngeniaBLDC), #Tab_MainControls
                                     ("UseBorderAroundThisGuiObjectFlag", 0),
                                     ("GUI_ROW", GUI_ROW_EntryListWithBlinking),
                                     ("GUI_COLUMN", GUI_COLUMN_EntryListWithBlinking),
@@ -901,15 +889,14 @@ if __name__ == '__main__':
                                     ("GUI_COLUMNSPAN", GUI_COLUMNSPAN_EntryListWithBlinking)])
 
     global EntryListWithBlinking_Variables_ListOfDicts
-    EntryListWithBlinking_Variables_ListOfDicts = [dict([("Name", "Velocity_LowPassFilterForDictsOfLists_ExponentialSmoothingFilterLambda"),
-                                                         ("Type", "float"),
-                                                         ("StartingVal", Velocity_LowPassFilterForDictsOfLists_ExponentialSmoothingFilterLambda),
-                                                         ("MinVal", 0.0),
-                                                         ("MaxVal", 1.0),
-                                                         ("EntryBlinkEnabled", 0),
-                                                         ("EntryWidth", EntryWidth),
-                                                         ("LabelWidth", LabelWidth),
-                                                         ("FontSize", FontSize)])]
+    EntryListWithBlinking_Variables_ListOfDicts = [dict([("Name", "SinusoidalMotionInput_MaxValue_PositionControl"),("Type", "float"),("StartingVal", SinusoidalMotionInput_MaxValue_PositionControl),("MinVal", 0.0),("MaxVal", 360.0),("EntryBlinkEnabled", 0),("EntryWidth", EntryWidth),("LabelWidth", LabelWidth),("FontSize", FontSize)]),
+                                                   dict([("Name", "SinusoidalMotionInput_ROMtestTimeToPeakAngle"),("Type", "float"),("StartingVal", SinusoidalMotionInput_ROMtestTimeToPeakAngle),("MinVal", 0.0),("MaxVal", 360.0),("EntryBlinkEnabled", 0),("EntryWidth", EntryWidth),("LabelWidth", LabelWidth),("FontSize", FontSize)]),
+                                                   dict([("Name", "IngeniaBLDC_PositionPIDgains_Kp_1"),("Type", "float"),("StartingVal", IngeniaBLDC_PositionPIDgains_Kp_1),("MinVal", -1000.0),("MaxVal", 1000.0),("EntryBlinkEnabled", 0),("EntryWidth", EntryWidth),("LabelWidth", LabelWidth),("FontSize", FontSize)]),
+                                                   dict([("Name", "IngeniaBLDC_PositionPIDgains_Ki_1"),("Type", "float"),("StartingVal", IngeniaBLDC_PositionPIDgains_Ki_1),("MinVal", -1000.0),("MaxVal", 1000.0),("EntryBlinkEnabled", 0),("EntryWidth", EntryWidth),("LabelWidth", LabelWidth),("FontSize", FontSize)]),
+                                                   dict([("Name", "IngeniaBLDC_PositionPIDgains_Kd_1"),("Type", "float"),("StartingVal", IngeniaBLDC_PositionPIDgains_Kd_1),("MinVal", -1000.0),("MaxVal", 1000.0),("EntryBlinkEnabled", 0),("EntryWidth", EntryWidth),("LabelWidth", LabelWidth),("FontSize", FontSize)]),
+                                                   dict([("Name", "IngeniaBLDC_PositionPIDgains_Kp_2"),("Type", "float"),("StartingVal", IngeniaBLDC_PositionPIDgains_Kp_2),("MinVal", -1000.0),("MaxVal", 1000.0),("EntryBlinkEnabled", 0),("EntryWidth", EntryWidth),("LabelWidth", LabelWidth),("FontSize", FontSize)]),
+                                                   dict([("Name", "IngeniaBLDC_PositionPIDgains_Ki_2"),("Type", "float"),("StartingVal", IngeniaBLDC_PositionPIDgains_Ki_2),("MinVal", -1000.0),("MaxVal", 1000.0),("EntryBlinkEnabled", 0),("EntryWidth", EntryWidth),("LabelWidth", LabelWidth),("FontSize", FontSize)]),
+                                                   dict([("Name", "IngeniaBLDC_PositionPIDgains_Kd_2"),("Type", "float"),("StartingVal", IngeniaBLDC_PositionPIDgains_Kd_2),("MinVal", -1000.0),("MaxVal", 1000.0),("EntryBlinkEnabled", 0),("EntryWidth", EntryWidth),("LabelWidth", LabelWidth),("FontSize", FontSize)])]
 
     global EntryListWithBlinking_ReubenPython2and3ClassObject_setup_dict
     EntryListWithBlinking_ReubenPython2and3ClassObject_setup_dict = dict([("GUIparametersDict", EntryListWithBlinking_ReubenPython2and3ClassObject_GUIparametersDict),
@@ -1045,14 +1032,6 @@ if __name__ == '__main__':
     #################################################
     #################################################
 
-    ####################################################
-    ####################################################
-    if LOWPASSFILTER_OPEN_FLAG != 1:
-        print("Failed to open LowPassFilterForDictsOfLists_ReubenPython2and3ClassObject.")
-        #ExitProgram_Callback()
-    ####################################################
-    ####################################################
-
     #################################################
     #################################################
     if USE_EntryListWithBlinking_FLAG == 1 and EntryListWithBlinking_OPEN_FLAG != 1:
@@ -1072,10 +1051,11 @@ if __name__ == '__main__':
     #################################################
     #################################################
     if IngeniaBLDC_OPEN_FLAG == 1:
-        for SlaveID_Int in DesiredSlaveID_List:
-            IngeniaBLDC_Object.SetPositionPIDgains_ExternalProgram(SlaveID_Int, Kp_ToBeSet=0.005, Ki_ToBeSet=0.001, Kd_ToBeSet=0.001, PrintDebugFlag=1)
-            #IngeniaBLDC_Object.SetVelocityPIDgains_ExternalProgram(SlaveID_Int Kp_ToBeSet=0.0051, Ki_ToBeSet=0.0011, Kd_ToBeSet=0.0011, PrintDebugFlag=1)
-            IngeniaBLDC_Object.SetMaxCurrent_ExternalProgram(SlaveID_Int, 2.0, PrintDebugFlag=1)
+        pass
+        #for SlaveID_Int in DesiredSlaveID_List:
+        #    IngeniaBLDC_Object.SetPositionPIDgains_ExternalProgram(SlaveID_Int, Kp_ToBeSet=0.005, Ki_ToBeSet=0.001, Kd_ToBeSet=0.001, PrintDebugFlag=1)
+        #    #IngeniaBLDC_Object.SetVelocityPIDgains_ExternalProgram(SlaveID_Int Kp_ToBeSet=0.0051, Ki_ToBeSet=0.0011, Kd_ToBeSet=0.0011, PrintDebugFlag=1)
+        #    IngeniaBLDC_Object.SetMaxCurrent_ExternalProgram(SlaveID_Int, 2.0, PrintDebugFlag=1)
     #################################################
     #################################################
 
@@ -1102,11 +1082,16 @@ if __name__ == '__main__':
                 #print("DataUpdateNumber = " + str(EntryListWithBlinking_MostRecentDict_DataUpdateNumber) + ", EntryListWithBlinking_MostRecentDict: " + str(EntryListWithBlinking_MostRecentDict))
 
                 if EntryListWithBlinking_MostRecentDict_DataUpdateNumber > 1:
-                    Velocity_LowPassFilterForDictsOfLists_ExponentialSmoothingFilterLambda = EntryListWithBlinking_MostRecentDict["Velocity_LowPassFilterForDictsOfLists_ExponentialSmoothingFilterLambda"]
+                    SinusoidalMotionInput_MaxValue_PositionControl = EntryListWithBlinking_MostRecentDict["SinusoidalMotionInput_MaxValue_PositionControl"]
+                    SinusoidalMotionInput_ROMtestTimeToPeakAngle = EntryListWithBlinking_MostRecentDict["SinusoidalMotionInput_ROMtestTimeToPeakAngle"]
+                    IngeniaBLDC_PositionPIDgains_Kp_1 = EntryListWithBlinking_MostRecentDict["IngeniaBLDC_PositionPIDgains_Kp_1"]
+                    IngeniaBLDC_PositionPIDgains_Ki_1 = EntryListWithBlinking_MostRecentDict["IngeniaBLDC_PositionPIDgains_Ki_1"]
+                    IngeniaBLDC_PositionPIDgains_Kd_1 = EntryListWithBlinking_MostRecentDict["IngeniaBLDC_PositionPIDgains_Kd_1"]
+                    IngeniaBLDC_PositionPIDgains_Kp_2 = EntryListWithBlinking_MostRecentDict["IngeniaBLDC_PositionPIDgains_Kp_2"]
+                    IngeniaBLDC_PositionPIDgains_Ki_2 = EntryListWithBlinking_MostRecentDict["IngeniaBLDC_PositionPIDgains_Ki_2"]
+                    IngeniaBLDC_PositionPIDgains_Kd_2 = EntryListWithBlinking_MostRecentDict["IngeniaBLDC_PositionPIDgains_Kd_2"]
 
-                    if LOWPASSFILTER_OPEN_FLAG == 1:
-                        LowPassFilterForDictsOfLists_DictOfVariableFilterSettings["Velocity"]["ExponentialSmoothingFilterLambda"] = Velocity_LowPassFilterForDictsOfLists_ExponentialSmoothingFilterLambda
-                        LowPassFilterForDictsOfLists_ReubenPython2and3ClassObject.AddOrUpdateDictOfVariableFilterSettingsFromExternalProgram(LowPassFilterForDictsOfLists_DictOfVariableFilterSettings)
+                    IngeniaBLDC_NeedToUpdatePositionPIDgainsFlag = 1
 
         ###################################################
 
@@ -1134,32 +1119,31 @@ if __name__ == '__main__':
         ###################################################
         ###################################################
 
-        #################################################### GET's
-        ####################################################
-        if LOWPASSFILTER_OPEN_FLAG == 1:
-
-            LowPassFilterForDictsOfLists_ReubenPython2and3ClassObject.AddDataDictFromExternalProgram(dict([("Velocity", IngeniaBLDC_MostRecentDict_Velocity_Actual)])) #Update data
-
-            LowPassFilterForDictsOfLists_ReubenPython2and3ClassObject_MostRecentDict = LowPassFilterForDictsOfLists_ReubenPython2and3ClassObject.GetMostRecentDataDict() #Get latest data
-            #print("LowPassFilterForDictsOfLists_ReubenPython2and3ClassObject_MostRecentDict: " + str(LowPassFilterForDictsOfLists_ReubenPython2and3ClassObject_MostRecentDict))
-
-            if "Velocity" in LowPassFilterForDictsOfLists_ReubenPython2and3ClassObject_MostRecentDict:
-                Raw_1 = LowPassFilterForDictsOfLists_ReubenPython2and3ClassObject_MostRecentDict["Velocity"]["Raw_MostRecentValuesList"]
-                Filtered_1 = LowPassFilterForDictsOfLists_ReubenPython2and3ClassObject_MostRecentDict["Velocity"]["Filtered_MostRecentValuesList"]
-
-        ####################################################
-        ####################################################
-
         ################################################### SET's
         ###################################################
         if IngeniaBLDC_OPEN_FLAG == 1:
 
+            ###################################################
+            if IngeniaBLDC_NeedToUpdatePositionPIDgainsFlag == 1:
+                IngeniaBLDC_Object.SetPositionPIDgains_ExternalProgram(1, IngeniaBLDC_PositionPIDgains_Kp_1, IngeniaBLDC_PositionPIDgains_Ki_1, IngeniaBLDC_PositionPIDgains_Kd_1)
+                IngeniaBLDC_Object.SetPositionPIDgains_ExternalProgram(2, IngeniaBLDC_PositionPIDgains_Kp_2, IngeniaBLDC_PositionPIDgains_Ki_2, IngeniaBLDC_PositionPIDgains_Kd_2)
+
+                IngeniaBLDC_NeedToUpdatePositionPIDgainsFlag = 0
+            ###################################################
+
+            ###################################################
             if USE_SINUSOIDAL_POS_CONTROL_INPUT_FLAG == 1:
+                SinusoidalMotionInput_MinValue_PositionControl = -1.0*SinusoidalMotionInput_MaxValue_PositionControl
+                SinusoidalMotionInput_TimeGain = math.pi / (2.0 * SinusoidalMotionInput_ROMtestTimeToPeakAngle)
+                
                 SinusoidalMotionInput_CommandedValue = (SinusoidalMotionInput_MaxValue_PositionControl + SinusoidalMotionInput_MinValue_PositionControl)/2.0 + \
                                                        0.5*abs(SinusoidalMotionInput_MaxValue_PositionControl - SinusoidalMotionInput_MinValue_PositionControl)*math.sin(SinusoidalMotionInput_TimeGain*CurrentTime_MainLoopThread)
 
+                SinusoidalMotionInput_CommandedValue = SinusoidalMotionInput_CommandedValue*MotorCPR
+
                 for SlaveID_Int in DesiredSlaveID_List:
                     IngeniaBLDC_Object.SetPosition_ExternalProgram(SlaveID_Int, SinusoidalMotionInput_CommandedValue)
+            ###################################################
 
         ###################################################
         ###################################################
@@ -1235,11 +1219,6 @@ if __name__ == '__main__':
     #################################################
     if CSVdataLogger_OPEN_FLAG == 1:
         CSVdataLogger_ReubenPython3ClassObject.ExitProgram_Callback()
-    #################################################
-
-    #################################################
-    if LOWPASSFILTER_OPEN_FLAG == 1:
-        LowPassFilterForDictsOfLists_ReubenPython2and3ClassObject.ExitProgram_Callback()
     #################################################
 
     #################################################
