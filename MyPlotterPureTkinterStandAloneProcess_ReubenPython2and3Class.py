@@ -6,9 +6,9 @@ reuben.brewer@gmail.com,
 www.reubotics.com
 
 Apache 2 License
-Software Revision N, 10/17/2024
+Software Revision O, 11/03/2024
 
-Verified working on: Python 3.12 for Windows 8.1, 10 64-bit, Ubuntu 20.04, and Raspberry Pi Buster (no Mac testing yet).
+Verified working on: Python 3.12 for Windows 8.1, 10, and 11 64-bit, Ubuntu 20.04, and Raspberry Pi Buster (no Mac testing yet).
 THE SEPARATE-PROCESS-SPAWNING COMPONENT OF THIS CLASS IS NOT AVAILABLE IN PYTHON 2 DUE TO LIMITATION OF
 "multiprocessing.set_start_method('spawn', force=True)" ONLY BEING AVAILABLE IN PYTHON 3. PLOTTING WITHIN A SINGLE PROCESS STILL WORKS.
 '''
@@ -33,6 +33,9 @@ import platform
 import psutil
 import pexpect
 import subprocess
+
+from astropy.table.bst import Epsilon
+
 #########################################################
 
 #########################################################
@@ -245,6 +248,15 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
             self.WatchdogTimerDurationSeconds_ExpirationWillEndStandAlonePlottingProcess = 0.0
 
         print("MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class __init__: WatchdogTimerDurationSeconds_ExpirationWillEndStandAlonePlottingProcess: " + str(self.WatchdogTimerDurationSeconds_ExpirationWillEndStandAlonePlottingProcess))
+        ##########################################
+
+        ##########################################
+        if "AxisMinMaxEpsilon" in setup_dict:
+            self.AxisMinMaxEpsilon = self.PassThroughFloatValuesInRange_ExitProgramOtherwise("AxisMinMaxEpsilon", setup_dict["AxisMinMaxEpsilon"], 0.000001, 1000.0)
+        else:
+            self.AxisMinMaxEpsilon = 0.000001
+
+        print("MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class __init__: AxisMinMaxEpsilon: " + str(self.AxisMinMaxEpsilon))
         ##########################################
 
         ##########################################
@@ -1140,33 +1152,28 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
 
         try:
 
-            if (self.X_max - self.X_min) != 0.0 and (self.Y_max - self.Y_min) != 0.0:
+            x = PointListXY[0]
+            y = PointListXY[1]
 
-                x = PointListXY[0]
-                y = PointListXY[1]
+            W = self.GraphCanvasWidth*0.8 # #If we use the whole width, then we'll clip labels, tick marks, etc.
+            H = self.GraphCanvasHeight*0.9 # #If we use the whole width, then we'll clip labels, tick marks, etc.
 
-                W = self.GraphCanvasWidth*0.8 # #If we use the whole width, then we'll clip labels, tick marks, etc.
-                H = self.GraphCanvasHeight*0.9 # #If we use the whole width, then we'll clip labels, tick marks, etc.
+            m_Xaxis = ((W - self.GraphBoxOutline_X0)/(self.X_max - self.X_min))
+            b_Xaxis = W - m_Xaxis*self.X_max
 
-                m_Xaxis = ((W - self.GraphBoxOutline_X0)/(self.X_max - self.X_min))
-                b_Xaxis = W - m_Xaxis*self.X_max
-
-                X_out = m_Xaxis*x + b_Xaxis
+            X_out = m_Xaxis*x + b_Xaxis
 
 
-                m_Yaxis = ((H - self.GraphBoxOutline_Y0) / (self.Y_max - self.Y_min))
-                b_Yaxis = H - m_Yaxis * self.Y_max
+            m_Yaxis = ((H - self.GraphBoxOutline_Y0) / (self.Y_max - self.Y_min))
+            b_Yaxis = H - m_Yaxis * self.Y_max
 
-                Y_out = m_Yaxis * y + b_Yaxis
+            Y_out = m_Yaxis * y + b_Yaxis
 
 
-                X_out = X_out
-                Y_out = self.GraphCanvasHeight - Y_out #Flip y-axis
+            X_out = X_out
+            Y_out = self.GraphCanvasHeight - Y_out #Flip y-axis
 
-                return [X_out, Y_out]
-
-            else:
-                return PointListXY
+            return [X_out, Y_out]
 
         except:
             exceptions = sys.exc_info()[0]
@@ -1310,6 +1317,13 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
             exceptions = sys.exc_info()[0]
             print("UpdateNewXandYlimits, exceptions: %s" % exceptions)
             #traceback.print_exc()
+
+
+        if abs(X_max_NEW - X_min_NEW) < self.AxisMinMaxEpsilon:
+            X_max_NEW = X_min_NEW + self.AxisMinMaxEpsilon
+
+        if abs(Y_max_NEW - Y_min_NEW) < self.AxisMinMaxEpsilon:
+            Y_max_NEW = Y_min_NEW + self.AxisMinMaxEpsilon
 
         return [X_min_NEW, X_max_NEW, Y_min_NEW, Y_max_NEW]
     ##########################################################################################################

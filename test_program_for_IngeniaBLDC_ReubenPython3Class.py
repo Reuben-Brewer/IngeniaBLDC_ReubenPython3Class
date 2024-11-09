@@ -6,7 +6,7 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision C, 11/02/2024
+Software Revision D, 11/09/2024
 
 Verified working on: Python 3.12 for Windows 10, 11 64-bit.
 '''
@@ -263,6 +263,13 @@ def GUI_update_clock():
     global GUI_RootAfterCallbackInterval_Milliseconds
     global USE_GUI_FLAG
 
+    global LoopCounter_CalculatedFromGUIthread
+    global CurrentTime_CalculatedFromGUIthread
+    global StartingTime_CalculatedFromGUIthread
+    global LastTime_CalculatedFromGUIthread
+    global DataStreamingFrequency_CalculatedFromGUIthread
+    global DataStreamingDeltaT_CalculatedFromGUIthread
+
     global IngeniaBLDC_Object
     global IngeniaBLDC_OPEN_FLAG
     global SHOW_IN_GUI_IngeniaBLDC_FLAG
@@ -284,32 +291,59 @@ def GUI_update_clock():
         if EXIT_PROGRAM_FLAG == 0:
         #########################################################
         #########################################################
+        #########################################################
 
             #########################################################
-            IngeniaBLDC_MostRecentDict_Label["text"] = ConvertDictToProperlyFormattedStringForPrinting(IngeniaBLDC_MostRecentDict, NumberOfDecimalsPlaceToUse=3, NumberOfEntriesPerLine=3, NumberOfTabsBetweenItems=1)
+            #########################################################
+            try:
+                #########################################################
+                CurrentTime_CalculatedFromGUIthread = getPreciseSecondsTimeStampString() - StartingTime_CalculatedFromGUIthread
+                [LoopCounter_CalculatedFromGUIthread, LastTime_CalculatedFromGUIthread, DataStreamingFrequency_CalculatedFromGUIthread, DataStreamingDeltaT_CalculatedFromGUIthread] = UpdateFrequencyCalculation(LoopCounter_CalculatedFromGUIthread, CurrentTime_CalculatedFromGUIthread,
+                                                                                                                                                                                                                  LastTime_CalculatedFromGUIthread, DataStreamingFrequency_CalculatedFromGUIthread,
+                                                                                                                                                                                                                  DataStreamingDeltaT_CalculatedFromGUIthread)
+                #########################################################
+
+                #########################################################
+                IngeniaBLDC_MostRecentDict_Label["text"] = ConvertDictToProperlyFormattedStringForPrinting(IngeniaBLDC_MostRecentDict, NumberOfDecimalsPlaceToUse=3, NumberOfEntriesPerLine=3, NumberOfTabsBetweenItems=1)
+                #########################################################
+
+                #########################################################
+                if IngeniaBLDC_OPEN_FLAG == 1 and SHOW_IN_GUI_IngeniaBLDC_FLAG == 1:
+                    IngeniaBLDC_Object.GUI_update_clock()
+                #########################################################
+
+                #########################################################
+                if EntryListWithBlinking_OPEN_FLAG == 1:
+                    EntryListWithBlinking_ReubenPython2and3ClassObject.GUI_update_clock()
+                #########################################################
+
+                #########################################################
+                if CSVdataLogger_OPEN_FLAG == 1 and SHOW_IN_GUI_CSVdataLogger_FLAG == 1:
+                    CSVdataLogger_ReubenPython3ClassObject.GUI_update_clock()
+                #########################################################
+
+                #########################################################
+                if MyPrint_OPEN_FLAG == 1 and SHOW_IN_GUI_MyPrint_FLAG == 1:
+                    MyPrint_ReubenPython2and3ClassObject.GUI_update_clock()
+                #########################################################
+
+                #########################################################
+                root.after(GUI_RootAfterCallbackInterval_Milliseconds, GUI_update_clock)
+                #########################################################
+
+            #########################################################
             #########################################################
 
             #########################################################
-            if IngeniaBLDC_OPEN_FLAG == 1 and SHOW_IN_GUI_IngeniaBLDC_FLAG == 1:
-                IngeniaBLDC_Object.GUI_update_clock()
+            #########################################################
+            except:
+                exceptions = sys.exc_info()[0]
+                print("GUI_update_clock(), Exceptions: %s" % exceptions)
+                traceback.print_exc()
+            #########################################################
             #########################################################
 
-            #########################################################
-            if EntryListWithBlinking_OPEN_FLAG == 1:
-                EntryListWithBlinking_ReubenPython2and3ClassObject.GUI_update_clock()
-            #########################################################
-
-            #########################################################
-            if CSVdataLogger_OPEN_FLAG == 1 and SHOW_IN_GUI_CSVdataLogger_FLAG == 1:
-                CSVdataLogger_ReubenPython3ClassObject.GUI_update_clock()
-            #########################################################
-
-            #########################################################
-            if MyPrint_OPEN_FLAG == 1 and SHOW_IN_GUI_MyPrint_FLAG == 1:
-                MyPrint_ReubenPython2and3ClassObject.GUI_update_clock()
-            #########################################################
-
-            root.after(GUI_RootAfterCallbackInterval_Milliseconds, GUI_update_clock)
+        #########################################################
         #########################################################
         #########################################################
 
@@ -324,6 +358,32 @@ def ExitProgram_Callback(OptionalArugment = 0):
     print("ExitProgram_Callback event fired!")
 
     EXIT_PROGRAM_FLAG = 1
+##########################################################################################################
+##########################################################################################################
+
+##########################################################################################################
+##########################################################################################################
+def UpdateFrequencyCalculation(LoopCounter, CurrentTime, LastTime, DataStreamingFrequency, DataStreamingDeltaT):
+
+    try:
+
+        DataStreamingDeltaT = CurrentTime - LastTime
+
+        ##########################
+        if DataStreamingDeltaT != 0.0:
+            DataStreamingFrequency = 1.0/DataStreamingDeltaT
+        ##########################
+
+        LastTime = CurrentTime
+
+        LoopCounter = LoopCounter + 1
+
+        return [LoopCounter, LastTime, DataStreamingFrequency, DataStreamingDeltaT]
+
+    except:
+        exceptions = sys.exc_info()[0]
+        print("UpdateFrequencyCalculation, exceptions: %s" % exceptions)
+        return [-11111.0]*4
 ##########################################################################################################
 ##########################################################################################################
 
@@ -389,7 +449,7 @@ def GUI_Thread():
     #################################################
     global IngeniaBLDC_MostRecentDict_Label
     IngeniaBLDC_MostRecentDict_Label = Label(Tab_MainControls, text="IngeniaBLDC_MostRecentDict_Label", width=120, font=("Helvetica", 10))
-    IngeniaBLDC_MostRecentDict_Label.grid(row=0, column=0, padx=1, pady=1, columnspan=1, rowspan=1)
+    IngeniaBLDC_MostRecentDict_Label.grid(row=1, column=0, padx=1, pady=1, columnspan=1, rowspan=1)
     #################################################
     #################################################
 
@@ -397,15 +457,15 @@ def GUI_Thread():
     #################################################
     global ButtonsFrame
     ButtonsFrame = Frame(Tab_MainControls)
-    ButtonsFrame.grid(row = 1, column = 0, padx = 10, pady = 10, rowspan = 1, columnspan = 1)
+    ButtonsFrame.grid(row = 0, column = 0, padx = 10, pady = 10, rowspan = 1, columnspan = 1)
     #################################################
     #################################################
 
     #################################################
     #################################################
-    global ResetTare_Button
-    ResetTare_Button = Button(ButtonsFrame, text="Reset Tare", state="normal", width=20, command=lambda: ResetTare_Button_Response())
-    #ResetTare_Button.grid(row=0, column=0, padx=10, pady=10, columnspan=1, rowspan=1)
+    global ZeroEncoderOffsetOnAllMotors_Button
+    ZeroEncoderOffsetOnAllMotors_Button = Button(ButtonsFrame, text="Toggle Enable", state="normal", width=20, command=lambda: ZeroEncoderOffsetOnAllMotors_Button_Response())
+    ZeroEncoderOffsetOnAllMotors_Button.grid(row=0, column=0, padx=10, pady=10, columnspan=1, rowspan=1)
     #################################################
     #################################################
 
@@ -429,10 +489,10 @@ def GUI_Thread():
 
 ##########################################################################################################
 ##########################################################################################################
-def ResetTare_Button_Response():
-    global ResetTare_EventNeedsToBeFiredFlag
+def ZeroEncoderOffsetOnAllMotors_Button_Response():
+    global ZeroEncoderOffsetOnAllMotors_EventNeedsToBeFiredFlag
 
-    ResetTare_EventNeedsToBeFiredFlag = 1
+    ZeroEncoderOffsetOnAllMotors_EventNeedsToBeFiredFlag = 1
 
 ##########################################################################################################
 ##########################################################################################################
@@ -484,13 +544,13 @@ if __name__ == '__main__':
     USE_IngeniaBLDC_FLAG = 1
 
     global USE_EntryListWithBlinking_FLAG
-    USE_EntryListWithBlinking_FLAG = 1
+    USE_EntryListWithBlinking_FLAG = 0
 
     global USE_MyPrint_FLAG
     USE_MyPrint_FLAG = 0
 
     global USE_MyPlotterPureTkinterStandAloneProcess_FLAG
-    USE_MyPlotterPureTkinterStandAloneProcess_FLAG = 1
+    USE_MyPlotterPureTkinterStandAloneProcess_FLAG = 0 #unicorn
 
     global USE_CSVdataLogger_FLAG
     USE_CSVdataLogger_FLAG = 0
@@ -530,7 +590,7 @@ if __name__ == '__main__':
     GUI_PADX_IngeniaBLDC = 1
     GUI_PADY_IngeniaBLDC = 1
     GUI_ROWSPAN_IngeniaBLDC = 1
-    GUI_COLUMNSPAN_IngeniaBLDC = 1
+    GUI_COLUMNSPAN_IngeniaBLDC = 2
 
     global GUI_ROW_EntryListWithBlinking
     global GUI_COLUMN_EntryListWithBlinking
@@ -581,11 +641,34 @@ if __name__ == '__main__':
     global EXIT_PROGRAM_FLAG
     EXIT_PROGRAM_FLAG = 0
 
+    #################################################
     global CurrentTime_MainLoopThread
     CurrentTime_MainLoopThread = -11111.0
 
     global StartingTime_MainLoopThread
     StartingTime_MainLoopThread = -11111.0
+    #################################################
+
+    #################################################
+    global LoopCounter_CalculatedFromGUIthread
+    LoopCounter_CalculatedFromGUIthread = 0
+
+    global CurrentTime_CalculatedFromGUIthread
+    CurrentTime_CalculatedFromGUIthread = -11111.0
+
+    global StartingTime_CalculatedFromGUIthread
+    StartingTime_CalculatedFromGUIthread = -11111.0
+
+    global LastTime_CalculatedFromGUIthread
+    LastTime_CalculatedFromGUIthread = -11111.0
+
+    global DataStreamingFrequency_CalculatedFromGUIthread
+    DataStreamingFrequency_CalculatedFromGUIthread = -1
+
+    global DataStreamingDeltaT_CalculatedFromGUIthread
+    DataStreamingDeltaT_CalculatedFromGUIthread = -1
+    #################################################
+
 
     global root
 
@@ -596,7 +679,7 @@ if __name__ == '__main__':
     root_Ypos = 20
 
     global root_width
-    root_width = 1020
+    root_width = 1400#1020
 
     global root_height
     root_height = 1020 - root_Ypos
@@ -607,10 +690,10 @@ if __name__ == '__main__':
     global Tab_MyPrint
 
     global GUI_RootAfterCallbackInterval_Milliseconds
-    GUI_RootAfterCallbackInterval_Milliseconds = 30
+    GUI_RootAfterCallbackInterval_Milliseconds = 5
     
-    global ResetTare_EventNeedsToBeFiredFlag
-    ResetTare_EventNeedsToBeFiredFlag = 0
+    global ZeroEncoderOffsetOnAllMotors_EventNeedsToBeFiredFlag
+    ZeroEncoderOffsetOnAllMotors_EventNeedsToBeFiredFlag = 0
 
     global SinusoidalMotionInput_MinValue_PositionControl
     SinusoidalMotionInput_MinValue_PositionControl = 0
@@ -627,8 +710,20 @@ if __name__ == '__main__':
     global SinusoidalMotionInput_CommandedValue
     SinusoidalMotionInput_CommandedValue = 0.0
 
-    global DesiredSlaveID_List
-    DesiredSlaveID_List = [1, 2]
+    #'''
+    global DesiredSlaves_DictOfDicts
+    DesiredSlaves_DictOfDicts = dict([(1, dict([("SlaveID_Int", 1), ("XDFfileDictionaryPath", os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "cap-xcr-e_eoe_2.4.1.xdf"), ("Position_Max", 10000.0), ("Position_Min", -10000.0), ("MaxCurrent_ToBeSet", 3.1), ("MaxProfileVelocity_ToBeSet", 50000), ("MaxProfileAcceleration_ToBeSet", 100000), ("EncoderTicksPerRevolution", 8192.0)])),
+                                      (2, dict([("SlaveID_Int", 2), ("XDFfileDictionaryPath", os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "cap-xcr-e_eoe_2.4.1.xdf"), ("Position_Max", 10000.00), ("Position_Min", -10000.00), ("MaxCurrent_ToBeSet", 3.2), ("MaxProfileVelocity_ToBeSet", 50000), ("MaxProfileAcceleration_ToBeSet", 100000), ("EncoderTicksPerRevolution", 8192.0)])),
+                                      (3, dict([("SlaveID_Int", 3), ("XDFfileDictionaryPath", os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "cap-xcr-e_eoe_2.4.1.xdf"), ("Position_Max", 10000.00), ("Position_Min", -10000.00), ("MaxCurrent_ToBeSet", 3.3), ("MaxProfileVelocity_ToBeSet", 50000), ("MaxProfileAcceleration_ToBeSet", 100000), ("EncoderTicksPerRevolution", 8192.0)])),
+                                      (4, dict([("SlaveID_Int", 4), ("XDFfileDictionaryPath", os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "cap-xcr-e_eoe_2.4.1.xdf"), ("Position_Max", 10000.00), ("Position_Min", -10000.00), ("MaxCurrent_ToBeSet", 3.4), ("MaxProfileVelocity_ToBeSet", 50000), ("MaxProfileAcceleration_ToBeSet", 100000), ("EncoderTicksPerRevolution", 8192.0)])),
+                                      (5, dict([("SlaveID_Int", 5), ("XDFfileDictionaryPath", os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "den-xcr-e_eoe_2.5.0.xdf"), ("Position_Max", 10000.00), ("Position_Min", -10000.00), ("MaxCurrent_ToBeSet", 3.5), ("MaxProfileVelocity_ToBeSet", 50000), ("MaxProfileAcceleration_ToBeSet", 100000), ("EncoderTicksPerRevolution", 8192.0)]))])
+    #'''
+
+    '''
+    global DesiredSlaves_DictOfDicts
+    DesiredSlaves_DictOfDicts = dict([(1, dict([("SlaveID_Int", 1), ("XDFfileDictionaryPath", os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "cap-xcr-e_eoe_2.4.1.xdf"), ("Position_Max", 10000.0), ("Position_Min", -10000.0), ("MaxCurrent", 3.0), ("MaxProfileVelocity_ToBeSet", 50000), ("MaxProfileAcceleration_ToBeSet", 100000), ("EncoderTicksPerRevolution", 8192.0)])),
+                                      (3, dict([("SlaveID_Int", 3), ("XDFfileDictionaryPath", os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "cap-xcr-e_eoe_2.4.1.xdf"), ("Position_Max", 10000.00), ("Position_Min", -10000.00), ("MaxCurrent", 3.3), ("MaxProfileVelocity_ToBeSet", 50000), ("MaxProfileAcceleration_ToBeSet", 100000), ("EncoderTicksPerRevolution", 8192.0)])),])
+    '''
     #################################################
     #################################################
 
@@ -785,21 +880,22 @@ if __name__ == '__main__':
                                     ("GUI_COLUMNSPAN", GUI_COLUMNSPAN_IngeniaBLDC)])
     #################################################
 
+
     #################################################
     global IngeniaBLDC_setup_dict
     IngeniaBLDC_setup_dict = dict([("GUIparametersDict", IngeniaBLDC_GUIparametersDict),
                                     ("NameToDisplay_UserSet", "IngeniaBLDC"),
                                     ("DesiredInterfaceName", "Realtek USB GbE Family Controller"), #likely "Intel(R) Ethernet Connection (2) I219-LM" or "Realtek USB GbE Family Controller"
-                                    ("DesiredSlaveID_List", DesiredSlaveID_List),
-                                    ("XDFfileDictionaryPath", os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "cap-xcr-e_eoe_2.4.1.xdf"), #"den-xcr-e_eoe_2.5.0.xdf" #"cap-xcr-e_eoe_2.4.1.xdf"
+                                    ("DesiredSlaves_DictOfDicts", DesiredSlaves_DictOfDicts),
                                     ("LaunchFlag_MotionLab3_IngEcatGateway_EoEservice", 0),
-                                    ("MotionLab3_IngEcatGateway_EoEservice_EXEfullFilePath", "C:\\Program Files (x86)\\MotionLab3\\_internal\\eoe_service\\IngEcatGateway.exe"), #"C:\\Program Files (x86)\\MotionLab3\\eoe_service\\IngEcatGateway.exe"
                                     ("DedicatedRxThread_TimeToSleepEachLoop", 0.001),
                                     ("DedicatedTxThread_TimeToSleepEachLoop", 0.001),
+                                    ("PDO_UpdateDeltaTinSeconds", 0.020),
                                     ("EnableMotorAutomaticallyAfterEstopRestorationFlag", 1),
                                     ("EnableMotorAtStartOfProgramFlag", 1),
-                                    ("GetVariablesEveryNloopsCycles", 1),
-                                    ("ListOfVariableNameStringsToGet", ["Position_Actual", "Current_Quadrature_Actual"])])
+                                    ("GetSDOvariablesEveryNloopsCycles", 1),
+                                    ("ListOfVariableNameStringsToGetViaSDO", []),
+                                    ("CheckDetectedVsDesiredSlaveListFlag", 1)])
     #################################################
 
     #################################################
@@ -889,7 +985,8 @@ if __name__ == '__main__':
                                     ("GUI_COLUMNSPAN", GUI_COLUMNSPAN_EntryListWithBlinking)])
 
     global EntryListWithBlinking_Variables_ListOfDicts
-    EntryListWithBlinking_Variables_ListOfDicts = [dict([("Name", "SinusoidalMotionInput_MaxValue_PositionControl"),("Type", "float"),("StartingVal", SinusoidalMotionInput_MaxValue_PositionControl),("MinVal", 0.0),("MaxVal", 360.0),("EntryBlinkEnabled", 0),("EntryWidth", EntryWidth),("LabelWidth", LabelWidth),("FontSize", FontSize)]),
+    EntryListWithBlinking_Variables_ListOfDicts = [dict([("Name", "USE_SINUSOIDAL_POS_CONTROL_INPUT_FLAG"),("Type", "float"),("StartingVal", USE_SINUSOIDAL_POS_CONTROL_INPUT_FLAG),("MinVal", 0.0),("MaxVal", 1.0),("EntryBlinkEnabled", 0),("EntryWidth", EntryWidth),("LabelWidth", LabelWidth),("FontSize", FontSize)]),
+                                                   dict([("Name", "SinusoidalMotionInput_MaxValue_PositionControl"),("Type", "float"),("StartingVal", SinusoidalMotionInput_MaxValue_PositionControl),("MinVal", 0.0),("MaxVal", 360.0),("EntryBlinkEnabled", 0),("EntryWidth", EntryWidth),("LabelWidth", LabelWidth),("FontSize", FontSize)]),
                                                    dict([("Name", "SinusoidalMotionInput_ROMtestTimeToPeakAngle"),("Type", "float"),("StartingVal", SinusoidalMotionInput_ROMtestTimeToPeakAngle),("MinVal", 0.0),("MaxVal", 360.0),("EntryBlinkEnabled", 0),("EntryWidth", EntryWidth),("LabelWidth", LabelWidth),("FontSize", FontSize)]),
                                                    dict([("Name", "IngeniaBLDC_PositionPIDgains_Kp_1"),("Type", "float"),("StartingVal", IngeniaBLDC_PositionPIDgains_Kp_1),("MinVal", -1000.0),("MaxVal", 1000.0),("EntryBlinkEnabled", 0),("EntryWidth", EntryWidth),("LabelWidth", LabelWidth),("FontSize", FontSize)]),
                                                    dict([("Name", "IngeniaBLDC_PositionPIDgains_Ki_1"),("Type", "float"),("StartingVal", IngeniaBLDC_PositionPIDgains_Ki_1),("MinVal", -1000.0),("MaxVal", 1000.0),("EntryBlinkEnabled", 0),("EntryWidth", EntryWidth),("LabelWidth", LabelWidth),("FontSize", FontSize)]),
@@ -1051,11 +1148,12 @@ if __name__ == '__main__':
     #################################################
     #################################################
     if IngeniaBLDC_OPEN_FLAG == 1:
-        pass
-        #for SlaveID_Int in DesiredSlaveID_List:
-        #    IngeniaBLDC_Object.SetPositionPIDgains_ExternalProgram(SlaveID_Int, Kp_ToBeSet=0.005, Ki_ToBeSet=0.001, Kd_ToBeSet=0.001, PrintDebugFlag=1)
-        #    #IngeniaBLDC_Object.SetVelocityPIDgains_ExternalProgram(SlaveID_Int Kp_ToBeSet=0.0051, Ki_ToBeSet=0.0011, Kd_ToBeSet=0.0011, PrintDebugFlag=1)
-        #    IngeniaBLDC_Object.SetMaxCurrent_ExternalProgram(SlaveID_Int, 2.0, PrintDebugFlag=1)
+
+        for SlaveID_Int in DesiredSlaves_DictOfDicts:
+            IngeniaBLDC_Object.SetPositionPIDgains_ExternalProgram(SlaveID_Int, Kp_ToBeSet=0.005, Ki_ToBeSet=0.001, Kd_ToBeSet=0.001, PrintDebugFlag=1)
+            #IngeniaBLDC_Object.SetMaxCurrent_ExternalProgram(SlaveID_Int, 2.0, PrintDebugFlag=1)
+            #IngeniaBLDC_Object.SetMaxProfileVelocity_ExternalProgram(SlaveID_Int, 50000.0, PrintDebugFlag=1)
+            #IngeniaBLDC_Object.SetMaxProfileAcceleration_ExternalProgram(SlaveID_Int, 100000.0, PrintDebugFlag=1)
     #################################################
     #################################################
 
@@ -1082,6 +1180,7 @@ if __name__ == '__main__':
                 #print("DataUpdateNumber = " + str(EntryListWithBlinking_MostRecentDict_DataUpdateNumber) + ", EntryListWithBlinking_MostRecentDict: " + str(EntryListWithBlinking_MostRecentDict))
 
                 if EntryListWithBlinking_MostRecentDict_DataUpdateNumber > 1:
+                    USE_SINUSOIDAL_POS_CONTROL_INPUT_FLAG = int(EntryListWithBlinking_MostRecentDict["SinusoidalMotionInput_MaxValue_PositionControl"])
                     SinusoidalMotionInput_MaxValue_PositionControl = EntryListWithBlinking_MostRecentDict["SinusoidalMotionInput_MaxValue_PositionControl"]
                     SinusoidalMotionInput_ROMtestTimeToPeakAngle = EntryListWithBlinking_MostRecentDict["SinusoidalMotionInput_ROMtestTimeToPeakAngle"]
                     IngeniaBLDC_PositionPIDgains_Kp_1 = EntryListWithBlinking_MostRecentDict["IngeniaBLDC_PositionPIDgains_Kp_1"]
@@ -1105,6 +1204,14 @@ if __name__ == '__main__':
         ################################################### GET's
         ###################################################
         if IngeniaBLDC_OPEN_FLAG == 1:
+            if IngeniaBLDC_Object.IsDedicatedPDOthreadStillRunning() == 0:
+                IngeniaBLDC_Object.StartPDOdedicatedThread()
+        ###################################################
+        ###################################################
+
+        ################################################### GET's
+        ###################################################
+        if IngeniaBLDC_OPEN_FLAG == 1:
 
             IngeniaBLDC_MostRecentDict = IngeniaBLDC_Object.GetMostRecentDataDict()
             #print("IngeniaBLDC_MostRecentDict: " + str(IngeniaBLDC_MostRecentDict))
@@ -1124,9 +1231,17 @@ if __name__ == '__main__':
         if IngeniaBLDC_OPEN_FLAG == 1:
 
             ###################################################
+            if ZeroEncoderOffsetOnAllMotors_EventNeedsToBeFiredFlag == 1:
+                for SlaveID_Int in DesiredSlaves_DictOfDicts:
+                    IngeniaBLDC_Object.SetEncoderOffset_ExternalProgram(SlaveID_Int, 0.0, PrintDebugFlag=1)
+
+                ZeroEncoderOffsetOnAllMotors_EventNeedsToBeFiredFlag = 0
+            ###################################################
+
+            ###################################################
             if IngeniaBLDC_NeedToUpdatePositionPIDgainsFlag == 1:
-                IngeniaBLDC_Object.SetPositionPIDgains_ExternalProgram(1, IngeniaBLDC_PositionPIDgains_Kp_1, IngeniaBLDC_PositionPIDgains_Ki_1, IngeniaBLDC_PositionPIDgains_Kd_1)
-                IngeniaBLDC_Object.SetPositionPIDgains_ExternalProgram(2, IngeniaBLDC_PositionPIDgains_Kp_2, IngeniaBLDC_PositionPIDgains_Ki_2, IngeniaBLDC_PositionPIDgains_Kd_2)
+                for SlaveID_Int in DesiredSlaves_DictOfDicts:
+                    IngeniaBLDC_Object.SetPositionPIDgains_ExternalProgram(SlaveID_Int, IngeniaBLDC_PositionPIDgains_Kp_1, IngeniaBLDC_PositionPIDgains_Ki_1, IngeniaBLDC_PositionPIDgains_Kd_1)
 
                 IngeniaBLDC_NeedToUpdatePositionPIDgainsFlag = 0
             ###################################################
@@ -1141,8 +1256,9 @@ if __name__ == '__main__':
 
                 SinusoidalMotionInput_CommandedValue = SinusoidalMotionInput_CommandedValue*MotorCPR
 
-                for SlaveID_Int in DesiredSlaveID_List:
-                    IngeniaBLDC_Object.SetPosition_ExternalProgram(SlaveID_Int, SinusoidalMotionInput_CommandedValue)
+                for SlaveID_Int in DesiredSlaves_DictOfDicts:
+                    SinusoidalMotionInput_CommandedValue_TEMP = SlaveID_Int*SinusoidalMotionInput_CommandedValue
+                    IngeniaBLDC_Object.SetPosition_ExternalProgram(SlaveID_Int, SinusoidalMotionInput_CommandedValue_TEMP)
             ###################################################
 
         ###################################################
@@ -1173,8 +1289,10 @@ if __name__ == '__main__':
 
         #################################################### SET's
         ####################################################
+        ####################################################
         if MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG == 1:
             try:
+                ####################################################
                 ####################################################
                 MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_MostRecentDict = MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.GetMostRecentDataDict()
 
@@ -1183,18 +1301,39 @@ if __name__ == '__main__':
 
                     if MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_MostRecentDict_StandAlonePlottingProcess_ReadyForWritingFlag == 1:
                         if CurrentTime_MainLoopThread - LastTime_MainLoopThread_MyPlotterPureTkinterStandAloneProcess >= 0.030:
+
+                            ####################################################
+                            ListOfPositionActualToPlot = []
+                            for SlaveID_Int in DesiredSlaves_DictOfDicts:
+                                ListOfPositionActualToPlot.append(IngeniaBLDC_MostRecentDict["IngeniaMotionController_MainDict"][SlaveID_Int]["Position_Actual"])
+                                #print("ListOfPositionActualToPlot: " + str(ListOfPositionActualToPlot))
+                            ####################################################
+
+                            ####################################################
+                            MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.ExternalAddPointOrListOfPointsToPlot(MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_NameList[0:len(ListOfPositionActualToPlot)],
+                                                                                                                                    [CurrentTime_MainLoopThread]*len(ListOfPositionActualToPlot),
+                                                                                                                                    ListOfPositionActualToPlot)
+                            #'''
+                            '''
                             MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.ExternalAddPointOrListOfPointsToPlot(["Channel0", "Channel1"],
                                                                                                                                     [CurrentTime_MainLoopThread]*2,
-                                                                                                                                    [SinusoidalMotionInput_CommandedValue, IngeniaBLDC_MostRecentDict["IngeniaMotionController_MainDict"][1]["Position_Actual"]])
+                                                                                                                                    [IngeniaBLDC_MostRecentDict["IngeniaMotionController_MainDict"][1]["Current_Quadrature_Actual"],
+                                                                                                                                     IngeniaBLDC_MostRecentDict["IngeniaMotionController_MainDict"][2]["Current_Quadrature_Actual"]])
+                            '''
+                            ####################################################
 
-
+                            ####################################################
                             LastTime_MainLoopThread_MyPlotterPureTkinterStandAloneProcess = CurrentTime_MainLoopThread
+                            ####################################################
+
+                ####################################################
                 ####################################################
 
             except:
                 exceptions = sys.exc_info()[0]
                 print("test_program_for_IngeniaBLDC_ReubenPython3Class, if MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG == 1: SET's, Exceptions: %s" % exceptions)
                 traceback.print_exc()
+        ####################################################
         ####################################################
         ####################################################
 
