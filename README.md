@@ -14,7 +14,7 @@ www.reubotics.com
 
 Apache 2 License
 
-Software Revision C, 11/02/2024
+Software Revision D, 11/09/2024
 
 Verified working on:
 
@@ -24,8 +24,9 @@ Windows 10, 11 64-bit
 
 Note For test_program_for_IngeniaBLDC_ReubenPython3Class.py:
 
-1.Currently only runs at ~40-50Hz in the Tx and Rx loops on Windows 10 64-bit, Python 3.12.
-This is a *very* slow way of interfacing with the controller and NOT the fast (>1KHz) method of interfacing via an Ethercat Master like Beckhoff TwinCat or Acontis.
+1.This is a slower way of interfacing with the controller and not the fast method of interfacing via an Ethercat Master like Beckhoff TwinCat or Acontis.
+
+2. You MUST install Ingenia's MotionLab3 BEFORE running this software, as this software relies on MotionLab3's EoE-service for the Ethercat communication.
 
 ###########################
 
