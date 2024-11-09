@@ -27,6 +27,7 @@ Note For test_program_for_IngeniaBLDC_ReubenPython3Class.py:
 1.This is a slower way of interfacing with the controller and not the fast method of interfacing via an Ethercat Master like Beckhoff TwinCat or Acontis.
 
 2. You MUST install Ingenia's MotionLab3 BEFORE running this software, as this software relies on MotionLab3's EoE-service for the Ethercat communication.
+
 ###########################
 
 ########################### Python module installation instructions, all OS's
