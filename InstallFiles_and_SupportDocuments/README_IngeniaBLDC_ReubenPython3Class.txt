@@ -14,7 +14,7 @@ www.reubotics.com
 
 Apache 2 License
 
-Software Revision D, 11/09/2024
+Software Revision E, 11/13/2024
 
 Verified working on:
 
@@ -25,8 +25,13 @@ Windows 10, 11 64-bit
 Note For test_program_for_IngeniaBLDC_ReubenPython3Class.py:
 
 1.This is a slower way of interfacing with the controller and not the fast method of interfacing via an Ethercat Master like Beckhoff TwinCat or Acontis.
+It uses PDO-callbacks for the majority of the data transfer (with only a smattering of SDO for infrequent calls, like gain setting), but it's still slower than
+via an Ethercat Master like Beckhoff TwinCat or Acontis. Currently it's been verified as working well with up to 5 motors @ 50Hz Tx/Rx simultaneously as part of a larger
+program with lots of other sensors/actuators being communicated with simultaneously.
 
 2. You MUST install Ingenia's MotionLab3 BEFORE running this software, as this software relies on MotionLab3's EoE-service for the Ethercat communication.
+
+3. If you're having trouble getting a motor to move with "test_program_for_IngeniaBLDC_ReubenPython3Class.py", then try "SimplestTest_SingleSlave_SDOnoPDO_IngeniaBLDC_ReubenPython3Class.py".
 
 ###########################
 

@@ -6,7 +6,7 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision D, 11/09/2024
+Software Revision E, 11/13/2024
 
 Verified working on: Python 3.12 for Windows 10, 11 64-bit.
 '''
@@ -550,10 +550,10 @@ if __name__ == '__main__':
     USE_MyPrint_FLAG = 0
 
     global USE_MyPlotterPureTkinterStandAloneProcess_FLAG
-    USE_MyPlotterPureTkinterStandAloneProcess_FLAG = 0 #unicorn
+    USE_MyPlotterPureTkinterStandAloneProcess_FLAG = 1 #unicorn
 
     global USE_CSVdataLogger_FLAG
-    USE_CSVdataLogger_FLAG = 0
+    USE_CSVdataLogger_FLAG = 1
 
     global USE_KEYBOARD_FLAG
     USE_KEYBOARD_FLAG = 1
@@ -669,20 +669,19 @@ if __name__ == '__main__':
     DataStreamingDeltaT_CalculatedFromGUIthread = -1
     #################################################
 
-
     global root
 
     global root_Xpos
     root_Xpos = 870
 
     global root_Ypos
-    root_Ypos = 20
+    root_Ypos = 0
 
     global root_width
-    root_width = 1400#1020
+    root_width = 1400
 
     global root_height
-    root_height = 1020 - root_Ypos
+    root_height = 1080 - root_Ypos
 
     global TabControlObject
     global Tab_MainControls
@@ -699,7 +698,7 @@ if __name__ == '__main__':
     SinusoidalMotionInput_MinValue_PositionControl = 0
 
     global SinusoidalMotionInput_MaxValue_PositionControl
-    SinusoidalMotionInput_MaxValue_PositionControl = (36.0/360.0)
+    SinusoidalMotionInput_MaxValue_PositionControl = 10.0
 
     global SinusoidalMotionInput_ROMtestTimeToPeakAngle
     SinusoidalMotionInput_ROMtestTimeToPeakAngle = 0.25
@@ -710,20 +709,12 @@ if __name__ == '__main__':
     global SinusoidalMotionInput_CommandedValue
     SinusoidalMotionInput_CommandedValue = 0.0
 
-    #'''
     global DesiredSlaves_DictOfDicts
-    DesiredSlaves_DictOfDicts = dict([(1, dict([("SlaveID_Int", 1), ("XDFfileDictionaryPath", os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "cap-xcr-e_eoe_2.4.1.xdf"), ("Position_Max", 10000.0), ("Position_Min", -10000.0), ("MaxCurrent_ToBeSet", 3.1), ("MaxProfileVelocity_ToBeSet", 50000), ("MaxProfileAcceleration_ToBeSet", 100000), ("EncoderTicksPerRevolution", 8192.0)])),
-                                      (2, dict([("SlaveID_Int", 2), ("XDFfileDictionaryPath", os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "cap-xcr-e_eoe_2.4.1.xdf"), ("Position_Max", 10000.00), ("Position_Min", -10000.00), ("MaxCurrent_ToBeSet", 3.2), ("MaxProfileVelocity_ToBeSet", 50000), ("MaxProfileAcceleration_ToBeSet", 100000), ("EncoderTicksPerRevolution", 8192.0)])),
-                                      (3, dict([("SlaveID_Int", 3), ("XDFfileDictionaryPath", os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "cap-xcr-e_eoe_2.4.1.xdf"), ("Position_Max", 10000.00), ("Position_Min", -10000.00), ("MaxCurrent_ToBeSet", 3.3), ("MaxProfileVelocity_ToBeSet", 50000), ("MaxProfileAcceleration_ToBeSet", 100000), ("EncoderTicksPerRevolution", 8192.0)])),
-                                      (4, dict([("SlaveID_Int", 4), ("XDFfileDictionaryPath", os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "cap-xcr-e_eoe_2.4.1.xdf"), ("Position_Max", 10000.00), ("Position_Min", -10000.00), ("MaxCurrent_ToBeSet", 3.4), ("MaxProfileVelocity_ToBeSet", 50000), ("MaxProfileAcceleration_ToBeSet", 100000), ("EncoderTicksPerRevolution", 8192.0)])),
-                                      (5, dict([("SlaveID_Int", 5), ("XDFfileDictionaryPath", os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "den-xcr-e_eoe_2.5.0.xdf"), ("Position_Max", 10000.00), ("Position_Min", -10000.00), ("MaxCurrent_ToBeSet", 3.5), ("MaxProfileVelocity_ToBeSet", 50000), ("MaxProfileAcceleration_ToBeSet", 100000), ("EncoderTicksPerRevolution", 8192.0)]))])
-    #'''
-
-    '''
-    global DesiredSlaves_DictOfDicts
-    DesiredSlaves_DictOfDicts = dict([(1, dict([("SlaveID_Int", 1), ("XDFfileDictionaryPath", os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "cap-xcr-e_eoe_2.4.1.xdf"), ("Position_Max", 10000.0), ("Position_Min", -10000.0), ("MaxCurrent", 3.0), ("MaxProfileVelocity_ToBeSet", 50000), ("MaxProfileAcceleration_ToBeSet", 100000), ("EncoderTicksPerRevolution", 8192.0)])),
-                                      (3, dict([("SlaveID_Int", 3), ("XDFfileDictionaryPath", os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "cap-xcr-e_eoe_2.4.1.xdf"), ("Position_Max", 10000.00), ("Position_Min", -10000.00), ("MaxCurrent", 3.3), ("MaxProfileVelocity_ToBeSet", 50000), ("MaxProfileAcceleration_ToBeSet", 100000), ("EncoderTicksPerRevolution", 8192.0)])),])
-    '''
+    DesiredSlaves_DictOfDicts = dict([(1, dict([("SlaveID_Int", 1), ("XDFfileDictionaryPath", os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "cap-xcr-e_eoe_2.4.1.xdf"), ("Position_Max_Deg", 360.0), ("Position_Min_Deg", -360.0), ("MaxCurrent_ToBeSet", 3.1), ("MaxProfileVelocity_ToBeSet", 50000), ("MaxProfileAcceleration_ToBeSet", 100000), ("EncoderTicksPerRevolution", 8192.0)])),
+                                      (2, dict([("SlaveID_Int", 2), ("XDFfileDictionaryPath", os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "cap-xcr-e_eoe_2.4.1.xdf"), ("Position_Max_Rev", 1.00), ("Position_Min_Rev", -1.00), ("MaxCurrent_ToBeSet", 3.2), ("MaxProfileVelocity_ToBeSet", 50000), ("MaxProfileAcceleration_ToBeSet", 100000), ("EncoderTicksPerRevolution", 8192.0)])),
+                                      (3, dict([("SlaveID_Int", 3), ("XDFfileDictionaryPath", os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "cap-xcr-e_eoe_2.4.1.xdf"), ("Position_Max_Rad", 2.0*math.pi), ("Position_Min_Rad", -2.0*math.pi), ("MaxCurrent_ToBeSet", 3.3), ("MaxProfileVelocity_ToBeSet", 50000), ("MaxProfileAcceleration_ToBeSet", 100000), ("EncoderTicksPerRevolution", 8192.0)])),
+                                      (4, dict([("SlaveID_Int", 4), ("XDFfileDictionaryPath", os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "cap-xcr-e_eoe_2.4.1.xdf"), ("Position_Max_EncoderTicks", 10000.00), ("Position_Min_EncoderTicks", -10000.00), ("MaxCurrent_ToBeSet", 3.4), ("MaxProfileVelocity_ToBeSet", 50000), ("MaxProfileAcceleration_ToBeSet", 100000), ("EncoderTicksPerRevolution", 8192.0)])),
+                                      (5, dict([("SlaveID_Int", 5), ("XDFfileDictionaryPath", os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "den-xcr-e_eoe_2.5.0.xdf"), ("Position_Max_EncoderTicks", 10000.00), ("Position_Min_EncoderTicks", -10000.00), ("MaxCurrent_ToBeSet", 3.5), ("MaxProfileVelocity_ToBeSet", 50000), ("MaxProfileAcceleration_ToBeSet", 100000), ("EncoderTicksPerRevolution", 8192.0)]))])
     #################################################
     #################################################
 
@@ -740,18 +731,9 @@ if __name__ == '__main__':
     global IngeniaBLDC_MostRecentDict_Time
     IngeniaBLDC_MostRecentDict_Time = 0.0
 
-    global IngeniaBLDC_MostRecentDict_Position_Actual
-    IngeniaBLDC_MostRecentDict_Position_Actual = -11111.0
+    global IngeniaBLDC_MostRecentDict_DetectedSlaveID_List
+    IngeniaBLDC_MostRecentDict_DetectedSlaveID_List = []
 
-    global IngeniaBLDC_MostRecentDict_Velocity_Actual
-    IngeniaBLDC_MostRecentDict_Velocity_Actual = -11111.0
-
-    global IngeniaBLDC_MostRecentDict_CurrentDirect_Actual
-    IngeniaBLDC_MostRecentDict_CurrentDirect_Actual = -11111.0
-
-    global IngeniaBLDC_MostRecentDict_CurrentQuadrature_Actual
-    IngeniaBLDC_MostRecentDict_CurrentQuadrature_Actual = -11111.0
-    
     global IngeniaBLDC_PositionPIDgains_Kp_1
     IngeniaBLDC_PositionPIDgains_Kp_1 = 0.005
     
@@ -772,9 +754,6 @@ if __name__ == '__main__':
 
     global IngeniaBLDC_NeedToUpdatePositionPIDgainsFlag
     IngeniaBLDC_NeedToUpdatePositionPIDgainsFlag = 1
-
-    global MotorCPR
-    MotorCPR = (2048*4)
     #################################################
     #################################################
 
@@ -799,6 +778,9 @@ if __name__ == '__main__':
 
     global CSVdataLogger_MostRecentDict_Time
     CSVdataLogger_MostRecentDict_Time = -11111.0
+
+    global CSVdataLogger_ReubenPython3ClassObject_setup_dict_VariableNamesForHeaderList
+    CSVdataLogger_ReubenPython3ClassObject_setup_dict_VariableNamesForHeaderList = []
     #################################################
     #################################################
 
@@ -888,18 +870,18 @@ if __name__ == '__main__':
                                     ("DesiredInterfaceName", "Realtek USB GbE Family Controller"), #likely "Intel(R) Ethernet Connection (2) I219-LM" or "Realtek USB GbE Family Controller"
                                     ("DesiredSlaves_DictOfDicts", DesiredSlaves_DictOfDicts),
                                     ("LaunchFlag_MotionLab3_IngEcatGateway_EoEservice", 0),
-                                    ("DedicatedRxThread_TimeToSleepEachLoop", 0.001),
-                                    ("DedicatedTxThread_TimeToSleepEachLoop", 0.001),
+                                    ("DedicatedRxThread_TimeToSleepEachLoop", 0.002),
+                                    ("DedicatedTxThread_TimeToSleepEachLoop", 0.002),
                                     ("PDO_UpdateDeltaTinSeconds", 0.020),
                                     ("EnableMotorAutomaticallyAfterEstopRestorationFlag", 1),
                                     ("EnableMotorAtStartOfProgramFlag", 1),
                                     ("GetSDOvariablesEveryNloopsCycles", 1),
                                     ("ListOfVariableNameStringsToGetViaSDO", []),
-                                    ("CheckDetectedVsDesiredSlaveListFlag", 1)])
+                                    ("CheckDetectedVsDesiredSlaveListFlag", 0)])
     #################################################
 
     #################################################
-    if USE_IngeniaBLDC_FLAG == 1:
+    if USE_IngeniaBLDC_FLAG == 1 and EXIT_PROGRAM_FLAG == 0:
         try:
             IngeniaBLDC_Object = IngeniaBLDC_ReubenPython3Class(IngeniaBLDC_setup_dict)
             IngeniaBLDC_OPEN_FLAG = IngeniaBLDC_Object.OBJECT_CREATED_SUCCESSFULLY_FLAG
@@ -914,6 +896,16 @@ if __name__ == '__main__':
     #################################################
 
     #################################################
+    #################################################
+    #################################################
+
+    #################################################
+    #################################################
+    if USE_IngeniaBLDC_FLAG == 1:
+        if EXIT_PROGRAM_FLAG == 0:
+            if IngeniaBLDC_OPEN_FLAG != 1:
+                print("Failed to open IngeniaBLDC_ReubenPython3Class.")
+                ExitProgram_Callback()
     #################################################
     #################################################
 
@@ -937,15 +929,7 @@ if __name__ == '__main__':
     #################################################
 
     #################################################
-    CSVdataLogger_ReubenPython3ClassObject_setup_dict_VariableNamesForHeaderList = ["Time (S)",
-                                                                                    "Position_Actual",
-                                                                                    "Velocity_Actual",
-                                                                                    "CurrentDirect_Actual",
-                                                                                    "CurrentQuadrature_Actual"]
-    #################################################
-
-    #################################################
-    print("CSVdataLogger_ReubenPython3ClassObject_setup_dict_VariableNamesForHeaderList: " + str(CSVdataLogger_ReubenPython3ClassObject_setup_dict_VariableNamesForHeaderList))
+    CSVdataLogger_ReubenPython3ClassObject_setup_dict_VariableNamesForHeaderList = ["Time (S)"]
     #################################################
 
     #################################################
@@ -959,7 +943,7 @@ if __name__ == '__main__':
                                                                                 ("MainThread_TimeToSleepEachLoop", 0.002),
                                                                                 ("SaveOnStartupFlag", 0)])
 
-    if USE_CSVdataLogger_FLAG == 1:
+    if USE_CSVdataLogger_FLAG == 1 and EXIT_PROGRAM_FLAG == 0:
         try:
             CSVdataLogger_ReubenPython3ClassObject = CSVdataLogger_ReubenPython3Class(CSVdataLogger_ReubenPython3ClassObject_setup_dict)
             CSVdataLogger_OPEN_FLAG = CSVdataLogger_ReubenPython3ClassObject.OBJECT_CREATED_SUCCESSFULLY_FLAG
@@ -969,6 +953,16 @@ if __name__ == '__main__':
             print("CSVdataLogger_ReubenPython3ClassObject __init__: Exceptions: %s" % exceptions)
             traceback.print_exc()
     #################################################
+    #################################################
+    #################################################
+
+    #################################################
+    #################################################
+    if USE_CSVdataLogger_FLAG == 1:
+        if EXIT_PROGRAM_FLAG == 0:
+            if CSVdataLogger_OPEN_FLAG != 1:
+                print("Failed to open CSVdataLogger_ReubenPython3Class.")
+                ExitProgram_Callback()
     #################################################
     #################################################
 
@@ -1000,7 +994,7 @@ if __name__ == '__main__':
                                                                           ("EntryListWithBlinking_Variables_ListOfDicts", EntryListWithBlinking_Variables_ListOfDicts),
                                                                           ("DebugByPrintingVariablesFlag", 0),
                                                                           ("LoseFocusIfMouseLeavesEntryFlag", 0)])
-    if USE_EntryListWithBlinking_FLAG == 1:
+    if USE_EntryListWithBlinking_FLAG == 1 and EXIT_PROGRAM_FLAG == 0:
         try:
             EntryListWithBlinking_ReubenPython2and3ClassObject = EntryListWithBlinking_ReubenPython2and3Class(EntryListWithBlinking_ReubenPython2and3ClassObject_setup_dict)
             EntryListWithBlinking_OPEN_FLAG = EntryListWithBlinking_ReubenPython2and3ClassObject.OBJECT_CREATED_SUCCESSFULLY_FLAG
@@ -1014,7 +1008,17 @@ if __name__ == '__main__':
 
     #################################################
     #################################################
-    if USE_MyPrint_FLAG == 1:
+    if USE_EntryListWithBlinking_FLAG == 1:
+        if EXIT_PROGRAM_FLAG == 0:
+            if EntryListWithBlinking_OPEN_FLAG != 1:
+                print("Failed to open EntryListWithBlinking_ReubenPython2and3Class.")
+                ExitProgram_Callback()
+    #################################################
+    #################################################
+
+    #################################################
+    #################################################
+    if USE_MyPrint_FLAG == 1 and EXIT_PROGRAM_FLAG == 0:
 
         MyPrint_ReubenPython2and3ClassObject_GUIparametersDict = dict([("USE_GUI_FLAG", USE_GUI_FLAG and SHOW_IN_GUI_MyPrint_FLAG),
                                                                         ("root", Tab_MyPrint),
@@ -1040,6 +1044,16 @@ if __name__ == '__main__':
             exceptions = sys.exc_info()[0]
             print("MyPrint_ReubenPython2and3ClassObject __init__: Exceptions: %s" % exceptions)
             traceback.print_exc()
+    #################################################
+    #################################################
+
+    #################################################
+    #################################################
+    if USE_MyPrint_FLAG == 1:
+        if EXIT_PROGRAM_FLAG == 0:
+            if MyPrint_OPEN_FLAG != 1:
+                print("Failed to open MyPrint_ReubenPython2and3ClassObject.")
+                ExitProgram_Callback()
     #################################################
     #################################################
 
@@ -1085,7 +1099,7 @@ if __name__ == '__main__':
                                                                                         ("YaxisLabelString", "Y-units (units)"),
                                                                                         ("ShowLegendFlag", 1)])
 
-    if USE_MyPlotterPureTkinterStandAloneProcess_FLAG == 1:
+    if USE_MyPlotterPureTkinterStandAloneProcess_FLAG == 1 and EXIT_PROGRAM_FLAG == 0:
         try:
             MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject = MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_setup_dict)
             MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG = MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.OBJECT_CREATED_SUCCESSFULLY_FLAG
@@ -1099,7 +1113,17 @@ if __name__ == '__main__':
 
     #################################################
     #################################################
-    if USE_KEYBOARD_FLAG == 1:
+    if USE_MyPlotterPureTkinterStandAloneProcess_FLAG == 1:
+        if EXIT_PROGRAM_FLAG == 0:
+            if MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG != 1:
+                print("Failed to open MyPlotterPureTkinterClass_Object.")
+                ExitProgram_Callback()
+    #################################################
+    #################################################
+
+    #################################################
+    #################################################
+    if USE_KEYBOARD_FLAG == 1 and EXIT_PROGRAM_FLAG == 0:
         keyboard.on_press_key("esc", ExitProgram_Callback)
         keyboard.on_press_key("q", ExitProgram_Callback)
     #################################################
@@ -1107,49 +1131,12 @@ if __name__ == '__main__':
 
     #################################################
     #################################################
-    if USE_IngeniaBLDC_FLAG == 1 and IngeniaBLDC_OPEN_FLAG != 1:
-        print("Failed to open IngeniaBLDC_ReubenPython3Class.")
-        #ExitProgram_Callback()
-    #################################################
-    #################################################
+    if IngeniaBLDC_OPEN_FLAG == 1 and EXIT_PROGRAM_FLAG == 0:
 
-    #################################################
-    #################################################
-    if USE_MyPrint_FLAG == 1 and MyPrint_OPEN_FLAG != 1:
-        print("Failed to open MyPrint_ReubenPython2and3ClassObject.")
-        #ExitProgram_Callback()
-    #################################################
-    #################################################
+        IngeniaBLDC_MostRecentDict = IngeniaBLDC_Object.GetMostRecentDataDict()
+        IngeniaBLDC_MostRecentDict_DetectedSlaveID_List = IngeniaBLDC_MostRecentDict["DetectedSlaveID_List"]
 
-    #################################################
-    #################################################
-    if USE_CSVdataLogger_FLAG == 1 and CSVdataLogger_OPEN_FLAG != 1:
-        print("Failed to open CSVdataLogger_ReubenPython3Class.")
-        #ExitProgram_Callback()
-    #################################################
-    #################################################
-
-    #################################################
-    #################################################
-    if USE_EntryListWithBlinking_FLAG == 1 and EntryListWithBlinking_OPEN_FLAG != 1:
-        print("Failed to open EntryListWithBlinking_ReubenPython2and3Class.")
-        #ExitProgram_Callback()
-    #################################################
-    #################################################
-
-    #################################################
-    #################################################
-    if USE_MyPlotterPureTkinterStandAloneProcess_FLAG == 1 and MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG != 1:
-        print("Failed to open MyPlotterPureTkinterClass_Object.")
-        #ExitProgram_Callback()
-    #################################################
-    #################################################
-
-    #################################################
-    #################################################
-    if IngeniaBLDC_OPEN_FLAG == 1:
-
-        for SlaveID_Int in DesiredSlaves_DictOfDicts:
+        for SlaveID_Int in IngeniaBLDC_MostRecentDict_DetectedSlaveID_List:
             IngeniaBLDC_Object.SetPositionPIDgains_ExternalProgram(SlaveID_Int, Kp_ToBeSet=0.005, Ki_ToBeSet=0.001, Kd_ToBeSet=0.001, PrintDebugFlag=1)
             #IngeniaBLDC_Object.SetMaxCurrent_ExternalProgram(SlaveID_Int, 2.0, PrintDebugFlag=1)
             #IngeniaBLDC_Object.SetMaxProfileVelocity_ExternalProgram(SlaveID_Int, 50000.0, PrintDebugFlag=1)
@@ -1157,8 +1144,33 @@ if __name__ == '__main__':
     #################################################
     #################################################
 
-    print("Starting main loop 'test_program_for_IngeniaBLDC_ReubenPython3Class.")
-    StartingTime_MainLoopThread = getPreciseSecondsTimeStampString()
+    #################################################
+    #################################################
+    if IngeniaBLDC_OPEN_FLAG == 1 and CSVdataLogger_OPEN_FLAG == 1 and EXIT_PROGRAM_FLAG == 0:
+
+        #################################################
+        for SlaveID_Int in IngeniaBLDC_MostRecentDict_DetectedSlaveID_List:
+            CSVdataLogger_ReubenPython3ClassObject_setup_dict_VariableNamesForHeaderList.append("Position (Deg) Slave " + str(SlaveID_Int))
+            CSVdataLogger_ReubenPython3ClassObject_setup_dict_VariableNamesForHeaderList.append("Current Quadrature (A) Slave " + str(SlaveID_Int))
+        #################################################
+
+        #################################################
+        print("CSVdataLogger_ReubenPython3ClassObject_setup_dict_VariableNamesForHeaderList: " + str(CSVdataLogger_ReubenPython3ClassObject_setup_dict_VariableNamesForHeaderList))
+        CSVdataLogger_ReubenPython3ClassObject_setup_dict["VariableNamesForHeaderList"] = CSVdataLogger_ReubenPython3ClassObject_setup_dict_VariableNamesForHeaderList
+        CSVdataLogger_ReubenPython3ClassObject.UpdateSetupDictParameters(CSVdataLogger_ReubenPython3ClassObject_setup_dict)
+        #################################################
+
+    #################################################
+    #################################################
+
+    #################################################
+    #################################################
+    if EXIT_PROGRAM_FLAG == 0:
+        print("Starting main loop 'test_program_for_IngeniaBLDC_ReubenPython3Class.")
+        StartingTime_MainLoopThread = getPreciseSecondsTimeStampString()
+    #################################################
+    #################################################
+
     while(EXIT_PROGRAM_FLAG == 0):
 
         ###################################################
@@ -1218,10 +1230,6 @@ if __name__ == '__main__':
 
             if "Time" in IngeniaBLDC_MostRecentDict:
                 IngeniaBLDC_MostRecentDict_Time = IngeniaBLDC_MostRecentDict["Time"]
-                #IngeniaBLDC_MostRecentDict_Position_Actual = IngeniaBLDC_MostRecentDict["Position_Actual"]
-                #IngeniaBLDC_MostRecentDict_Velocity_Actual = IngeniaBLDC_MostRecentDict["Velocity_Actual"]
-                #IngeniaBLDC_MostRecentDict_CurrentDirect_Actual = IngeniaBLDC_MostRecentDict["Current_Direct_Actual"]
-                #IngeniaBLDC_MostRecentDict_CurrentQuadrature_Actual = IngeniaBLDC_MostRecentDict["Current_Quadrature_Actual"]
 
         ###################################################
         ###################################################
@@ -1254,11 +1262,11 @@ if __name__ == '__main__':
                 SinusoidalMotionInput_CommandedValue = (SinusoidalMotionInput_MaxValue_PositionControl + SinusoidalMotionInput_MinValue_PositionControl)/2.0 + \
                                                        0.5*abs(SinusoidalMotionInput_MaxValue_PositionControl - SinusoidalMotionInput_MinValue_PositionControl)*math.sin(SinusoidalMotionInput_TimeGain*CurrentTime_MainLoopThread)
 
-                SinusoidalMotionInput_CommandedValue = SinusoidalMotionInput_CommandedValue*MotorCPR
+                SinusoidalMotionInput_CommandedValue = SinusoidalMotionInput_CommandedValue
 
                 for SlaveID_Int in DesiredSlaves_DictOfDicts:
                     SinusoidalMotionInput_CommandedValue_TEMP = SlaveID_Int*SinusoidalMotionInput_CommandedValue
-                    IngeniaBLDC_Object.SetPosition_ExternalProgram(SlaveID_Int, SinusoidalMotionInput_CommandedValue_TEMP)
+                    IngeniaBLDC_Object.SetPosition_ExternalProgram(SlaveID_Int, SinusoidalMotionInput_CommandedValue_TEMP, "Deg")
             ###################################################
 
         ###################################################
@@ -1273,10 +1281,10 @@ if __name__ == '__main__':
             ####################################################
             ListToWrite = []
             ListToWrite.append(CurrentTime_MainLoopThread)
-            #ListToWrite.append(IngeniaBLDC_MostRecentDict_Position_Actual)
-            #ListToWrite.append(IngeniaBLDC_MostRecentDict_Velocity_Actual)
-            #ListToWrite.append(IngeniaBLDC_MostRecentDict_CurrentDirect_Actual)
-            #ListToWrite.append(IngeniaBLDC_MostRecentDict_CurrentQuadrature_Actual)
+
+            for SlaveID_Int in IngeniaBLDC_MostRecentDict_DetectedSlaveID_List:
+                ListToWrite.append(IngeniaBLDC_MostRecentDict["IngeniaMotionController_MainDict"][SlaveID_Int]["Position_Actual_AllUnitsDict"]["Deg"])
+                ListToWrite.append(IngeniaBLDC_MostRecentDict["IngeniaMotionController_MainDict"][SlaveID_Int]["Current_Quadrature_Actual"])
 
             #print("ListToWrite: " + str(ListToWrite))
             ####################################################
@@ -1303,23 +1311,16 @@ if __name__ == '__main__':
                         if CurrentTime_MainLoopThread - LastTime_MainLoopThread_MyPlotterPureTkinterStandAloneProcess >= 0.030:
 
                             ####################################################
-                            ListOfPositionActualToPlot = []
-                            for SlaveID_Int in DesiredSlaves_DictOfDicts:
-                                ListOfPositionActualToPlot.append(IngeniaBLDC_MostRecentDict["IngeniaMotionController_MainDict"][SlaveID_Int]["Position_Actual"])
-                                #print("ListOfPositionActualToPlot: " + str(ListOfPositionActualToPlot))
+                            ListOfValuesToPlot = []
+                            for SlaveID_Int in IngeniaBLDC_MostRecentDict_DetectedSlaveID_List:
+                                ListOfValuesToPlot.append(IngeniaBLDC_MostRecentDict["IngeniaMotionController_MainDict"][SlaveID_Int]["Position_Actual_AllUnitsDict"]["Deg"])
+                                #ListOfValuesToPlot.append(IngeniaBLDC_MostRecentDict["IngeniaMotionController_MainDict"][SlaveID_Int]["Current_Quadrature_Actual"])
                             ####################################################
 
                             ####################################################
-                            MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.ExternalAddPointOrListOfPointsToPlot(MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_NameList[0:len(ListOfPositionActualToPlot)],
-                                                                                                                                    [CurrentTime_MainLoopThread]*len(ListOfPositionActualToPlot),
-                                                                                                                                    ListOfPositionActualToPlot)
-                            #'''
-                            '''
-                            MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.ExternalAddPointOrListOfPointsToPlot(["Channel0", "Channel1"],
-                                                                                                                                    [CurrentTime_MainLoopThread]*2,
-                                                                                                                                    [IngeniaBLDC_MostRecentDict["IngeniaMotionController_MainDict"][1]["Current_Quadrature_Actual"],
-                                                                                                                                     IngeniaBLDC_MostRecentDict["IngeniaMotionController_MainDict"][2]["Current_Quadrature_Actual"]])
-                            '''
+                            MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.ExternalAddPointOrListOfPointsToPlot(MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_NameList[0:len(ListOfValuesToPlot)],
+                                                                                                                                    [CurrentTime_MainLoopThread]*len(ListOfValuesToPlot),
+                                                                                                                                    ListOfValuesToPlot)
                             ####################################################
 
                             ####################################################
