@@ -200,8 +200,8 @@ class LowPassFilterForDictsOfLists_ReubenPython2and3Class():
                                                                      NewDictOfVariableFilterSettings[VariableNameString]["ExponentialSmoothingFilterLambda"])
                 #print("AddOrUpdateDictOfVariableFilterSettingsFromExternalProgram: VariableNameString " + VariableNameString + " was found in self.DictOfVariableFilterSettings.")
 
-        #print("AddOrUpdateDictOfVariableFilterSettingsFromExternalProgram: NewDictOfVariableFilterSettings = " + str(NewDictOfVariableFilterSettings))
-        #print("AddOrUpdateDictOfVariableFilterSettingsFromExternalProgram: self.DictOfVariableFilterSettings =" + str(self.DictOfVariableFilterSettings))
+        print("AddOrUpdateDictOfVariableFilterSettingsFromExternalProgram: NewDictOfVariableFilterSettings = " + str(NewDictOfVariableFilterSettings))
+        print("AddOrUpdateDictOfVariableFilterSettingsFromExternalProgram: self.DictOfVariableFilterSettings =" + str(self.DictOfVariableFilterSettings))
     ##########################################################################################################
     ##########################################################################################################
 

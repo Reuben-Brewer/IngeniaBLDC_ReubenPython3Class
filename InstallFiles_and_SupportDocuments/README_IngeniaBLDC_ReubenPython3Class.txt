@@ -14,7 +14,7 @@ www.reubotics.com
 
 Apache 2 License
 
-Software Revision E, 11/13/2024
+Software Revision F, 11/20/2024
 
 Verified working on:
 
@@ -32,6 +32,8 @@ program with lots of other sensors/actuators being communicated with simultaneou
 2. You MUST install Ingenia's MotionLab3 BEFORE running this software, as this software relies on MotionLab3's EoE-service for the Ethercat communication.
 
 3. If you're having trouble getting a motor to move with "test_program_for_IngeniaBLDC_ReubenPython3Class.py", then try "SimplestTest_SingleSlave_SDOnoPDO_IngeniaBLDC_ReubenPython3Class.py".
+
+4. Currently, the only supported OperationMode is "CyclicPosition".
 
 ###########################
 

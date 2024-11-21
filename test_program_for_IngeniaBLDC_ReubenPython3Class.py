@@ -6,7 +6,7 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision E, 11/13/2024
+Software Revision F, 11/20/2024
 
 Verified working on: Python 3.12 for Windows 10, 11 64-bit.
 '''
@@ -710,11 +710,11 @@ if __name__ == '__main__':
     SinusoidalMotionInput_CommandedValue = 0.0
 
     global DesiredSlaves_DictOfDicts
-    DesiredSlaves_DictOfDicts = dict([(1, dict([("SlaveID_Int", 1), ("XDFfileDictionaryPath", os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "cap-xcr-e_eoe_2.4.1.xdf"), ("Position_Max_Deg", 360.0), ("Position_Min_Deg", -360.0), ("MaxCurrent_ToBeSet", 3.1), ("MaxProfileVelocity_ToBeSet", 50000), ("MaxProfileAcceleration_ToBeSet", 100000), ("EncoderTicksPerRevolution", 8192.0)])),
-                                      (2, dict([("SlaveID_Int", 2), ("XDFfileDictionaryPath", os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "cap-xcr-e_eoe_2.4.1.xdf"), ("Position_Max_Rev", 1.00), ("Position_Min_Rev", -1.00), ("MaxCurrent_ToBeSet", 3.2), ("MaxProfileVelocity_ToBeSet", 50000), ("MaxProfileAcceleration_ToBeSet", 100000), ("EncoderTicksPerRevolution", 8192.0)])),
-                                      (3, dict([("SlaveID_Int", 3), ("XDFfileDictionaryPath", os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "cap-xcr-e_eoe_2.4.1.xdf"), ("Position_Max_Rad", 2.0*math.pi), ("Position_Min_Rad", -2.0*math.pi), ("MaxCurrent_ToBeSet", 3.3), ("MaxProfileVelocity_ToBeSet", 50000), ("MaxProfileAcceleration_ToBeSet", 100000), ("EncoderTicksPerRevolution", 8192.0)])),
-                                      (4, dict([("SlaveID_Int", 4), ("XDFfileDictionaryPath", os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "cap-xcr-e_eoe_2.4.1.xdf"), ("Position_Max_EncoderTicks", 10000.00), ("Position_Min_EncoderTicks", -10000.00), ("MaxCurrent_ToBeSet", 3.4), ("MaxProfileVelocity_ToBeSet", 50000), ("MaxProfileAcceleration_ToBeSet", 100000), ("EncoderTicksPerRevolution", 8192.0)])),
-                                      (5, dict([("SlaveID_Int", 5), ("XDFfileDictionaryPath", os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "den-xcr-e_eoe_2.5.0.xdf"), ("Position_Max_EncoderTicks", 10000.00), ("Position_Min_EncoderTicks", -10000.00), ("MaxCurrent_ToBeSet", 3.5), ("MaxProfileVelocity_ToBeSet", 50000), ("MaxProfileAcceleration_ToBeSet", 100000), ("EncoderTicksPerRevolution", 8192.0)]))])
+    DesiredSlaves_DictOfDicts = dict([(1, dict([("SlaveID_Int", 1), ("XDFfileDictionaryPath", os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "cap-xcr-e_eoe_2.4.1.xdf"), ("Position_Max_Deg", 360.0), ("Position_Min_Deg", -360.0), ("MaxCurrent_ToBeSet", 3.1), ("MaxProfileVelocity_ToBeSet", 50000), ("MaxProfileAcceleration_ToBeSet", 100000), ("EncoderTicksPerRevolution", 8192.0), ("PositionPIDgains_Kp_ToBeSet", 0.0051), ("PositionPIDgains_Ki_ToBeSet", 0.011), ("PositionPIDgains_Kd_ToBeSet", 0.0051)])),
+                                      (2, dict([("SlaveID_Int", 2), ("XDFfileDictionaryPath", os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "cap-xcr-e_eoe_2.4.1.xdf"), ("Position_Max_Rev", 1.00), ("Position_Min_Rev", -1.00), ("MaxCurrent_ToBeSet", 3.2), ("MaxProfileVelocity_ToBeSet", 50000), ("MaxProfileAcceleration_ToBeSet", 100000), ("EncoderTicksPerRevolution", 8192.0), ("PositionPIDgains_Kp_ToBeSet", 0.0052), ("PositionPIDgains_Ki_ToBeSet", 0.012), ("PositionPIDgains_Kd_ToBeSet", 0.0052)])),
+                                      (3, dict([("SlaveID_Int", 3), ("XDFfileDictionaryPath", os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "cap-xcr-e_eoe_2.4.1.xdf"), ("Position_Max_Rad", 2.0*math.pi), ("Position_Min_Rad", -2.0*math.pi), ("MaxCurrent_ToBeSet", 3.3), ("MaxProfileVelocity_ToBeSet", 50000), ("MaxProfileAcceleration_ToBeSet", 100000), ("EncoderTicksPerRevolution", 8192.0), ("PositionPIDgains_Kp_ToBeSet", 0.0053), ("PositionPIDgains_Ki_ToBeSet", 0.013), ("PositionPIDgains_Kd_ToBeSet", 0.0053)])),
+                                      (4, dict([("SlaveID_Int", 4), ("XDFfileDictionaryPath", os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "cap-xcr-e_eoe_2.4.1.xdf"), ("Position_Max_EncoderTicks", 10000.00), ("Position_Min_EncoderTicks", -10000.00), ("MaxCurrent_ToBeSet", 3.4), ("MaxProfileVelocity_ToBeSet", 50000), ("MaxProfileAcceleration_ToBeSet", 100000), ("EncoderTicksPerRevolution", 8192.0), ("PositionPIDgains_Kp_ToBeSet", 0.0054), ("PositionPIDgains_Ki_ToBeSet", 0.014), ("PositionPIDgains_Kd_ToBeSet", 0.0054)])),
+                                      (5, dict([("SlaveID_Int", 5), ("XDFfileDictionaryPath", os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "den-xcr-e_eoe_2.5.0.xdf"), ("Position_Max_EncoderTicks", 10000.00), ("Position_Min_EncoderTicks", -10000.00), ("MaxCurrent_ToBeSet", 3.5), ("MaxProfileVelocity_ToBeSet", 50000), ("MaxProfileAcceleration_ToBeSet", 100000), ("EncoderTicksPerRevolution", 8192.0), ("PositionPIDgains_Kp_ToBeSet", 0.0055), ("PositionPIDgains_Ki_ToBeSet", 0.015), ("PositionPIDgains_Kd_ToBeSet", 0.0055)]))])
     #################################################
     #################################################
 
@@ -733,27 +733,6 @@ if __name__ == '__main__':
 
     global IngeniaBLDC_MostRecentDict_DetectedSlaveID_List
     IngeniaBLDC_MostRecentDict_DetectedSlaveID_List = []
-
-    global IngeniaBLDC_PositionPIDgains_Kp_1
-    IngeniaBLDC_PositionPIDgains_Kp_1 = 0.005
-    
-    global IngeniaBLDC_PositionPIDgains_Ki_1
-    IngeniaBLDC_PositionPIDgains_Ki_1 = 0.010
-    
-    global IngeniaBLDC_PositionPIDgains_Kd_1
-    IngeniaBLDC_PositionPIDgains_Kd_1 = 0.005
-
-    global IngeniaBLDC_PositionPIDgains_Kp_2
-    IngeniaBLDC_PositionPIDgains_Kp_2 = 0.005
-
-    global IngeniaBLDC_PositionPIDgains_Ki_2
-    IngeniaBLDC_PositionPIDgains_Ki_2 = 0.010
-
-    global IngeniaBLDC_PositionPIDgains_Kd_2
-    IngeniaBLDC_PositionPIDgains_Kd_2 = 0.005
-
-    global IngeniaBLDC_NeedToUpdatePositionPIDgainsFlag
-    IngeniaBLDC_NeedToUpdatePositionPIDgainsFlag = 1
     #################################################
     #################################################
 
@@ -981,13 +960,7 @@ if __name__ == '__main__':
     global EntryListWithBlinking_Variables_ListOfDicts
     EntryListWithBlinking_Variables_ListOfDicts = [dict([("Name", "USE_SINUSOIDAL_POS_CONTROL_INPUT_FLAG"),("Type", "float"),("StartingVal", USE_SINUSOIDAL_POS_CONTROL_INPUT_FLAG),("MinVal", 0.0),("MaxVal", 1.0),("EntryBlinkEnabled", 0),("EntryWidth", EntryWidth),("LabelWidth", LabelWidth),("FontSize", FontSize)]),
                                                    dict([("Name", "SinusoidalMotionInput_MaxValue_PositionControl"),("Type", "float"),("StartingVal", SinusoidalMotionInput_MaxValue_PositionControl),("MinVal", 0.0),("MaxVal", 360.0),("EntryBlinkEnabled", 0),("EntryWidth", EntryWidth),("LabelWidth", LabelWidth),("FontSize", FontSize)]),
-                                                   dict([("Name", "SinusoidalMotionInput_ROMtestTimeToPeakAngle"),("Type", "float"),("StartingVal", SinusoidalMotionInput_ROMtestTimeToPeakAngle),("MinVal", 0.0),("MaxVal", 360.0),("EntryBlinkEnabled", 0),("EntryWidth", EntryWidth),("LabelWidth", LabelWidth),("FontSize", FontSize)]),
-                                                   dict([("Name", "IngeniaBLDC_PositionPIDgains_Kp_1"),("Type", "float"),("StartingVal", IngeniaBLDC_PositionPIDgains_Kp_1),("MinVal", -1000.0),("MaxVal", 1000.0),("EntryBlinkEnabled", 0),("EntryWidth", EntryWidth),("LabelWidth", LabelWidth),("FontSize", FontSize)]),
-                                                   dict([("Name", "IngeniaBLDC_PositionPIDgains_Ki_1"),("Type", "float"),("StartingVal", IngeniaBLDC_PositionPIDgains_Ki_1),("MinVal", -1000.0),("MaxVal", 1000.0),("EntryBlinkEnabled", 0),("EntryWidth", EntryWidth),("LabelWidth", LabelWidth),("FontSize", FontSize)]),
-                                                   dict([("Name", "IngeniaBLDC_PositionPIDgains_Kd_1"),("Type", "float"),("StartingVal", IngeniaBLDC_PositionPIDgains_Kd_1),("MinVal", -1000.0),("MaxVal", 1000.0),("EntryBlinkEnabled", 0),("EntryWidth", EntryWidth),("LabelWidth", LabelWidth),("FontSize", FontSize)]),
-                                                   dict([("Name", "IngeniaBLDC_PositionPIDgains_Kp_2"),("Type", "float"),("StartingVal", IngeniaBLDC_PositionPIDgains_Kp_2),("MinVal", -1000.0),("MaxVal", 1000.0),("EntryBlinkEnabled", 0),("EntryWidth", EntryWidth),("LabelWidth", LabelWidth),("FontSize", FontSize)]),
-                                                   dict([("Name", "IngeniaBLDC_PositionPIDgains_Ki_2"),("Type", "float"),("StartingVal", IngeniaBLDC_PositionPIDgains_Ki_2),("MinVal", -1000.0),("MaxVal", 1000.0),("EntryBlinkEnabled", 0),("EntryWidth", EntryWidth),("LabelWidth", LabelWidth),("FontSize", FontSize)]),
-                                                   dict([("Name", "IngeniaBLDC_PositionPIDgains_Kd_2"),("Type", "float"),("StartingVal", IngeniaBLDC_PositionPIDgains_Kd_2),("MinVal", -1000.0),("MaxVal", 1000.0),("EntryBlinkEnabled", 0),("EntryWidth", EntryWidth),("LabelWidth", LabelWidth),("FontSize", FontSize)])]
+                                                   dict([("Name", "SinusoidalMotionInput_ROMtestTimeToPeakAngle"),("Type", "float"),("StartingVal", SinusoidalMotionInput_ROMtestTimeToPeakAngle),("MinVal", 0.0),("MaxVal", 360.0),("EntryBlinkEnabled", 0),("EntryWidth", EntryWidth),("LabelWidth", LabelWidth),("FontSize", FontSize)])]
 
     global EntryListWithBlinking_ReubenPython2and3ClassObject_setup_dict
     EntryListWithBlinking_ReubenPython2and3ClassObject_setup_dict = dict([("GUIparametersDict", EntryListWithBlinking_ReubenPython2and3ClassObject_GUIparametersDict),
@@ -1001,7 +974,7 @@ if __name__ == '__main__':
 
         except:
             exceptions = sys.exc_info()[0]
-            print("EntryListWithBlinking_ReubenPython2and3ClassObject __init__: Exceptions: %s" % exceptions, 0)
+            print("EntryListWithBlinking_ReubenPython2and3ClassObject __init__: Exceptions: %s" % exceptions)
             traceback.print_exc()
     #################################################
     #################################################
@@ -1133,14 +1106,20 @@ if __name__ == '__main__':
     #################################################
     if IngeniaBLDC_OPEN_FLAG == 1 and EXIT_PROGRAM_FLAG == 0:
 
+        #################################################
         IngeniaBLDC_MostRecentDict = IngeniaBLDC_Object.GetMostRecentDataDict()
         IngeniaBLDC_MostRecentDict_DetectedSlaveID_List = IngeniaBLDC_MostRecentDict["DetectedSlaveID_List"]
+        #################################################
 
+        ################################################# Uncomment this section only to test certain "_ExternalProgram" functions!
         for SlaveID_Int in IngeniaBLDC_MostRecentDict_DetectedSlaveID_List:
-            IngeniaBLDC_Object.SetPositionPIDgains_ExternalProgram(SlaveID_Int, Kp_ToBeSet=0.005, Ki_ToBeSet=0.001, Kd_ToBeSet=0.001, PrintDebugFlag=1)
+            dummy = 0
+            #IngeniaBLDC_Object.SetPositionPIDgains_ExternalProgram(SlaveID_Int, Kp_ToBeSet=0.005, Ki_ToBeSet=0.001, Kd_ToBeSet=0.001, PrintDebugFlag=1)
             #IngeniaBLDC_Object.SetMaxCurrent_ExternalProgram(SlaveID_Int, 2.0, PrintDebugFlag=1)
             #IngeniaBLDC_Object.SetMaxProfileVelocity_ExternalProgram(SlaveID_Int, 50000.0, PrintDebugFlag=1)
             #IngeniaBLDC_Object.SetMaxProfileAcceleration_ExternalProgram(SlaveID_Int, 100000.0, PrintDebugFlag=1)
+        #################################################
+
     #################################################
     #################################################
 
@@ -1195,15 +1174,6 @@ if __name__ == '__main__':
                     USE_SINUSOIDAL_POS_CONTROL_INPUT_FLAG = int(EntryListWithBlinking_MostRecentDict["SinusoidalMotionInput_MaxValue_PositionControl"])
                     SinusoidalMotionInput_MaxValue_PositionControl = EntryListWithBlinking_MostRecentDict["SinusoidalMotionInput_MaxValue_PositionControl"]
                     SinusoidalMotionInput_ROMtestTimeToPeakAngle = EntryListWithBlinking_MostRecentDict["SinusoidalMotionInput_ROMtestTimeToPeakAngle"]
-                    IngeniaBLDC_PositionPIDgains_Kp_1 = EntryListWithBlinking_MostRecentDict["IngeniaBLDC_PositionPIDgains_Kp_1"]
-                    IngeniaBLDC_PositionPIDgains_Ki_1 = EntryListWithBlinking_MostRecentDict["IngeniaBLDC_PositionPIDgains_Ki_1"]
-                    IngeniaBLDC_PositionPIDgains_Kd_1 = EntryListWithBlinking_MostRecentDict["IngeniaBLDC_PositionPIDgains_Kd_1"]
-                    IngeniaBLDC_PositionPIDgains_Kp_2 = EntryListWithBlinking_MostRecentDict["IngeniaBLDC_PositionPIDgains_Kp_2"]
-                    IngeniaBLDC_PositionPIDgains_Ki_2 = EntryListWithBlinking_MostRecentDict["IngeniaBLDC_PositionPIDgains_Ki_2"]
-                    IngeniaBLDC_PositionPIDgains_Kd_2 = EntryListWithBlinking_MostRecentDict["IngeniaBLDC_PositionPIDgains_Kd_2"]
-
-                    IngeniaBLDC_NeedToUpdatePositionPIDgainsFlag = 1
-
         ###################################################
 
         ###################################################
@@ -1244,14 +1214,6 @@ if __name__ == '__main__':
                     IngeniaBLDC_Object.SetEncoderOffset_ExternalProgram(SlaveID_Int, 0.0, PrintDebugFlag=1)
 
                 ZeroEncoderOffsetOnAllMotors_EventNeedsToBeFiredFlag = 0
-            ###################################################
-
-            ###################################################
-            if IngeniaBLDC_NeedToUpdatePositionPIDgainsFlag == 1:
-                for SlaveID_Int in DesiredSlaves_DictOfDicts:
-                    IngeniaBLDC_Object.SetPositionPIDgains_ExternalProgram(SlaveID_Int, IngeniaBLDC_PositionPIDgains_Kp_1, IngeniaBLDC_PositionPIDgains_Ki_1, IngeniaBLDC_PositionPIDgains_Kd_1)
-
-                IngeniaBLDC_NeedToUpdatePositionPIDgainsFlag = 0
             ###################################################
 
             ###################################################

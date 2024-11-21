@@ -6,7 +6,7 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision E, 11/13/2024
+Software Revision F, 11/20/2024
 
 Verified working on: Python 3.12 for Windows 10, 11 64-bit.
 '''
@@ -15,6 +15,7 @@ __author__ = 'reuben.brewer'
 
 ##########################################
 from GetPIDsByProcessEnglishNameAndOptionallyKill_ReubenPython2and3 import *
+from EntryListWithBlinking_ReubenPython2and3Class import *
 from LowPassFilterForDictsOfLists_ReubenPython2and3Class import *
 ##########################################
 
@@ -1413,6 +1414,18 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
 
                 ##########################################################################################################
                 ##########################################################################################################
+                if self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionPIDgains_Kp_ToBeSet"] != -11111.0 and\
+                    self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionPIDgains_Ki_ToBeSet"] != -11111.0 and\
+                    self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionPIDgains_Kd_ToBeSet"] != -11111.0:
+                        self.__SetPositionPIDgains(SlaveID_Int, self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionPIDgains_Kp_ToBeSet"],
+                                                   self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionPIDgains_Ki_ToBeSet"],
+                                                   self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionPIDgains_Kd_ToBeSet"],
+                                                   PrintDebugFlag=1)
+                ##########################################################################################################
+                ##########################################################################################################
+
+                ##########################################################################################################
+                ##########################################################################################################
                 self.SetEnabledState_ExternalProgram(SlaveID_Int, self.EnableMotorAtStartOfProgramFlag)
                 ##########################################################################################################
                 ##########################################################################################################
@@ -1722,8 +1735,13 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
 
                 self.__GetPositionPIDgains(SlaveID_Int)
 
+                self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_ReubenPython2and3ClassObject_NeedsToBeUpdatedFromExternalSourceFlag"] = 1
+
                 if PrintDebugFlag == 1:
-                    print("__SetPositionPIDgains event fired for SlaveID_Int = " + str(SlaveID_Int))
+                    print("__SetPositionPIDgains event fired for SlaveID_Int = " + str(SlaveID_Int) +
+                          ", Kp = " + str(Kp_ToBeSet) +
+                          ", Ki = " + str(Ki_ToBeSet) +
+                          ", Kd = " + str(Kd_ToBeSet))
 
         except:
             exceptions = sys.exc_info()[0]
@@ -3218,7 +3236,7 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
         #################################################
         #################################################
         for SlaveID_Int in self.DetectedSlaveID_List:
-
+        
             #################################################
             self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfoFrame"] = Frame(self.AllMotorsInfoFrame)
             self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfoFrame"]["borderwidth"] = 2
@@ -3226,36 +3244,86 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
             self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfoFrame"].grid(row=0, column=SlaveID_Int-1, padx=self.GUI_PADX, pady=self.GUI_PADY, rowspan=1, columnspan=1)
             #################################################
 
+            #################################################
+            self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfoCanvas"] = Canvas(self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfoFrame"])
+            self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfoCanvas"].grid(row=0, column=0, padx=self.GUI_PADX, pady=self.GUI_PADY, rowspan=1, columnspan=1)
 
+            #self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfoCanvas_Scrollbar"] = Scrollbar(self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfoFrame"], orient='vertical')
+            #self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfoCanvas_Scrollbar"].grid(row=0, column=1, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
+            #self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfoCanvas_Scrollbar"].config(command = self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfoCanvas"].yview)
+            #################################################
 
             #################################################
-            self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfo_Label"] = Label(self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfoFrame"], text="IndividualMotorInfo_Label " + str(SlaveID_Int), width=40)
+            self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfo_Label"] = Label(self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfoCanvas"],
+                                                                                                              text="IndividualMotorInfo_Label " + str(SlaveID_Int),
+                                                                                                              width=55)
+
             self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfo_Label"].grid(row=0, column=0, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
             #################################################
 
             #################################################
-            self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EnabledState_Button"] = Button(self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfoFrame"],
+            self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfo_ButtonsFrame"] = Frame(self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfoCanvas"])
+            self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfo_ButtonsFrame"].grid(row=1, column=0, padx=self.GUI_PADX, pady=self.GUI_PADY, rowspan=1, columnspan=1)
+            #################################################
+
+            #################################################
+            self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EnabledState_Button"] = Button(self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfo_ButtonsFrame"],
                                                                                                          text="EnabledState_Button " + str(SlaveID_Int), state="normal",
                                                                                                          width=20,
                                                                                                          bg=self.TKinter_LightYellowColor,
                                                                                                          command=lambda name=SlaveID_Int: self.EnabledState_Button_Response(name))
 
-            self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EnabledState_Button"].grid(row=1, column=0, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
+            self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EnabledState_Button"].grid(row=0, column=0, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
             #################################################
             
             #################################################
-            self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["ZeroEncoder_Button"] = Button(self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfoFrame"],
+            self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["ZeroEncoder_Button"] = Button(self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfo_ButtonsFrame"],
                                                                                                          text="ZeroEncoder_Button " + str(SlaveID_Int), state="normal",
                                                                                                          width=20,
                                                                                                          bg=self.TKinter_DefaultGrayColor,
                                                                                                          command=lambda name=SlaveID_Int: self.ZeroEncoder_Button_Response(name))
 
-            self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["ZeroEncoder_Button"].grid(row=2, column=0, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
+            self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["ZeroEncoder_Button"].grid(row=0, column=1, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
+            #################################################
+
+            #################################################
+            self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_ReubenPython2and3ClassObject_GUIparametersDict"] = dict([("root", self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfoCanvas"]),
+                                                                                                                                                    ("UseBorderAroundThisGuiObjectFlag", 0),
+                                                                                                                                                    ("GUI_ROW", 3),
+                                                                                                                                                    ("GUI_COLUMN", 0),
+                                                                                                                                                    ("GUI_PADX", 1),
+                                                                                                                                                    ("GUI_PADY", 1),
+                                                                                                                                                    ("GUI_ROWSPAN", 1),
+                                                                                                                                                    ("GUI_COLUMNSPAN", 1)])
+
+            EntryWidth = 10
+            LabelWidth = 40
+            FontSize = 8
+            self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_Variables_ListOfDicts"] = [dict([("Name", "PositionPIDgains_Kp_ToBeSet"),("Type", "float"),("StartingVal", self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionPIDgains_Kp_ToBeSet"]),("MinVal", -1000000.0),("MaxVal", 1000000.0),("EntryBlinkEnabled", 0),("EntryWidth", EntryWidth),("LabelWidth", LabelWidth),("FontSize", FontSize)]),
+                                                                                                                           dict([("Name", "PositionPIDgains_Ki_ToBeSet"),("Type", "float"),("StartingVal", self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionPIDgains_Ki_ToBeSet"]),("MinVal", -1000000.0),("MaxVal", 1000000.0),("EntryBlinkEnabled", 0),("EntryWidth", EntryWidth),("LabelWidth", LabelWidth),("FontSize", FontSize)]),
+                                                                                                                           dict([("Name", "PositionPIDgains_Kd_ToBeSet"),("Type", "float"),("StartingVal", self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionPIDgains_Kd_ToBeSet"]),("MinVal", -1000000.0),("MaxVal", 1000000.0),("EntryBlinkEnabled", 0),("EntryWidth", EntryWidth),("LabelWidth", LabelWidth),("FontSize", FontSize)])]
+
+            self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_ReubenPython2and3ClassObject_setup_dict"] = dict([("GUIparametersDict", self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_ReubenPython2and3ClassObject_GUIparametersDict"]),
+                                                                                                                                                  ("EntryListWithBlinking_Variables_ListOfDicts", self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_Variables_ListOfDicts"]),
+                                                                                                                                                  ("DebugByPrintingVariablesFlag", 0),
+                                                                                                                                                  ("LoseFocusIfMouseLeavesEntryFlag", 0)])
+
+            try:
+                self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_ReubenPython2and3ClassObject"] = EntryListWithBlinking_ReubenPython2and3Class(self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_ReubenPython2and3ClassObject_setup_dict"])
+                self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_OPEN_FLAG"] = self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_ReubenPython2and3ClassObject"].OBJECT_CREATED_SUCCESSFULLY_FLAG
+                self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_MostRecentDict_DataUpdateNumber"] = 0
+                self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_MostRecentDict_DataUpdateNumber_last"] = -1
+                self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_ReubenPython2and3ClassObject_NeedsToBeUpdatedFromExternalSourceFlag"] = 0
+
+            except:
+                exceptions = sys.exc_info()[0]
+                print("GUI_Thread EntryListWithBlinking_ReubenPython2and3ClassObject: Exceptions: %s" % exceptions)
+                traceback.print_exc()
             #################################################
 
             ###################################################
             self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorMotionSetpoint_GUIscale_Value"] = DoubleVar()
-            self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorMotionSetpoint_GUIscale_ScaleObject"] = Scale(self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfoFrame"],
+            self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorMotionSetpoint_GUIscale_ScaleObject"] = Scale(self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfoCanvas"],
                                                                                                                                        from_=self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionMin_AllUnitsDict"]["EncoderTicks"],
                                                                                                                                        to=self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionMax_AllUnitsDict"]["EncoderTicks"],
                                                                                                                                        orient=HORIZONTAL,
@@ -3270,7 +3338,7 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
             self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorMotionSetpoint_GUIscale_ScaleObject"].bind('<B1-Motion>', lambda event, name=SlaveID_Int: self.IndividualMotorMotionSetpoint_GUIscale_EventResponse(event, name))
             self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorMotionSetpoint_GUIscale_ScaleObject"].bind('<ButtonRelease-1>', lambda event, name=SlaveID_Int: self.IndividualMotorMotionSetpoint_GUIscale_EventResponse(event, name))
             self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorMotionSetpoint_GUIscale_ScaleObject"].set(self.IngeniaMotionController_MainDict[SlaveID_Int]["Position_ToBeSet_EncoderTicks"])
-            self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorMotionSetpoint_GUIscale_ScaleObject"].grid(row=3, column=0, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
+            self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorMotionSetpoint_GUIscale_ScaleObject"].grid(row=2, column=0, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
             self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorMotionSetpoint_GUIscale_ScaleObject_ValueNeedsToBeUpdated"] = 0
             ###################################################
 
@@ -3359,8 +3427,10 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
         #######################################################
         #######################################################
         #######################################################
+        #######################################################
         if self.USE_GUI_FLAG == 1 and self.EXIT_PROGRAM_FLAG == 0:
 
+            #######################################################
             #######################################################
             #######################################################
             #######################################################
@@ -3370,8 +3440,10 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                 #######################################################
                 #######################################################
                 #######################################################
+                #######################################################
                 try:
 
+                    #######################################################
                     #######################################################
                     #######################################################
                     self.Data_Label["text"] = "Time, PDO callback Tx: " + self.ConvertFloatToStringWithNumberOfLeadingNumbersAndDecimalPlaces_NumberOrListInput(self.CurrentTime_CalculatedFromTPDOcallback, 0, 3) +\
@@ -3389,11 +3461,14 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
 
                     #######################################################
                     #######################################################
+                    #######################################################
 
+                    #######################################################
                     #######################################################
                     #######################################################
                     for SlaveID_Int in self.DetectedSlaveID_List:
 
+                        #######################################################
                         #######################################################
                         if self.IngeniaMotionController_MainDict[SlaveID_Int]["EnabledState_Actual"] == 1:
                             self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EnabledState_Button"]["bg"] = self.TKinter_LightGreenColor
@@ -3404,7 +3479,9 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                         else:
                             self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EnabledState_Button"]["bg"] = self.TKinter_LightYellowColor
                         #######################################################
+                        #######################################################
 
+                        #######################################################
                         #######################################################
                         DictToDisplay = dict([("SlaveID_Int", self.IngeniaMotionController_MainDict[SlaveID_Int]["SlaveID_Int"]),
                                               ("MotorConnectedFlag", self.IngeniaMotionController_MainDict[SlaveID_Int]["MotorConnectedFlag"]),
@@ -3419,41 +3496,95 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                                               ("MaxProfileVelocity_Actual", self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxProfileVelocity_Actual"]),
                                               ("MaxProfileAcceleration_Actual", self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxProfileAcceleration_Actual"]),
                                               ("PositionMin_AllUnitsDict", self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionMin_AllUnitsDict"]),
-                                              ("PositionMax_AllUnitsDict", self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionMax_AllUnitsDict"]),
-                                              ("StatusWordFlagStates_DictEnglishNameAsKey", self.IngeniaMotionController_MainDict[SlaveID_Int]["StatusWordFlagStates_DictEnglishNameAsKey"]),
-                                              ("STOstatusFlagStates_DictEnglishNameAsKey", self.IngeniaMotionController_MainDict[SlaveID_Int]["STOstatusFlagStates_DictEnglishNameAsKey"]) ])
-
+                                              ("PositionMax_AllUnitsDict", self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionMax_AllUnitsDict"])])
 
                         self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfo_Label"]["text"] = self.ConvertDictToProperlyFormattedStringForPrinting(DictToDisplay,
-                                                                                                    NumberOfDecimalsPlaceToUse = 3,
+                                                                                                    NumberOfDecimalsPlaceToUse = 4,
                                                                                                     NumberOfEntriesPerLine = 1,
                                                                                                     NumberOfTabsBetweenItems = 1)
+
+                        self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfo_Label"]["text"] = self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfo_Label"]["text"] +\
+                                                                self.ConvertDictToProperlyFormattedStringForPrinting(self.IngeniaMotionController_MainDict[SlaveID_Int]["StatusWordFlagStates_DictEnglishNameAsKey"], 0, 2, 2) + \
+                                                                "\n\n" + \
+                                                                self.ConvertDictToProperlyFormattedStringForPrinting(self.IngeniaMotionController_MainDict[SlaveID_Int]["STOstatusFlagStates_DictEnglishNameAsKey"], 0, 2, 2)
+
 
                         self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfo_Label"]["text"] = self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfo_Label"]["text"] + \
                                                                                                                             "\nPosition Actual" +\
                                                                                                                             self.ConvertDictToProperlyFormattedStringForPrinting(self.IngeniaMotionController_MainDict[SlaveID_Int]["Position_Actual_AllUnitsDict"], 3, 1, 1) + \
-                                                                                                                            "\nVelocity Actual" + \
+                                                                                                                            "Velocity Actual" + \
                                                                                                                             self.ConvertDictToProperlyFormattedStringForPrinting(self.IngeniaMotionController_MainDict[SlaveID_Int]["Velocity_Actual_AllUnitsDict"], 6, 1, 1)
                         #######################################################
+                        #######################################################
 
+                        #######################################################
                         #######################################################
                         if self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorMotionSetpoint_GUIscale_ScaleObject_ValueNeedsToBeUpdated"] == 1:
                             self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorMotionSetpoint_GUIscale_ScaleObject"].set(self.IngeniaMotionController_MainDict[SlaveID_Int]["Position_ToBeSet_EncoderTicks"])
                             self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorMotionSetpoint_GUIscale_ScaleObject_ValueNeedsToBeUpdated"] = 0
                         #######################################################
+                        #######################################################
+
+                        #########################################################
+                        #######################################################
+                        if self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_OPEN_FLAG"] == 1:
+
+                            #######################################################
+                            if self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_ReubenPython2and3ClassObject_NeedsToBeUpdatedFromExternalSourceFlag"] == 1:
+                                self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_ReubenPython2and3ClassObject"].SetEntryValue("PositionPIDgains_Kp_ToBeSet", self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionPIDgains_Kp_ToBeSet"])
+                                self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_ReubenPython2and3ClassObject"].SetEntryValue("PositionPIDgains_Ki_ToBeSet", self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionPIDgains_Ki_ToBeSet"])
+                                self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_ReubenPython2and3ClassObject"].SetEntryValue("PositionPIDgains_Kd_ToBeSet", self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionPIDgains_Kd_ToBeSet"])
+
+                                self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_ReubenPython2and3ClassObject_NeedsToBeUpdatedFromExternalSourceFlag"] = 0
+                            #######################################################
+
+                            #######################################################
+                            self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_MostRecentDict"] = self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_ReubenPython2and3ClassObject"].GetMostRecentDataDict()
+                            #print(self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_MostRecentDict"])
+
+                            if "DataUpdateNumber" in self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_MostRecentDict"]:
+                                self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_MostRecentDict_DataUpdateNumber"] = self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_MostRecentDict"]["DataUpdateNumber"]
+
+                            if self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_MostRecentDict_DataUpdateNumber"] != self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_MostRecentDict_DataUpdateNumber_last"]:
+                                self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_MostRecentDict_DataUpdateNumber"] = self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_MostRecentDict"]["DataUpdateNumber"]
+
+                                if self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_MostRecentDict_DataUpdateNumber"] >= 1:
+                                    self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionPIDgains_Kp_ToBeSet"] = float(self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_MostRecentDict"]["PositionPIDgains_Kp_ToBeSet"])
+                                    self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionPIDgains_Ki_ToBeSet"] = float(self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_MostRecentDict"]["PositionPIDgains_Ki_ToBeSet"])
+                                    self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionPIDgains_Kd_ToBeSet"] = float(self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_MostRecentDict"]["PositionPIDgains_Kd_ToBeSet"])
+                                    self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionPIDgains_NeedsToBeSetFlag"] = 1
+                            #######################################################
+
+                            #######################################################
+                            self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_ReubenPython2and3ClassObject"].GUI_update_clock()
+                            #######################################################
+
+                        #######################################################
+                        #######################################################
+
+                        ###################################################
+                        #######################################################
+                        self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_MostRecentDict_DataUpdateNumber_last"] = self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_MostRecentDict_DataUpdateNumber"]
+                        ###################################################
+                        #######################################################
 
                     #######################################################
                     #######################################################
+                    #######################################################
 
+                    #######################################################
                     #######################################################
                     #######################################################
                     self.PrintToGui_Label.config(text=self.PrintToGui_Label_TextInput_Str)
                     #######################################################
                     #######################################################
+                    #######################################################
 
                     #######################################################
                     #######################################################
+                    #######################################################
                     self.UpdateFrequencyCalculation_GUIthread_Filtered()
+                    #######################################################
                     #######################################################
                     #######################################################
 
@@ -3464,12 +3595,15 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                 #######################################################
                 #######################################################
                 #######################################################
+                #######################################################
 
             #######################################################
             #######################################################
             #######################################################
             #######################################################
+            #######################################################
 
+        #######################################################
         #######################################################
         #######################################################
         #######################################################
