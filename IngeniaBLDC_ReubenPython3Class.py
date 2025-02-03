@@ -2102,9 +2102,16 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                 PIDcontrollerMaxOutputUmax_ToBeSet = 100000
                 PIDcontrollerMinOutputUmin_ToBeSet = -1.0*PIDcontrollerMaxOutputUmax_ToBeSet
 
+                ###
                 #self.IngeniaMotionControllerObject.communication.set_register("CL_POS_PID_KD_FILTER", KdFilter_ToBeSet, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
                 self.IngeniaMotionControllerObject.communication.set_register("CL_POS_PID_MAX_OUT", PIDcontrollerMaxOutputUmax_ToBeSet, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
                 self.IngeniaMotionControllerObject.communication.set_register("CL_POS_PID_MIN_OUT", PIDcontrollerMinOutputUmin_ToBeSet, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+                ###
+
+                ### Not sure why these registers (which are supposed to be in CL Torque mode) are limiting in position control, but they are.
+                self.IngeniaMotionControllerObject.communication.set_register("CL_TOR_PID_MAX_OUT", self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxCurrent_ToBeSet"], servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+                self.IngeniaMotionControllerObject.communication.set_register("CL_TOR_PID_MIN_OUT", -1.0*self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxCurrent_ToBeSet"], servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+                ###
 
                 time.sleep(0.001)
 
