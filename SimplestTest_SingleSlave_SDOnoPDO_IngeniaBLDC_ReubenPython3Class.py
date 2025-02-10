@@ -6,7 +6,7 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision G, 02/02/2025
+Software Revision H, 02/10/2025
 
 Verified working on: Python 3.12 for Windows 10, 11 64-bit.
 '''
@@ -144,14 +144,17 @@ if __name__ == '__main__':
     ##########################################################################################################
 
     ######## $$$$$$$ %%%%%%% ^^^^^^^ IMPORTANT FLAG
-    ApplyNewSettingsToMotorFlag = 1
+    ApplyNewSettingsToMotorFlag = 0
     ######## $$$$$$$ %%%%%%% ^^^^^^^ IMPORTANT FLAG
 
-    #DesiredInterfaceName = "ASIX USB to Gigabit Ethernet Family Adapter"
+    DesiredInterfaceName = "ASIX USB to Gigabit Ethernet Family Adapter"
     #DesiredInterfaceName = "Intel(R) Ethernet Connection (2) I219-LM"
-    DesiredInterfaceName = "Realtek USB GbE Family Controller"
+    #DesiredInterfaceName = "Realtek USB GbE Family Controller"
+    #DesiredInterfaceName = "Dell Realtek USB GbE Family Controller"
+    #DesiredInterfaceName = "Anker Realtek USB GbE Family Controller #2"
 
-    XDFfileDictionaryPath = os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "cap-xcr-e_eoe_2.4.1.xdf"  # "cap-xcr-e_eoe_2.4.1.xdf"  #den-xcr-e_eoe_2.5.0.xdf
+    #XDFfileDictionaryPath = os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "cap-xcr-e_eoe_2.4.1.xdf"
+    XDFfileDictionaryPath = os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "den-xcr-e_eoe_2.5.0.xdf"
 
     OperationModeSelected = "CyclicPosition"
     #OperationModeSelected = "CyclicCurrent"
@@ -160,6 +163,7 @@ if __name__ == '__main__':
     ######## $$$$$$$ %%%%%%% ^^^^^^^ IMPORTANT FLAG
     EncoderTicksPerRevolution = 2048*4 #CPR*4, Maxon
     #EncoderTicksPerRevolution = 145.1*1 #CPR*4, GoBilda 5203-2402-0005 (1150RPM)
+    #EncoderTicksPerRevolution = 1234 #Random test value.
     ######## $$$$$$$ %%%%%%% ^^^^^^^ IMPORTANT FLAG
 
     ######## $$$$$$$ %%%%%%% ^^^^^^^ IMPORTANT FLAG
@@ -185,6 +189,7 @@ if __name__ == '__main__':
 
     MaxCurrent = 4.24 #Maxon motor
     #MaxCurrent = 10.0 #GoBilda 5203-2402-0005 (1150RPM)
+    #MaxCurrent = 0.1234 Random test value
 
     MinPosition_EncoderTicks = -12000.0
     MaxPosition_EncoderTicks = 11000.0
@@ -195,9 +200,17 @@ if __name__ == '__main__':
     MaxProfileVelocity = 50000.0
     MaxProfileAcceleration = 20000.0
 
-    PositionPIDgains_Kp_ToBeSet = 0.01#0.05
+    '''
+    PositionPIDgains_Kp_ToBeSet = 0.01
     PositionPIDgains_Ki_ToBeSet = 0.2
     PositionPIDgains_Kd_ToBeSet = 0.1
+    '''
+
+    #'''
+    PositionPIDgains_Kp_ToBeSet = 1.0
+    PositionPIDgains_Ki_ToBeSet = 0.0
+    PositionPIDgains_Kd_ToBeSet = 0.0
+    #'''
 
     MotorEnabled_State = 0
 
