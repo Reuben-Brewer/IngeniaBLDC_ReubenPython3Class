@@ -6,7 +6,7 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision H, 02/10/2025
+Software Revision I, 03/28/2025
 
 Verified working on: Python 3.12 for Windows 10, 11 64-bit.
 '''
@@ -144,17 +144,17 @@ if __name__ == '__main__':
     ##########################################################################################################
 
     ######## $$$$$$$ %%%%%%% ^^^^^^^ IMPORTANT FLAG
-    ApplyNewSettingsToMotorFlag = 0
+    ApplyNewSettingsToMotorFlag = 1
     ######## $$$$$$$ %%%%%%% ^^^^^^^ IMPORTANT FLAG
 
-    DesiredInterfaceName = "ASIX USB to Gigabit Ethernet Family Adapter"
+    #DesiredInterfaceName = "ASIX USB to Gigabit Ethernet Family Adapter"
     #DesiredInterfaceName = "Intel(R) Ethernet Connection (2) I219-LM"
     #DesiredInterfaceName = "Realtek USB GbE Family Controller"
     #DesiredInterfaceName = "Dell Realtek USB GbE Family Controller"
-    #DesiredInterfaceName = "Anker Realtek USB GbE Family Controller #2"
+    DesiredInterfaceName = "Anker Realtek USB GbE Family Controller #2"
 
-    #XDFfileDictionaryPath = os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "cap-xcr-e_eoe_2.4.1.xdf"
-    XDFfileDictionaryPath = os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "den-xcr-e_eoe_2.5.0.xdf"
+    XDFfileDictionaryPath = os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "cap-xcr-e_eoe_2.4.1.xdf"
+    #XDFfileDictionaryPath = os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "den-xcr-e_eoe_2.5.0.xdf"
 
     OperationModeSelected = "CyclicPosition"
     #OperationModeSelected = "CyclicCurrent"
@@ -167,8 +167,8 @@ if __name__ == '__main__':
     ######## $$$$$$$ %%%%%%% ^^^^^^^ IMPORTANT FLAG
 
     ######## $$$$$$$ %%%%%%% ^^^^^^^ IMPORTANT FLAG
-    SinusoidalMotionInput_MinValue = -2.0*EncoderTicksPerRevolution #PositionControl
-    SinusoidalMotionInput_MaxValue = 2.0*EncoderTicksPerRevolution #PositionControl
+    SinusoidalMotionInput_MinValue = -20.0*EncoderTicksPerRevolution #PositionControl
+    SinusoidalMotionInput_MaxValue = 20.0*EncoderTicksPerRevolution #PositionControl
 
     #SinusoidalMotionInput_MinValue = -4.24 #CurrentControl
     #SinusoidalMotionInput_MaxValue = 4.24 #CurrentControl
@@ -187,9 +187,9 @@ if __name__ == '__main__':
     UseBrakeFlag = 0
     ######## $$$$$$$ %%%%%%% ^^^^^^^ IMPORTANT FLAG
 
-    MaxCurrent = 4.24 #Maxon motor
-    #MaxCurrent = 10.0 #GoBilda 5203-2402-0005 (1150RPM)
-    #MaxCurrent = 0.1234 Random test value
+    MaxCurrentHardLimit = 4.24 #Maxon motor
+    #MaxCurrentHardLimit = 10.0 #GoBilda 5203-2402-0005 (1150RPM)
+    #MaxCurrentHardLimit = 0.1234 Random test value
 
     MinPosition_EncoderTicks = -12000.0
     MaxPosition_EncoderTicks = 11000.0
@@ -207,7 +207,7 @@ if __name__ == '__main__':
     '''
 
     #'''
-    PositionPIDgains_Kp_ToBeSet = 1.0
+    PositionPIDgains_Kp_ToBeSet = 0.01
     PositionPIDgains_Ki_ToBeSet = 0.0
     PositionPIDgains_Kd_ToBeSet = 0.0
     #'''
@@ -434,7 +434,7 @@ if __name__ == '__main__':
             IngeniaMotionControllerObject.communication.set_register("CL_POS_REF_MIN", int(1.0*MinPosition_EncoderTicks)) #User minimum allowed position.
             IngeniaMotionControllerObject.communication.set_register("CL_POS_REF_MAX", int(1.0*MaxPosition_EncoderTicks)) #User maximum allowed position.
 
-            IngeniaMotionControllerObject.communication.set_register("CL_CUR_REF_MAX", MaxCurrent)
+            IngeniaMotionControllerObject.communication.set_register("CL_CUR_REF_MAX", MaxCurrentHardLimit)
 
             IngeniaMotionControllerObject.configuration.set_max_profile_velocity(MaxProfileVelocity)  # Set all registers needed before activating the trapezoidal profiler
             IngeniaMotionControllerObject.configuration.set_max_profile_acceleration(MaxProfileAcceleration)

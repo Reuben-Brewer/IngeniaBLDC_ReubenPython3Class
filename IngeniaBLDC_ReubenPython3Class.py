@@ -6,7 +6,7 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision H, 02/10/2025
+Software Revision I, 03/28/2025
 
 Verified working on: Python 3.12 for Windows 10, 11 64-bit.
 '''
@@ -97,7 +97,165 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
 
         #########################################################
         #########################################################
-        #https://drives.novantamotion.com/summit/0x6041-status-word
+        #https://drives.novantamotion.com/cap-xcr/error-management#ErrorManagementcomoco-Faultreactionanderrormasking
+        self.ErrorCodes_DictHexNumberAsKey_FromWebsite = dict([(0x00000000, "NoError"),
+                                                           (0x00001001, "Communications watchdog error"),
+                                                           (0x00002280, "Over-current detected (internal drive limit)"),
+                                                           (0x00002281, "Faulty gate driver"),
+                                                           (0x00002282, "Current A sensing reached upper saturation limit"),
+                                                           (0x00002283, "Current A sensing reached lower saturation limit"),
+                                                           (0x00002284, "Current B sensing reached upper saturation limit"),
+                                                           (0x00002285, "Current B sensing reached lower saturation limit"),
+                                                           (0x00002286, "Current C sensing reached upper saturation limit"),
+                                                           (0x00002287, "Current C sensing reached lower saturation limit"),
+                                                           (0x00002288, "User I2T limit detected without current control"),
+                                                           (0x00002289, "Over-current detected (user limit) without current control"),
+                                                           (0x0000228A, "System I2T detected"),
+                                                           (0x0000228B, "Derating without current control"),
+                                                           (0x0000228C, "Current sensor calibration error"),
+                                                           (0x00002301, "Brake over-current"),
+                                                           (0x00002302, "Brake tracking error"),
+                                                           (0x00003210, "Over-voltage detected (internal drive limit)"),
+                                                           (0x00003211, "Over-voltage detected (redundant internal drive limit)"),
+                                                           (0x00003221, "Under-voltage detected (internal drive limit)"),
+                                                           (0x00003231, "Over-voltage detected (user limit)"),
+                                                           (0x00003241, "Under-voltage detected (user limit)"),
+                                                           (0x00003280, "STO is enabled"),
+                                                           (0x00003281, "STO supply fault"),
+                                                           (0x00003282, "STO abnormal fault"),
+                                                           (0x00003283, "STO active in operation enabled"),
+                                                           (0x00003290, "Input stage problem"),
+                                                           (0x00004300, "Over-Temperature detected (internal drive limit)"),
+                                                           (0x00004301, "Under-Temperature detected (internal drive limit)"),
+                                                           (0x00004303, "Over-temperature detected (user limit)"),
+                                                           (0x00004304, "Under-temperature detected (user limit)"),
+                                                           (0x00004305, "Wrong ADC measurements detection"),
+                                                           (0x00004400, "Motor Over Temperature detected"),
+                                                           (0x00004500, "External fault"),
+                                                           (0x00007370, "Halls sequence error"),
+                                                           (0x00007371, "Halls combination error"),
+                                                           (0x00007372, "Feedback runaway error"),
+                                                           (0x0000737E, "Absolute encoder 1 disconnection or frame overlap"),
+                                                           (0x0000737F, "Absolute encoder 2 disconnection or frame overlap"),
+                                                           (0x00007380, "Too many incorrect invalid position flags detected in SSI / BiSS - C readings"),
+                                                           (0x00007381, "BiSS-C warning bit active"),
+                                                           (0x00007382, "Too many incorrect CRC checks in SSI / BiSS-C readings"),
+                                                           (0x00007384, "Absolute encoder error bit active without exceeding error tolerance"),
+                                                           (0x00007385, "Position out of limits out of position modes"),
+                                                           (0x00007386, "Velocity out of limits out of velocity or position modes"),
+                                                           (0x00007387, "In a position mode, following error overcomes the position following error window"),
+                                                           (0x00007388, "In a velocity mode, following error overcomes the velocity following error window"),
+                                                           (0x0000738C, "Position out of limits in position mode"),
+                                                           (0x00007390, "Interpolation time is too small when PVT is enabled."),
+                                                           (0x00007391, "Profiler parameters not valid. They should all have positive values."),
+                                                           (0x0000739A, "The electrical velocity limit has been exceeded"),
+                                                           (0x0000739B, "Over-temperature warning detected (user limit)"),
+                                                           (0x0000739C, "Under-temperature warning detected (user limit)"),
+                                                           (0x0000F011, "Cyclic mode mapping error"),
+                                                           (0x0000FF42, "EtherCAT cable disconnected"),
+                                                           (0x0000FF43, "Cyclic timeout EtherCAT PDO lifeguard"),
+                                                           (0x0000738B, "Trapezoidal commutation without digital halls not allowed"),
+                                                           (0x00007400, "Unsupported synchronization method"),
+                                                           (0x00007500, "Number of active feedbacks is higher than allowed"),
+                                                           (0x00007503, "Access unsupported in the current state."),
+                                                           (0x00007504, "Access unsupported because of local control"),
+                                                           (0x05040000, "COMKIT Timeout. CORE device is not properly connected"),
+                                                           (0x06010000, "Incorrect access type"),
+                                                           (0x06020000, "Object does not exist"),
+                                                           (0x06040041, "Object isn't cyclic mappable as requested"),
+                                                           (0x06040042, "Cyclic mapping is too large"),
+                                                           (0x06070010, "Mapped cyclic register size is wrong"),
+                                                           (0x06090011, "Sub-Index does not exist"),
+                                                           (0x060A0000, "Unsupported value introduced in register"),
+                                                           (0x08000000, "Read / Write operation not executed"),
+                                                           (0x08010000, "Cyclic mapping key is wrong"),
+                                                           (0x08010010, "Communication state is unreachable"),
+                                                           (0x08010020, "Communication setting is not modifiable in the current state"),
+                                                           (0x08010030, "Invalid command"),
+                                                           (0x08010040, "CRC error")])
+
+        self.ErrorCodes_DictHexNumberAsKey_FromXDFfile = dict([(0x00003280, "STO is active and could have disabled the power stage disabled"),
+                                                        (0x00002280, "HW over current"),
+                                                        (0x00002288, "User I2T limit detected without current control"),
+                                                        (0x00003290, "Input stage problem"),
+                                                        (0x00003210, "HW Over-voltage detected"),
+                                                        (0x00003211, "FW Over-voltage detected"),
+                                                        (0x00003221, "FW Under-voltage detected"),
+                                                        (0x00004300, "Over-Temperature detected (internal drive limit)."),
+                                                        (0x00004301, "Under-Temperature detected (internal drive limit)"),
+                                                        (0x00004400, "Motor Over Temperature error"),
+                                                        (0x00007380, "Too many error bits or invalid position flags detected in absolute encoder"),
+                                                        (0x00007382, "Too many incorrect CRC checks in absolute encoder readings"),
+                                                        (0x00007385, "Position out of limits out of position modes"),
+                                                        (0x00007386, "Velocity out of limits out of velocity or position modes"),
+                                                        (0x00007387, "Position following error"),
+                                                        (0x06010000, "Incorrect access type"),
+                                                        (0x06020000, "Object doesn't exist"),
+                                                        (0x06040041, "Object isn't PDO mappable as requested"),
+                                                        (0x06070010, "Incorrect specified object size"),
+                                                        (0x06090011, "Sub-Index does not exist"),
+                                                        (0x060A0000, "Unsupported value introduced in register"),
+                                                        (0x08000000, "Read / Write operation not executed"),
+                                                        (0x00003231, "User Over-voltage detected"),
+                                                        (0x00003241, "User Under-voltage detected"),
+                                                        (0x00004303, "Over-temperature detected (user limit)"),
+                                                        (0x00004304, "Under-temperature detected (user limit)"),
+                                                        (0x00004500, "External error"),
+                                                        (0x00007390, "Interpolation time is to small when PVT is enabled"),
+                                                        (0x00003281, "Abnormal STO Supply. Unit could be damaged"),
+                                                        (0x00003282, "Abnormal STO. STO1 and STO2 inputs differed more than latching time"),
+                                                        (0x00007370, "Halls sequence error"),
+                                                        (0x00007371, "Halls combination error"),
+                                                        (0x00007372, "Feedback runaway error"),
+                                                        (0x00002289, "Over current without current control"),
+                                                        (0x00007391, "Profiler parameters not valid. They should all have positive values."),
+                                                        (0x00000000, "No error"),
+                                                        (0x00007381, "BiSS-C warning bit active"),
+                                                        (0x00001001, "Communications watchdog error"),
+                                                        (0x00007388, "Velocity following error"),
+                                                        (0x00007389, "Angle integrity check 1 error"),
+                                                        (0x0000738A, "Angle integrity check 2 error"),
+                                                        (0x0000738B, "Trapezoidal commutation without digital halls not allowed. Review commutation sensor configuration and phasing"),
+                                                        (0x0000228A, "System I2T detected"),
+                                                        (0x00007383, "Maximum absolute velocity exceeded"),
+                                                        (0x0000738D, "Incremental encoder 1 index pulse integrity check fail"),
+                                                        (0x0000738E, "Incremental encoder 2 index pulse integrity check fail"),
+                                                        (0x00002281, "Fault detected in the power stage gate driver"),
+                                                        (0x00002291, "Open phase detected"),
+                                                        (0x00002290, "Non-zero total phase current"),
+                                                        (0x00002282, "Current A sensing reached upper saturation limit"),
+                                                        (0x00002283, "Current A sensing reached lower saturation limit"),
+                                                        (0x00002284, "Current B sensing reached upper saturation limit"),
+                                                        (0x00002285, "Current B sensing reached lower saturation limit"),
+                                                        (0x00002286, "Current C sensing reached upper saturation limit"),
+                                                        (0x00002287, "Current C sensing reached lower saturation limit"),
+                                                        (0x0000738F, "Digital encoder index pulse integrity check calibration error"),
+                                                        (0x00002302, "Brake current tracking error"),
+                                                        (0x0000228B, "Current derating without current control"),
+                                                        (0x00004305, "Wrong ADC measurements detection"),
+                                                        (0x00004306, "User over temperature warning threshold exceeded."),
+                                                        (0x00004307, "User under temperature warning threshold exceeded."),
+                                                        (0x00003212, "Gate voltage out of limits"),
+                                                        (0x00004501, "Load cell health signal error detected."),
+                                                        (0x00004502, "Load cell analog input out of range"),
+                                                        (0x00007393, "Current direct following error detected"),
+                                                        (0x00007392, "Current quadrature following error detected"),
+                                                        (0x00007384, "Absolute encoder error bit active without exceeding error tolerance"),
+                                                        (0x05040000, "COM-KIT Timeout. CORE device is not properly connected"),
+                                                        (0x0000FF42, "EtherCAT cable is disconnected during operation"),
+                                                        (0x00008130, "Lifeguard error or heartbeat error in CANOpen communication"),
+                                                        (0x0000FF43, "Cyclic timeout Ethercat PDO lifeguard"),
+                                                        (0x00007394, "Emergency position set-point not configured."),
+                                                        (0x0000F011, "Cyclic mode mapping error"),
+                                                        (0x0000228C, "Current calibration error"),
+                                                        (0x0000737E, "Absolute encoder 1 disconnection or frame overlap"),
+                                                        (0x0000737F, "Absolute encoder 2 disconnection or frame overlap"),
+                                                        (0x00008210, "PDO not processed due to length error"),
+                                                        (0x0000738C, "Position out of limits in position mode"),
+                                                        (0x00003283, "STO is active in operation enabled and has disabled the power stage"),
+                                                        (0x00002301, "Brake over-current")])
+
+        self.ErrorCodes_DictHexNumberAsKey = self.ErrorCodes_DictHexNumberAsKey_FromXDFfile #unicorn
 
         self.OperationMode_ListOfAcceptableValuesStrings = ["CyclicPosition",
                                                             "CyclicCurrent",
@@ -117,6 +275,7 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                                                  (180, "PVT"),
                                                  (275, "Homing")])
 
+        #https://drives.novantamotion.com/summit/0x6041-status-word
         self.StatusWordFlagNames_DictBitNumberAsKey = dict([(0, "ReadyToSwitchOn"),                #Ready to switch on
                                                             (1, "SwitchedOn"),                      #Switched on
                                                             (2, "OperationEnabled"),                #Operation enabled
@@ -418,7 +577,7 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
             self.DesiredInterfaceName_MustItBeExactMatchFlag = self.PassThrough0and1values_ExitProgramOtherwise("DesiredInterfaceName_MustItBeExactMatchFlag", setup_dict["DesiredInterfaceName_MustItBeExactMatchFlag"])
 
         else:
-            DesiredInterfaceName_MustItBeExactMatchFlag = 1
+            self.DesiredInterfaceName_MustItBeExactMatchFlag = 1
 
         print("IngeniaBLDC_ReubenPython3Class __init__: DesiredInterfaceName_MustItBeExactMatchFlag: " + str(self.DesiredInterfaceName_MustItBeExactMatchFlag))
         #########################################################
@@ -476,80 +635,132 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
             #########################################################
             #########################################################
             self.IngeniaMotionController_MainDict[SlaveID_Int] = dict([("SlaveID_Int", SlaveID_Int),
-                                                                            ("AliasOrServoName_String", str(SlaveID_Int)),
-                                                                            ("MotorConnectedFlag", 0),
-                                                                            ("SerialNumber_Actual", -1),
-                                                                            ("VendorID_Actual", -1),
-                                                                            ("ProductCode_Actual", -1),
-                                                                            ("FWversion_Actual", -1),
-                                                                            ("STO_Status", -1),
-                                                                            ("STO_Status_last", -1),
-                                                                            ("Status_Word", -1),
-                                                                            ("Position_Actual_EncoderTicks", -11111.0),
-                                                                            ("Position_Actual_AllUnitsDict", dict([("EncoderTicks", -1.11111), ("Deg", -1.11111), ("Rad", -1.11111), ("Rev", -1.11111)])),
-                                                                            ("PositionSetPoint_Actual_EncoderTicks", -11111.0),
-                                                                            ("PositionSetPoint_Actual_AllUnitsDict", dict([("EncoderTicks", -1.11111), ("Deg", -1.11111), ("Rad", -1.11111), ("Rev", -1.11111)])),
-                                                                            ("Velocity_Actual_EncoderTicks", -11111.0),
-                                                                            ("Velocity_Actual_AllUnitsDict", dict([("EncoderTicks", -1.11111), ("Deg", -1.11111), ("Rad", -1.11111), ("Rev", -1.11111)])),
-                                                                            ("Current_Quadrature_Actual", -11111.0),
-                                                                            ("EnabledState_ToBeSet", 0),
-                                                                            ("EnabledState_NeedsToBeSetFlag", 0),
-                                                                            ("EnabledState_Actual", -1),
-                                                                            ("PositionPIDgains_Kp_Actual", -11111.0),
-                                                                            ("PositionPIDgains_Ki_Actual", -11111.0),
-                                                                            ("PositionPIDgains_Kd_Actual", -11111.0),
-                                                                            ("PositionPIDgains_Kp_ToBeSet", -11111.0),
-                                                                            ("PositionPIDgains_Ki_ToBeSet", -11111.0),
-                                                                            ("PositionPIDgains_Kd_ToBeSet", -11111.0),
-                                                                            ("PositionPIDgains_NeedsToBeSetFlag", 0),
-                                                                            ("VelocityPIDgains_Kp_Actual", -11111.0),
-                                                                            ("VelocityPIDgains_Ki_Actual", -11111.0),
-                                                                            ("VelocityPIDgains_Kd_Actual", -11111.0),
-                                                                            ("VelocityPIDgains_Kp_ToBeSet", -11111.0),
-                                                                            ("VelocityPIDgains_Ki_ToBeSet", -11111.0),
-                                                                            ("VelocityPIDgains_Kd_ToBeSet", -11111.0),
-                                                                            ("VelocityPIDgains_NeedsToBeSetFlag", 0),
-                                                                            ("CurrentQuadraturePIgains_Kp_Actual", -11111.0),
-                                                                            ("CurrentQuadraturePIgains_Ki_Actual", -11111.0),
-                                                                            ("CurrentQuadraturePIgains_Kp_ToBeSet", -11111.0),
-                                                                            ("CurrentQuadraturePIgains_Ki_ToBeSet", -11111.0),
-                                                                            ("CurrentQuadraturePIgains_NeedsToBeSetFlag", 0),
-                                                                            ("MaxVelocity_Actual", -11111.0),
-                                                                            ("MaxVelocity_ToBeSet", -11111.0),
-                                                                            ("MaxVelocity_NeedsToBeSetFlag", 0),
-                                                                            ("MaxProfileVelocity_Actual", -11111.0),
-                                                                            ("MaxProfileVelocity_ToBeSet", -11111.0),
-                                                                            ("MaxProfileVelocity_NeedsToBeSetFlag", 0),
-                                                                            ("MaxProfileAcceleration_Actual", -11111.0),
-                                                                            ("MaxProfileAcceleration_ToBeSet", -11111.0),
-                                                                            ("MaxProfileAcceleration_NeedsToBeSetFlag", 0),
-                                                                            ("MaxCurrent_Actual", -11111.0),
-                                                                            ("MaxCurrent_ToBeSet", -11111.0),
-                                                                            ("MaxCurrent_NeedsToBeSetFlag", 0),
-                                                                            ("EncoderOffset_NeedsToBeSetFlag", 0),
-                                                                            ("ZeroEncoder_EventNeedsToBeFiredFlag", 0),
-                                                                            ("ZeroEncoder_FireEventOnStartupFlag", 0),
-                                                                            ("Position_ToBeSet_EncoderTicks", 0.0),
-                                                                            ("Position_NeedsToBeSetFlag", 0), #As of 01/23/25, not doing anything
-                                                                            ("Position_ToBeSet_AllUnitsDict", dict([("EncoderTicks", 0.0), ("Deg", 0.0), ("Rad", 0.0), ("Rev", 0.0)])),
-                                                                            ("PositionMinAndMaxInEncoderTicks_NeedsToBeSetFlag", 0),
-                                                                            ("Current_Quadrature_ToBeSet", 0.0), #As of 01/23/25, not doing anything
-                                                                            ("Current_Quadrature_NeedsToBeSetFlag", 0),
-                                                                            ("Voltage_Quadrature_ToBeSet", 0.0), #As of 01/23/25, not doing anything
-                                                                            ("Voltage_Quadrature_NeedsToBeSetFlag", 0),
-                                                                            ("StatusWordFlagStates_DictEnglishNameAsKey", dict()),
-                                                                            ("STOstatusFlagStates_DictEnglishNameAsKey", dict()),
-                                                                            ("PositionMinRange_EncoderTicks_Actual", -11111),
-                                                                            ("PositionMaxRange_EncoderTicks_Actual", -11111),
-                                                                            ("PositionMin_EncoderTicks_Actual", -11111),
-                                                                            ("PositionMax_EncoderTicks_Actual", -11111),
-                                                                            ("ResetFaults_EventNeedsToBeFiredFlag", 0),
-                                                                            ("OperationMode", "CyclicPosition"),
-                                                                            ("OperationMode_Actual_Int", -11111),
-                                                                            ("OperationMode_Actual_EnglishName", "default"),
-                                                                            ("JointEnglishName", "")])
+                                                                        ("AliasOrServoName_String", str(SlaveID_Int)),
+                                                                        ("JointEnglishName", ""),
+                                                                        ("MotorConnectedFlag", 0),
 
-                                                                            #("Current_Direct_Actual", -11111.0), Only need Quadrature
+                                                                        ("SerialNumber_Actual", -1),
+                                                                        ("VendorID_Actual", -1),
+                                                                        ("ProductCode_Actual", -1),
+                                                                        ("FWversion_Actual", -1),
+
+                                                                        ("OperationMode", "CyclicPosition"),
+                                                                        ("OperationMode_Actual_Int", -11111),
+                                                                        ("OperationMode_Actual_EnglishName", "default"),
+
+                                                                        ("Status_Word", -1),
+                                                                        ("StatusWordFlagStates_DictEnglishNameAsKey", dict()),
+
+                                                                        ("STO_Status", -1),
+                                                                        ("STO_Status_last", -1),
+                                                                        ("STOstatusFlagStates_DictEnglishNameAsKey", dict()),
+
+                                                                        ("Error_Last_HexCode", -1),
+                                                                        ("Error_Last_EnglishName", ""),
+
+                                                                        ("FaultReset_EventNeedsToBeFiredFlag", 0),
+                                                                        ("ResetFaults_EventNeedsToBeFiredFlag", 0),
+
+                                                                        ("EnabledState_ToBeSet", 0),
+                                                                        ("EnabledState_NeedsToBeSetFlag", 0),
+                                                                        ("EnabledState_Actual", -1),
+
+                                                                        ("EncoderTicksPerRevolution_ToBeSet", 1),
+                                                                        ("EncoderTicksPerRevolution_Actual", -11111),
+                                                                        ("EncoderOffset_NeedsToBeSetFlag", 0),
+                                                                        ("ZeroEncoder_EventNeedsToBeFiredFlag", 0),
+                                                                        ("ZeroEncoder_FireEventOnStartupFlag", 0),
+
+                                                                        ("Position_ToBeSet_EncoderTicks", 0.0),
+                                                                        ("Position_NeedsToBeSetFlag", 0), #Not needed when using TPDO
+                                                                        ("Position_ToBeSet_AllUnitsDict", dict([("EncoderTicks", 0.0), ("Deg", 0.0), ("Rad", 0.0), ("Rev", 0.0)])),
+
+                                                                        ("Position_Actual_EncoderTicks", -11111.0),
+                                                                        ("Position_Actual_AllUnitsDict", dict([("EncoderTicks", -1.11111), ("Deg", -1.11111), ("Rad", -1.11111), ("Rev", -1.11111)])),
+
+                                                                        ("PositionSetPoint_Actual_EncoderTicks", -11111.0),
+                                                                        ("PositionSetPoint_Actual_AllUnitsDict", dict([("EncoderTicks", -1.11111), ("Deg", -1.11111), ("Rad", -1.11111), ("Rev", -1.11111)])),
+
+                                                                        ("PositionMinRange_EncoderTicks_Actual", -11111),
+                                                                        ("PositionMaxRange_EncoderTicks_Actual", -11111),
+                                                                        ("PositionMin_EncoderTicks_Actual", -11111),
+                                                                        ("PositionMax_EncoderTicks_Actual", -11111),
+                                                                        ("PositionMinAndMaxInEncoderTicks_NeedsToBeSetFlag", 0),
+
+                                                                        ("PositionFollowingErrorWindow_ToBeSet", -11111.0),
+                                                                        ("PositionFollowingErrorTimeoutMilliseconds_ToBeSet", -11111.0),
+                                                                        ("PositionFollowingErrorFaultModeInt_ToBeSet", 0),
+                                                                        ("PositionFollowingErrorWindow_Actual", -11111.0),
+                                                                        ("PositionFollowingErrorTimeoutMilliseconds_Actual", -11111.0),
+                                                                        ("PositionFollowingErrorFaultModeInt_Actual", -11111),
+                                                                        ("PositionFollowingErrorWindowTimeoutAndFaultParameters_NeedsToBeSetFlag", -11111.0),
+
+                                                                        ("PositionPIDgains_Kp_Actual", -11111.0),
+                                                                        ("PositionPIDgains_Ki_Actual", -11111.0),
+                                                                        ("PositionPIDgains_Kd_Actual", -11111.0),
+                                                                        ("PositionPIDgains_Kp_ToBeSet", -11111.0),
+                                                                        ("PositionPIDgains_Ki_ToBeSet", -11111.0),
+                                                                        ("PositionPIDgains_Kd_ToBeSet", -11111.0),
+                                                                        ("PositionPIDgains_NeedsToBeSetFlag", 0),
+
+                                                                        ("MaxVelocity_ToBeSet", -11111.0),
+                                                                        ("MaxVelocity_NeedsToBeSetFlag", 0),
+                                                                        ("MaxVelocity_Actual", -11111.0),
+
+                                                                        ("MaxProfileVelocity_ToBeSet", -11111.0),
+                                                                        ("MaxProfileVelocity_NeedsToBeSetFlag", 0),
+                                                                        ("MaxProfileVelocity_Actual", -11111.0),
+
+                                                                        ("Velocity_Actual_EncoderTicks", -11111.0),
+                                                                        ("Velocity_Actual_AllUnitsDict", dict([("EncoderTicks", -1.11111), ("Deg", -1.11111), ("Rad", -1.11111), ("Rev", -1.11111)])),
+
+                                                                        ("VelocityPIDgains_Kp_Actual", -11111.0),
+                                                                        ("VelocityPIDgains_Ki_Actual", -11111.0),
+                                                                        ("VelocityPIDgains_Kd_Actual", -11111.0),
+                                                                        ("VelocityPIDgains_Kp_ToBeSet", -11111.0),
+                                                                        ("VelocityPIDgains_Ki_ToBeSet", -11111.0),
+                                                                        ("VelocityPIDgains_Kd_ToBeSet", -11111.0),
+                                                                        ("VelocityPIDgains_NeedsToBeSetFlag", 0),
+
+                                                                        ("MaxProfileAcceleration_ToBeSet", -11111.0),
+                                                                        ("MaxProfileAcceleration_NeedsToBeSetFlag", 0),
+                                                                        ("MaxProfileAcceleration_Actual", -11111.0),
+
+                                                                        ("Current_FOCcombinedDQ_Actual", 0.0),
+
+                                                                        ("Current_Direct_ToBeSet", 0.0),
+                                                                        ("Current_Direct_NeedsToBeSetFlag", 0),
+                                                                        ("Current_Direct_Actual", -11111.0),
+
+                                                                        ("Current_Quadrature_ToBeSet", 0.0),
+                                                                        ("Current_Quadrature_NeedsToBeSetFlag", 0),
+                                                                        ("Current_Quadrature_Actual", -11111.0),
+
+                                                                        ("MaxCurrentHardLimit_ToBeSet", -11111.0),
+                                                                        ("MaxCurrentHardLimit_NeedsToBeSetFlag", 0),
+                                                                        ("MaxCurrentHardLimit_Actual", -11111.0),
+
+                                                                        ("MaxContinuousCurrent_ToBeSet", -11111.0),
+                                                                        ("MaxContinuousCurrent_NeedsToBeSetFlag", 0),
+                                                                        ("MaxContinuousCurrent_Actual", -11111.0),
+
+                                                                        ("PeakCurrentValue_ToBeSet", -11111.0),
+                                                                        ("PeakCurrentTimeMilliseconds_ToBeSet", -11111.0),
+                                                                        ("PeakCurrentFaultModeInt_ToBeSet", 0),
+                                                                        ("PeakCurrentValueTimeAndFaultParameters_NeedsToBeSetFlag", -11111.0),
+                                                                        ("PeakCurrentValue_Actual", -11111.0),
+                                                                        ("PeakCurrentTimeMilliseconds_Actual", -11111.0),
+                                                                        ("PeakCurrentTime_Actual", -11111.0),
+                                                                        ("PeakCurrentFaultModeInt_Actual", -11111),
+
+                                                                        ("CurrentQuadraturePIgains_Kp_ToBeSet", -11111.0),
+                                                                        ("CurrentQuadraturePIgains_Ki_ToBeSet", -11111.0),
+                                                                        ("CurrentQuadraturePIgains_NeedsToBeSetFlag", 0),
+                                                                        ("CurrentQuadraturePIgains_Kp_Actual", -11111.0),
+                                                                        ("CurrentQuadraturePIgains_Ki_Actual", -11111.0),
+
+                                                                        ("Voltage_Quadrature_ToBeSet", 0.0),
+                                                                        ("Voltage_Quadrature_NeedsToBeSetFlag", 0)])
             #########################################################
             #########################################################
             #########################################################
@@ -763,10 +974,12 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                     print("ERROR: VariableNameString no an acceptable value.")
 
         if "STO_Status" not in self.ListOfVariableNameStringsToGetViaSDO:
-            self.ListOfVariableNameStringsToGetViaSDO.append("STO_Status") #Required for the motors to to be detected as connected and then be drive.
+            pass #We're now querying this automatically via RPDO.
+            #self.ListOfVariableNameStringsToGetViaSDO.append("STO_Status") #Required for the motors to to be detected as connected and then be drive.
 
         if "EnabledState_Actual" not in self.ListOfVariableNameStringsToGetViaSDO:
-            self.ListOfVariableNameStringsToGetViaSDO.append("EnabledState_Actual") #Required for the motors to to be detected as connected and then be drive.
+            pass #We're now querying this automatically via RPDO.
+            #self.ListOfVariableNameStringsToGetViaSDO.append("EnabledState_Actual") #Required for the motors to to be detected as connected and then be drive.
 
         print("IngeniaBLDC_ReubenPython3Class __init__: ListOfVariableNameStringsToGet: " + str(self.ListOfVariableNameStringsToGetViaSDO))
         #########################################################
@@ -1398,19 +1611,25 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
             ##########################################################################################################
 
             ##########################################################################################################
-            self.DetectedSlaveID_List = self.IngeniaMotionControllerObject.communication.scan_servos_ethercat(InterfaceSelected)
-            print("IngeniaBLDC_ReubenPython3Class, 'InitializeMotors': self.DetectedSlaveID_List: " + str(self.DetectedSlaveID_List))
+            DetectedSlaveID_List_ORIGINAL = self.IngeniaMotionControllerObject.communication.scan_servos_ethercat(InterfaceSelected)
+            print("IngeniaBLDC_ReubenPython3Class, 'InitializeMotors': DetectedSlaveID_List_ORIGINAL: " + str(DetectedSlaveID_List_ORIGINAL))
+
+            self.DetectedSlaveID_List = []
 
             DetectedVsDesiredMismatchFlag = 0
-            for SlaveID_Int in self.DetectedSlaveID_List:
+            for SlaveID_Int in DetectedSlaveID_List_ORIGINAL:
                 if SlaveID_Int not in self.DesiredSlaveID_List:
                     print("IngeniaBLDC_ReubenPython3Class, 'InitializeMotors': error, DetectedSlaveID = " + str(SlaveID_Int)  + " is not in self.DesiredSlaveID_List.")
                     DetectedVsDesiredMismatchFlag = 1
+                else:
+                    self.DetectedSlaveID_List.append(SlaveID_Int)
 
             for SlaveID_Int in self.DesiredSlaveID_List:
-                if SlaveID_Int not in self.DetectedSlaveID_List:
+                if SlaveID_Int not in DetectedSlaveID_List_ORIGINAL:
                     print("IngeniaBLDC_ReubenPython3Class, 'InitializeMotors': error, DesiredlaveID = " + str(SlaveID_Int)  + " is not in self.DetectedSlaveID_List.")
                     DetectedVsDesiredMismatchFlag = 1
+
+            print("IngeniaBLDC_ReubenPython3Class, 'InitializeMotors': self.DetectedSlaveID_List: " + str(self.DetectedSlaveID_List))
             ##########################################################################################################
 
             ##########################################################################################################
@@ -1493,8 +1712,46 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
 
                 ########################################################################################################## THESE SET'S HAVE TO TAKE PLACE AFTER THE MOTOR IS CONNECTED
                 ##########################################################################################################
-                if self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxCurrent_ToBeSet"] != -11111.0:
-                    self.__SetMaxCurrent(SlaveID_Int, self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxCurrent_ToBeSet"], PrintDebugFlag=1)
+                if self.IngeniaMotionController_MainDict[SlaveID_Int]["EncoderTicksPerRevolution_ToBeSet"] != -11111.0 and self.IngeniaMotionController_MainDict[SlaveID_Int]["EncoderTicksPerRevolution_ToBeSet"] != 1:
+                    self.__SetEncoderTicksPerRevolution(SlaveID_Int, self.IngeniaMotionController_MainDict[SlaveID_Int]["EncoderTicksPerRevolution_ToBeSet"], PrintDebugFlag=1)
+                ##########################################################################################################
+                ##########################################################################################################
+
+                ##########################################################################################################
+                ##########################################################################################################
+                if self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxCurrentHardLimit_ToBeSet"] != -11111.0:
+                    self.__SetMaxCurrentHardLimit(SlaveID_Int, self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxCurrentHardLimit_ToBeSet"], PrintDebugFlag=1)
+                ##########################################################################################################
+                ##########################################################################################################
+                
+                ##########################################################################################################
+                ##########################################################################################################
+                if self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxContinuousCurrent_ToBeSet"] != -11111.0:
+                    self.__SetMaxContinuousCurrent(SlaveID_Int, self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxContinuousCurrent_ToBeSet"], PrintDebugFlag=1)
+                ##########################################################################################################
+                ##########################################################################################################
+
+                ##########################################################################################################
+                ##########################################################################################################
+                if self.IngeniaMotionController_MainDict[SlaveID_Int]["PeakCurrentValue_ToBeSet"] != -11111.0 and self.IngeniaMotionController_MainDict[SlaveID_Int]["PeakCurrentTimeMilliseconds_ToBeSet"] != -11111.0 and self.IngeniaMotionController_MainDict[SlaveID_Int]["PeakCurrentFaultModeInt_ToBeSet"] != -11111:
+
+                    Value = self.IngeniaMotionController_MainDict[SlaveID_Int]["PeakCurrentValue_ToBeSet"]
+                    Time = self.IngeniaMotionController_MainDict[SlaveID_Int]["PeakCurrentTimeMilliseconds_ToBeSet"]
+                    FaultModeInt = self.IngeniaMotionController_MainDict[SlaveID_Int]["PeakCurrentFaultModeInt_ToBeSet"]
+
+                    self.__SetPeakCurrentValueTimeAndFaultParameters(SlaveID_Int, Value, Time, FaultModeInt, FaultReactionTimeoutMilliseconds_ToBeSet=1, PrintDebugFlag=1)
+                ##########################################################################################################
+                ##########################################################################################################
+
+                ##########################################################################################################
+                ##########################################################################################################
+                if self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionFollowingErrorWindow_ToBeSet"] != -11111.0 and self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionFollowingErrorTimeoutMilliseconds_ToBeSet"] != -11111.0 and self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionFollowingErrorFaultModeInt_ToBeSet"] != -11111:
+
+                    Window = self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionFollowingErrorWindow_ToBeSet"]
+                    Timeout = self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionFollowingErrorTimeoutMilliseconds_ToBeSet"]
+                    FaultModeInt = self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionFollowingErrorFaultModeInt_ToBeSet"]
+
+                    self.__SetPositionFollowingErrorWindowTimeoutAndFaultParameters(SlaveID_Int, Window, Timeout, FaultModeInt, PrintDebugFlag=1)
                 ##########################################################################################################
                 ##########################################################################################################
 
@@ -1553,7 +1810,7 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                     if self.IngeniaMotionController_MainDict[SlaveID_Int]["ZeroEncoder_FireEventOnStartupFlag"] == 1:
                         self.SetPosition_ExternalProgram(SlaveID_Int, 0.0)
                         self.__SetPosition(SlaveID_Int, 0.0)
-                        self.IngeniaMotionController_MainDict[SlaveID_Int]["Position_NeedsToBeSetFlag"] = 1
+                        #self.IngeniaMotionController_MainDict[SlaveID_Int]["Position_NeedsToBeSetFlag"] = 1 #Not needed when using TPDO
                     ##########################################################################################################
 
                 ##########################################################################################################
@@ -1561,7 +1818,7 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
 
                 ##########################################################################################################
                 ##########################################################################################################
-                if self.IngeniaMotionController_MainDict[SlaveID_Int]["OperationMode"] == "CyclicCurrent":
+                if 1:#self.IngeniaMotionController_MainDict[SlaveID_Int]["OperationMode"] == "CyclicCurrent":
                     if self.IngeniaMotionController_MainDict[SlaveID_Int]["CurrentQuadraturePIgains_Kp_ToBeSet"] != -11111.0 and\
                         self.IngeniaMotionController_MainDict[SlaveID_Int]["CurrentQuadraturePIgains_Ki_ToBeSet"] != -11111.0:
                             self.__SetCurrentQuadraturePIgains(SlaveID_Int, self.IngeniaMotionController_MainDict[SlaveID_Int]["CurrentQuadraturePIgains_Kp_ToBeSet"],
@@ -1666,7 +1923,7 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
             ##########################################################################################################
 
             ##########################################################################################################
-            if "EncoderTicksPerRevolution" not in self.IngeniaMotionController_MainDict[SlaveID_Int]:
+            if "EncoderTicksPerRevolution_ToBeSet" not in self.IngeniaMotionController_MainDict[SlaveID_Int]: #Don't use EncoderTicksPerRevolution_Actual as some times we don't want to read it.
                 return ConvertedValuesDict
             ##########################################################################################################
 
@@ -1677,17 +1934,17 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
 
             ##########################################################################################################
             elif InputUnits.upper() == "DEG":
-                ConvertedValue_EncoderTicks = InputValue*(self.IngeniaMotionController_MainDict[SlaveID_Int]["EncoderTicksPerRevolution"]/360.0)
+                ConvertedValue_EncoderTicks = InputValue*(self.IngeniaMotionController_MainDict[SlaveID_Int]["EncoderTicksPerRevolution_ToBeSet"]/360.0) #Don't use EncoderTicksPerRevolution_Actual as some times we don't want to read it.
             ##########################################################################################################
 
             ##########################################################################################################
             elif InputUnits.upper() == "RAD":
-                ConvertedValue_EncoderTicks = InputValue*(self.IngeniaMotionController_MainDict[SlaveID_Int]["EncoderTicksPerRevolution"]/(2*math.pi))
+                ConvertedValue_EncoderTicks = InputValue*(self.IngeniaMotionController_MainDict[SlaveID_Int]["EncoderTicksPerRevolution_ToBeSet"]/(2*math.pi)) #Don't use EncoderTicksPerRevolution_Actual as some times we don't want to read it.
             ##########################################################################################################
 
             ##########################################################################################################
             elif InputUnits.upper() == "REV":
-                ConvertedValue_EncoderTicks = InputValue*(self.IngeniaMotionController_MainDict[SlaveID_Int]["EncoderTicksPerRevolution"]/1.0)
+                ConvertedValue_EncoderTicks = InputValue*(self.IngeniaMotionController_MainDict[SlaveID_Int]["EncoderTicksPerRevolution_ToBeSet"]/1.0) #Don't use EncoderTicksPerRevolution_Actual as some times we don't want to read it.
             ##########################################################################################################
 
             ##########################################################################################################
@@ -1705,9 +1962,9 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
             ##########################################################################################################
             if InputUnits in self.Position_AcceptableUnitsList:
                 ConvertedValue_EncoderTicks = ConvertedValue_EncoderTicks/1.0
-                ConvertedValue_Deg = ConvertedValue_EncoderTicks/(self.IngeniaMotionController_MainDict[SlaveID_Int]["EncoderTicksPerRevolution"]/360.0)
-                ConvertedValue_Rad = ConvertedValue_EncoderTicks/(self.IngeniaMotionController_MainDict[SlaveID_Int]["EncoderTicksPerRevolution"]/(2*math.pi))
-                ConvertedValue_Rev = ConvertedValue_EncoderTicks/(self.IngeniaMotionController_MainDict[SlaveID_Int]["EncoderTicksPerRevolution"]/1.0)
+                ConvertedValue_Deg = ConvertedValue_EncoderTicks/(self.IngeniaMotionController_MainDict[SlaveID_Int]["EncoderTicksPerRevolution_ToBeSet"]/360.0) #Don't use EncoderTicksPerRevolution_Actual as some times we don't want to read it.
+                ConvertedValue_Rad = ConvertedValue_EncoderTicks/(self.IngeniaMotionController_MainDict[SlaveID_Int]["EncoderTicksPerRevolution_ToBeSet"]/(2*math.pi)) #Don't use EncoderTicksPerRevolution_Actual as some times we don't want to read it.
+                ConvertedValue_Rev = ConvertedValue_EncoderTicks/(self.IngeniaMotionController_MainDict[SlaveID_Int]["EncoderTicksPerRevolution_ToBeSet"]/1.0) #Don't use EncoderTicksPerRevolution_Actual as some times we don't want to read it.
 
             else:
                 print("ConvertPositionToAllUnits: InputUnits not recognized. Input value: " + str(InputValue) + ", InputUnits: " + str(InputUnits))
@@ -1796,7 +2053,7 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
             PositionTarget_EncoderTicks_Limited = PositionTarget_EncoderTicks
 
             self.IngeniaMotionController_MainDict[SlaveID_Int]["Position_ToBeSet_EncoderTicks"] = PositionTarget_EncoderTicks_Limited
-            self.IngeniaMotionController_MainDict[SlaveID_Int]["Position_NeedsToBeSetFlag"] = 1
+            #self.IngeniaMotionController_MainDict[SlaveID_Int]["Position_NeedsToBeSetFlag"] = 1 #Not needed when using TPDO
 
             self.IngeniaMotionController_MainDict[SlaveID_Int]["Position_ToBeSet_AllUnitsDict"] = self.ConvertPositionToAllUnits(SlaveID_Int, PositionTarget_EncoderTicks_Limited, Units, VelocityInsteadOfPositionFlag=0)
 
@@ -1822,8 +2079,8 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
 
             if self.IngeniaMotionController_MainDict[SlaveID_Int]["MotorConnectedFlag"] == 1:
 
-                CurrentQuadratureTarget_Limited = self.LimitNumber_FloatOutputOnly(-1.0*self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxCurrent_ToBeSet"],
-                                                                                       self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxCurrent_ToBeSet"],
+                CurrentQuadratureTarget_Limited = self.LimitNumber_FloatOutputOnly(-1.0*self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxCurrentHardLimit_ToBeSet"],
+                                                                                       self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxCurrentHardLimit_ToBeSet"],
                                                                                        CurrentQuadratureTarget)
 
                 # MUST PASS IN A FLOAT FOR COMMAND
@@ -1849,8 +2106,8 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
 
             CurrentQuadratureTarget = float(CurrentQuadratureTarget)
 
-            #CurrentQuadratureTarget_Limited = self.LimitNumber_FloatOutputOnly(-1.0 * self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxCurrent_ToBeSet"],
-            #                                                                   self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxCurrent_ToBeSet"],
+            #CurrentQuadratureTarget_Limited = self.LimitNumber_FloatOutputOnly(-1.0 * self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxCurrentHardLimit_ToBeSet"],
+            #                                                                   self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxCurrentHardLimit_ToBeSet"],
             #                                                                   CurrentQuadratureTarget)
 
             CurrentQuadratureTarget_Limited = CurrentQuadratureTarget
@@ -2146,27 +2403,55 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
         try:
             if self.IngeniaMotionController_MainDict[SlaveID_Int]["MotorConnectedFlag"] == 1:
 
-                self.IngeniaMotionControllerObject.communication.set_register("CL_POS_PID_KP", Kp_ToBeSet, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
-                self.IngeniaMotionControllerObject.communication.set_register("CL_POS_PID_KI", Ki_ToBeSet, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
-                self.IngeniaMotionControllerObject.communication.set_register("CL_POS_PID_KD", Kd_ToBeSet, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+                ##########################################################################################################
+                if self.IngeniaMotionController_MainDict[SlaveID_Int]["AllowWritingOfControllerConfigurationFlag"] == 1:
 
-                PIDcontrollerMaxOutputUmax_ToBeSet = 100000
-                PIDcontrollerMinOutputUmin_ToBeSet = -1.0*PIDcontrollerMaxOutputUmax_ToBeSet
+                    self.IngeniaMotionControllerObject.communication.set_register("CL_POS_PID_KP", Kp_ToBeSet, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+                    self.IngeniaMotionControllerObject.communication.set_register("CL_POS_PID_KI", Ki_ToBeSet, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+                    self.IngeniaMotionControllerObject.communication.set_register("CL_POS_PID_KD", Kd_ToBeSet, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
 
-                ###
-                #self.IngeniaMotionControllerObject.communication.set_register("CL_POS_PID_KD_FILTER", KdFilter_ToBeSet, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
-                self.IngeniaMotionControllerObject.communication.set_register("CL_POS_PID_MAX_OUT", PIDcontrollerMaxOutputUmax_ToBeSet, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
-                self.IngeniaMotionControllerObject.communication.set_register("CL_POS_PID_MIN_OUT", PIDcontrollerMinOutputUmin_ToBeSet, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
-                ###
+                    PIDcontrollerMaxOutputUmax_ToBeSet = 100000
+                    PIDcontrollerMinOutputUmin_ToBeSet = -1.0*PIDcontrollerMaxOutputUmax_ToBeSet
 
-                ### Not sure why these registers (which are supposed to be in CL Torque mode) are limiting in position control, but they are.
-                self.IngeniaMotionControllerObject.communication.set_register("CL_TOR_PID_MAX_OUT", self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxCurrent_ToBeSet"], servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
-                self.IngeniaMotionControllerObject.communication.set_register("CL_TOR_PID_MIN_OUT", -1.0*self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxCurrent_ToBeSet"], servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
-                ###
+                    ###
+                    #self.IngeniaMotionControllerObject.communication.set_register("CL_POS_PID_KD_FILTER", KdFilter_ToBeSet, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+                    self.IngeniaMotionControllerObject.communication.set_register("CL_POS_PID_MAX_OUT", PIDcontrollerMaxOutputUmax_ToBeSet, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+                    self.IngeniaMotionControllerObject.communication.set_register("CL_POS_PID_MIN_OUT", PIDcontrollerMinOutputUmin_ToBeSet, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+                    ###
 
-                time.sleep(0.001)
+                    ### Not sure why these registers (which are supposed to be in CL Torque mode) are limiting in position control, but they are.
 
+                    '''
+                    <Register access="rw" address_type="NVM" address="0x0527"  dtype="float" id="CL_TOR_PID_MAX_OUT" units="A" subnode="1" cyclic="CYCLIC_RX" desc="Maximum output of the torque PID controller" cat_id="CONTROL">
+                    <Register access="rw" address_type="NVM" address="0x0528"  dtype="float" id="CL_TOR_PID_MIN_OUT" units="A" subnode="1" cyclic="CYCLIC_RX" desc="Minimum output of the torque PID controller" cat_id="CONTROL">
+                    '''
+
+                    self.IngeniaMotionControllerObject.communication.set_register("CL_TOR_PID_MAX_OUT", 10.0, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+                    self.IngeniaMotionControllerObject.communication.set_register("CL_TOR_PID_MIN_OUT", -10.0, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+
+                    #self.IngeniaMotionControllerObject.communication.set_register("CL_TOR_PID_MAX_OUT", self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxCurrentHardLimit_ToBeSet"], servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+                    #self.IngeniaMotionControllerObject.communication.set_register("CL_TOR_PID_MIN_OUT", -1.0*self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxCurrentHardLimit_ToBeSet"], servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+                    ###
+
+                    time.sleep(0.001)
+
+                ##########################################################################################################
+
+                ##########################################################################################################
+                else:
+                    if PrintDebugFlag == 1:
+                        print("__SetPositionPIDgains for SlaveID_Int = " + str(SlaveID_Int) + ", not allowed to write.")
+                ##########################################################################################################
+
+                ##########################################################################################################
                 self.__GetPositionPIDgains(SlaveID_Int)
+
+                #############################################
+                if self.IngeniaMotionController_MainDict[SlaveID_Int]["AllowWritingOfControllerConfigurationFlag"] == 0:
+                    self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionPIDgains_Kp_ToBeSet"] = self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionPIDgains_Kp_Actual"]
+                    self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionPIDgains_Ki_ToBeSet"] = self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionPIDgains_Ki_Actual"]
+                    self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionPIDgains_Kd_ToBeSet"] = self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionPIDgains_Kd_Actual"]
+                #############################################
 
                 self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_ReubenPython2and3ClassObject_NeedsToBeUpdatedFromExternalSourceFlag"] = 1
 
@@ -2175,6 +2460,7 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                           ", Kp = " + str(Kp_ToBeSet) +
                           ", Ki = " + str(Ki_ToBeSet) +
                           ", Kd = " + str(Kd_ToBeSet))
+                ##########################################################################################################
 
         except:
             exceptions = sys.exc_info()[0]
@@ -2237,16 +2523,35 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
         try:
             if self.IngeniaMotionController_MainDict[SlaveID_Int]["MotorConnectedFlag"] == 1:
 
-                self.IngeniaMotionControllerObject.communication.set_register("CL_POS_VEL_KP", Kp_ToBeSet, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
-                self.IngeniaMotionControllerObject.communication.set_register("CL_POS_VEL_KI", Ki_ToBeSet, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
-                self.IngeniaMotionControllerObject.communication.set_register("CL_POS_VEL_KD", Kd_ToBeSet, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+                ##########################################################################################################
+                if self.IngeniaMotionController_MainDict[SlaveID_Int]["AllowWritingOfControllerConfigurationFlag"] == 1:
 
-                time.sleep(0.001)
+                    self.IngeniaMotionControllerObject.communication.set_register("CL_POS_VEL_KP", Kp_ToBeSet, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+                    self.IngeniaMotionControllerObject.communication.set_register("CL_POS_VEL_KI", Ki_ToBeSet, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+                    self.IngeniaMotionControllerObject.communication.set_register("CL_POS_VEL_KD", Kd_ToBeSet, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
 
+                    time.sleep(0.001)
+                ##########################################################################################################
+
+                ##########################################################################################################
+                else:
+                    if PrintDebugFlag == 1:
+                        print("__SetVelocityPIDgains for SlaveID_Int = " + str(SlaveID_Int) + ", not allowed to write.")
+                ##########################################################################################################
+
+                ##########################################################################################################
                 self.__GetVelocityPIDgains(SlaveID_Int)
+
+                #############################################
+                if self.IngeniaMotionController_MainDict[SlaveID_Int]["AllowWritingOfControllerConfigurationFlag"] == 0:
+                    self.IngeniaMotionController_MainDict[SlaveID_Int]["VelocityPIDgains_Kp_ToBeSet"] = self.IngeniaMotionController_MainDict[SlaveID_Int]["VelocityPIDgains_Kp_Actual"]
+                    self.IngeniaMotionController_MainDict[SlaveID_Int]["VelocityPIDgains_Ki_ToBeSet"] = self.IngeniaMotionController_MainDict[SlaveID_Int]["VelocityPIDgains_Ki_Actual"]
+                    self.IngeniaMotionController_MainDict[SlaveID_Int]["VelocityPIDgains_Kd_ToBeSet"] = self.IngeniaMotionController_MainDict[SlaveID_Int]["VelocityPIDgains_Kd_Actual"]
+                #############################################
 
                 if PrintDebugFlag == 1:
                     print("__SetVelocityPIDgains event fired for SlaveID_Int = " + str(SlaveID_Int))
+                ##########################################################################################################
 
         except:
             exceptions = sys.exc_info()[0]
@@ -2301,25 +2606,142 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
 
     ##########################################################################################################
     ##########################################################################################################
-    def __SetCurrentQuadraturePIgains(self, SlaveID_Int, Kp_ToBeSet, Ki_ToBeSet, PrintDebugFlag = 0):
+    def __SetEncoderTicksPerRevolution(self, SlaveID_Int, EncoderTicksPerRevolution_ToBeSet, PrintDebugFlag=0):
+        try:
+
+            '''
+            <Register access="rw" dtype="u32" id="FBK_DIGENC1_RESOLUTION" storage="8192" subnode="1"/>
+            '''
+
+            if self.IngeniaMotionController_MainDict[SlaveID_Int]["MotorConnectedFlag"] == 1:
+
+                ##########################################################################################################
+                if self.IngeniaMotionController_MainDict[SlaveID_Int]["AllowWritingOfControllerConfigurationFlag"] == 1:
+                    self.IngeniaMotionControllerObject.communication.set_register("FBK_DIGENC1_RESOLUTION", int(EncoderTicksPerRevolution_ToBeSet), servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+
+                    time.sleep(0.001)
+                ##########################################################################################################
+
+                ##########################################################################################################
+                else:
+                    if PrintDebugFlag == 1:
+                        print("__SetEncoderTicksPerRevolution for SlaveID_Int = " + str(SlaveID_Int) + ", not allowed to write.")
+                ##########################################################################################################
+
+                ##########################################################################################################
+                self.__GetEncoderTicksPerRevolution(SlaveID_Int)
+
+                #############################################
+                if self.IngeniaMotionController_MainDict[SlaveID_Int]["AllowWritingOfControllerConfigurationFlag"] == 0:
+                    self.IngeniaMotionController_MainDict[SlaveID_Int]["EncoderTicksPerRevolution_ToBeSet"] = self.IngeniaMotionController_MainDict[SlaveID_Int]["EncoderTicksPerRevolution_Actual"]
+                #############################################
+
+                if PrintDebugFlag == 1:
+                    print("__SetEncoderTicksPerRevolution event fired for SlaveID_Int = " + str(SlaveID_Int))
+                ##########################################################################################################
+
+        except:
+            exceptions = sys.exc_info()[0]
+            print("__SetEncoderTicksPerRevolution, exceptions: %s" % exceptions)
+            traceback.print_exc()
+
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
+    def SetEncoderTicksPerRevolution_ExternalProgram(self, SlaveID_Int, EncoderTicksPerRevolution_ToBeSet, PrintDebugFlag = 0):
+        try:
+
+            self.IngeniaMotionController_MainDict[SlaveID_Int]["EncoderTicksPerRevolution_ToBeSet"] = EncoderTicksPerRevolution_ToBeSet
+
+            self.IngeniaMotionController_MainDict[SlaveID_Int]["EncoderTicksPerRevolution_NeedsToBeSetFlag"] = 1
+
+            if PrintDebugFlag == 1:
+                print("SetEncoderTicksPerRevolution_ExternalProgram event fired for SlaveID_Int = " + str(SlaveID_Int))
+
+        except:
+            exceptions = sys.exc_info()[0]
+            print("SetEncoderTicksPerRevolution_ExternalProgram, exceptions: %s" % exceptions)
+            traceback.print_exc()
+
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
+    def __GetEncoderTicksPerRevolution(self, SlaveID_Int, PrintDebugFlag=0):
         try:
             if self.IngeniaMotionController_MainDict[SlaveID_Int]["MotorConnectedFlag"] == 1:
 
-                self.IngeniaMotionControllerObject.communication.set_register("CL_CUR_Q_KP", Kp_ToBeSet, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
-                self.IngeniaMotionControllerObject.communication.set_register("CL_CUR_Q_KI", Ki_ToBeSet, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
-                self.IngeniaMotionControllerObject.communication.set_register("CL_CUR_Q_MAX_OUT", 48.0, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"]) #Still experimenting with these values
-                self.IngeniaMotionControllerObject.communication.set_register("CL_CUR_Q_MIN_OUT", -48.0, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"]) #Still experimenting with these values
+                self.IngeniaMotionController_MainDict[SlaveID_Int]["EncoderTicksPerRevolution_Actual"] = self.IngeniaMotionControllerObject.communication.get_register("FBK_DIGENC1_RESOLUTION", servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
 
-                time.sleep(0.001)
+                if PrintDebugFlag == 1:
+                    print("__GetEncoderTicksPerRevolution event fired for SlaveID_Int = " + str(SlaveID_Int))
 
+        except:
+            exceptions = sys.exc_info()[0]
+            print("__GetEncoderTicksPerRevolution, exceptions: %s" % exceptions)
+            traceback.print_exc()
+
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
+    def __SetCurrentQuadraturePIgains(self, SlaveID_Int, Kp_ToBeSet, Ki_ToBeSet, PrintDebugFlag = 0):
+
+        '''
+        https://drives.novantamotion.com/summit/0x2502-current-quadrature-loop-max-out
+        <Register access="rw" address_type="NVM" address="0x0502"  dtype="float" id="CL_CUR_Q_MAX_OUT" units="V" subnode="1" cyclic="CONFIG" desc="Maximum output of the quadrature current PI controller." cat_id="CONTROL">
+        This parameter allows configuring the Umax of the PI controller used for current Q regulation.
+
+        https://drives.novantamotion.com/summit/0x2503-current-quadrature-loop-min-out
+        <Register access="rw" address_type="NVM" address="0x0503"  dtype="float" id="CL_CUR_Q_MIN_OUT" units="V" subnode="1" cyclic="CONFIG" desc="Minimum output of the quadrature current PI controller." cat_id="CONTROL">
+        This parameter allows configuring the Umin of the PI controller used for current Q regulation.
+        '''
+
+        try:
+            if self.IngeniaMotionController_MainDict[SlaveID_Int]["MotorConnectedFlag"] == 1:
+
+                CL_CUR_Q_MAX_OUT = 48.0
+                CL_CUR_Q_MIN_OUT = -48.0
+
+                ##########################################################################################################
+                if self.IngeniaMotionController_MainDict[SlaveID_Int]["AllowWritingOfControllerConfigurationFlag"] == 1:
+
+                    self.IngeniaMotionControllerObject.communication.set_register("CL_CUR_Q_KP", Kp_ToBeSet, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+                    self.IngeniaMotionControllerObject.communication.set_register("CL_CUR_Q_KI", Ki_ToBeSet, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+                    self.IngeniaMotionControllerObject.communication.set_register("CL_CUR_Q_MAX_OUT", CL_CUR_Q_MAX_OUT, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"]) #Still experimenting with these values
+                    self.IngeniaMotionControllerObject.communication.set_register("CL_CUR_Q_MIN_OUT", CL_CUR_Q_MIN_OUT, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"]) #Still experimenting with these values
+
+                    time.sleep(0.001)
+                ##########################################################################################################
+
+                ##########################################################################################################
+                else:
+                    if PrintDebugFlag == 1:
+                        print("__SetCurrentQuadraturePIgains for SlaveID_Int = " + str(SlaveID_Int) + ", not allowed to write.")
+                ##########################################################################################################
+
+                ##########################################################################################################
                 self.__GetCurrentQuadraturePIgains(SlaveID_Int)
+
+                #############################################
+                if self.IngeniaMotionController_MainDict[SlaveID_Int]["AllowWritingOfControllerConfigurationFlag"] == 0:
+                    self.IngeniaMotionController_MainDict[SlaveID_Int]["CurrentQuadraturePIgains_Kp_ToBeSet"] = self.IngeniaMotionController_MainDict[SlaveID_Int]["CurrentQuadraturePIgains_Kp_Actual"]
+                    self.IngeniaMotionController_MainDict[SlaveID_Int]["CurrentQuadraturePIgains_Ki_ToBeSet"] = self.IngeniaMotionController_MainDict[SlaveID_Int]["CurrentQuadraturePIgains_Ki_Actual"]
+                #############################################
 
                 self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_ReubenPython2and3ClassObject_NeedsToBeUpdatedFromExternalSourceFlag"] = 1
 
                 if PrintDebugFlag == 1:
                     print("__SetCurrentQuadraturePIgains event fired for SlaveID_Int = " + str(SlaveID_Int) +
                           ", Kp = " + str(Kp_ToBeSet) +
-                          ", Ki = " + str(Ki_ToBeSet))
+                          ", Ki = " + str(Ki_ToBeSet) +
+                          ", CL_CUR_Q_MAX_OUT = " + str(CL_CUR_Q_MAX_OUT) +
+                          ", CL_CUR_Q_MIN_OUT = " + str(CL_CUR_Q_MIN_OUT))
+                ##########################################################################################################
 
         except:
             exceptions = sys.exc_info()[0]
@@ -2372,22 +2794,43 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
 
     ##########################################################################################################
     ##########################################################################################################
-    def __SetMaxCurrent(self, SlaveID_Int, MaxCurrent_ToBeSet, PrintDebugFlag=0):
+    def __SetMaxCurrentHardLimit(self, SlaveID_Int, MaxCurrentHardLimit_ToBeSet, PrintDebugFlag=0):
         try:
+
+            '''
+            <Register access="rw" address_type="NVM" address="0x01E0"  dtype="float" id="CL_CUR_REF_MAX" units="A" subnode="1" cyclic="CYCLIC_RX" desc="User allowed maximum current" cat_id="LIMITS">
+            '''
+
             if self.IngeniaMotionController_MainDict[SlaveID_Int]["MotorConnectedFlag"] == 1:
 
-                self.IngeniaMotionControllerObject.communication.set_register("CL_CUR_REF_MAX", MaxCurrent_ToBeSet, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+                ##########################################################################################################
+                if self.IngeniaMotionController_MainDict[SlaveID_Int]["AllowWritingOfControllerConfigurationFlag"] == 1:
+                    self.IngeniaMotionControllerObject.communication.set_register("CL_CUR_REF_MAX", MaxCurrentHardLimit_ToBeSet, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
 
-                time.sleep(0.001)
+                    time.sleep(0.001)
+                ##########################################################################################################
 
-                self.__GetMaxCurrent(SlaveID_Int)
+                ##########################################################################################################
+                else:
+                    if PrintDebugFlag == 1:
+                        print("__SetMaxCurrentHardLimit for SlaveID_Int = " + str(SlaveID_Int) + ", not allowed to write.")
+                ##########################################################################################################
+
+                ##########################################################################################################
+                self.__GetMaxCurrentHardLimit(SlaveID_Int)
+
+                #############################################
+                if self.IngeniaMotionController_MainDict[SlaveID_Int]["AllowWritingOfControllerConfigurationFlag"] == 0:
+                    self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxCurrentHardLimit_ToBeSet"] = self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxCurrentHardLimit_Actual"]
+                #############################################
 
                 if PrintDebugFlag == 1:
-                    print("__SetMaxCurrent event fired for SlaveID_Int = " + str(SlaveID_Int))
+                    print("__SetMaxCurrentHardLimit event fired for SlaveID_Int = " + str(SlaveID_Int))
+                ##########################################################################################################
 
         except:
             exceptions = sys.exc_info()[0]
-            print("__SetMaxCurrent, exceptions: %s" % exceptions)
+            print("__SetMaxCurrentHardLimit, exceptions: %s" % exceptions)
             traceback.print_exc()
 
     ##########################################################################################################
@@ -2395,19 +2838,19 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
 
     ##########################################################################################################
     ##########################################################################################################
-    def SetMaxCurrent_ExternalProgram(self, SlaveID_Int, MaxCurrent_ToBeSet, PrintDebugFlag = 0):
+    def SetMaxCurrentHardLimit_ExternalProgram(self, SlaveID_Int, MaxCurrentHardLimit_ToBeSet, PrintDebugFlag = 0):
         try:
 
-            self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxCurrent_ToBeSet"] = MaxCurrent_ToBeSet
+            self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxCurrentHardLimit_ToBeSet"] = MaxCurrentHardLimit_ToBeSet
             
-            self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxCurrent_NeedsToBeSetFlag"] = 1
+            self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxCurrentHardLimit_NeedsToBeSetFlag"] = 1
 
             if PrintDebugFlag == 1:
-                print("SetMaxCurrent_ExternalProgram event fired for SlaveID_Int = " + str(SlaveID_Int))
+                print("SetMaxCurrentHardLimit_ExternalProgram event fired for SlaveID_Int = " + str(SlaveID_Int))
 
         except:
             exceptions = sys.exc_info()[0]
-            print("SetMaxCurrent_ExternalProgram, exceptions: %s" % exceptions)
+            print("SetMaxCurrentHardLimit_ExternalProgram, exceptions: %s" % exceptions)
             traceback.print_exc()
 
     ##########################################################################################################
@@ -2415,18 +2858,432 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
 
     ##########################################################################################################
     ##########################################################################################################
-    def __GetMaxCurrent(self, SlaveID_Int, PrintDebugFlag=0):
+    def __GetMaxCurrentHardLimit(self, SlaveID_Int, PrintDebugFlag=0):
         try:
             if self.IngeniaMotionController_MainDict[SlaveID_Int]["MotorConnectedFlag"] == 1:
 
-                self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxCurrent_Actual"] = self.IngeniaMotionControllerObject.configuration.get_max_current(servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+                self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxCurrentHardLimit_Actual"] = self.IngeniaMotionControllerObject.configuration.get_max_current(servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
 
                 if PrintDebugFlag == 1:
-                    print("__GetMaxCurrent event fired for SlaveID_Int = " + str(SlaveID_Int))
+                    print("__GetMaxCurrentHardLimit event fired for SlaveID_Int = " + str(SlaveID_Int))
 
         except:
             exceptions = sys.exc_info()[0]
-            print("__GetMaxCurrent, exceptions: %s" % exceptions)
+            print("__GetMaxCurrentHardLimit, exceptions: %s" % exceptions)
+            traceback.print_exc()
+
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
+    def __SetMaxContinuousCurrent(self, SlaveID_Int, MaxContinuousCurrent_ToBeSet, PrintDebugFlag=0):
+        try:
+
+            '''
+            <Register access="rw" address_type="NVM" address="0x0100"  dtype="float" id="MOT_RATED_CURRENT" units="A" subnode="1" cyclic="CYCLIC_RX" desc="Indicates the continuous current of the actuator / system" cat_id="PROTECTIONS">
+            '''
+
+            if self.IngeniaMotionController_MainDict[SlaveID_Int]["MotorConnectedFlag"] == 1:
+
+                ##########################################################################################################
+                if self.IngeniaMotionController_MainDict[SlaveID_Int]["AllowWritingOfControllerConfigurationFlag"] == 1:
+                    self.IngeniaMotionControllerObject.communication.set_register("MOT_RATED_CURRENT", MaxContinuousCurrent_ToBeSet, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+
+                    time.sleep(0.001)
+                ##########################################################################################################
+
+                ##########################################################################################################
+                else:
+                    if PrintDebugFlag == 1:
+                        print("__SetMaxContinuousCurrent for SlaveID_Int = " + str(SlaveID_Int) + ", not allowed to write.")
+                ##########################################################################################################
+
+                ##########################################################################################################
+                self.__GetMaxContinuousCurrent(SlaveID_Int)
+
+                #############################################
+                if self.IngeniaMotionController_MainDict[SlaveID_Int]["AllowWritingOfControllerConfigurationFlag"] == 0:
+                    self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxContinuousCurrent_ToBeSet"] = self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxContinuousCurrent_Actual"]
+                #############################################
+
+                if PrintDebugFlag == 1:
+                    print("__SetMaxContinuousCurrent event fired for SlaveID_Int = " + str(SlaveID_Int))
+                ##########################################################################################################
+
+        except:
+            exceptions = sys.exc_info()[0]
+            print("__SetMaxContinuousCurrent, exceptions: %s" % exceptions)
+            traceback.print_exc()
+
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
+    def SetMaxContinuousCurrent_ExternalProgram(self, SlaveID_Int, MaxContinuousCurrent_ToBeSet, PrintDebugFlag = 0):
+        try:
+
+            self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxContinuousCurrent_ToBeSet"] = MaxContinuousCurrent_ToBeSet
+            
+            self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxContinuousCurrent_NeedsToBeSetFlag"] = 1
+
+            if PrintDebugFlag == 1:
+                print("SetMaxContinuousCurrent_ExternalProgram event fired for SlaveID_Int = " + str(SlaveID_Int))
+
+        except:
+            exceptions = sys.exc_info()[0]
+            print("SetMaxContinuousCurrent_ExternalProgram, exceptions: %s" % exceptions)
+            traceback.print_exc()
+
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
+    def __GetMaxContinuousCurrent(self, SlaveID_Int, PrintDebugFlag=0):
+        try:
+            if self.IngeniaMotionController_MainDict[SlaveID_Int]["MotorConnectedFlag"] == 1:
+
+                self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxContinuousCurrent_Actual"] = self.IngeniaMotionControllerObject.communication.get_register("MOT_RATED_CURRENT", servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+
+                if PrintDebugFlag == 1:
+                    print("__GetMaxContinuousCurrent event fired for SlaveID_Int = " + str(SlaveID_Int))
+
+        except:
+            exceptions = sys.exc_info()[0]
+            print("__GetMaxContinuousCurrent, exceptions: %s" % exceptions)
+            traceback.print_exc()
+
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
+    def __SetPeakCurrentValueTimeAndFaultParameters(self, SlaveID_Int, PeakCurrentValue_ToBeSet, PeakCurrentTimeMilliseconds_ToBeSet, PeakCurrentFaultModeInt_ToBeSet, FaultReactionTimeoutMilliseconds_ToBeSet=1, PrintDebugFlag=0):
+
+        '''
+        ###
+        https://drives.novantamotion.com/summit/0x2101-peak-current
+
+        <Register access="rw" address_type="NVM" address="0x0101"  dtype="float" id="DRV_PROT_I2T_PEAK_VALUE" units="A" subnode="1" cyclic="CONFIG" desc="User peak current" cat_id="PROTECTIONS">
+
+        This register defines the maximum allowed instant current during the defined peak current time.
+        These registers allows to configure the I2T parameters to protect the drive and/or motor in front of exceeding their thermal limit. It is a complementary protection that works together with temperature limits and current derating.
+
+        This protection is always active. For modes of operation where current loop is not enabled, instead of limiting the current a fault is generated.
+
+        There is a maximum configurable I2T. If a user sets an I2T less restrictive than the allowed, the drive overwrites the user configuration with its own. The applied nominal current is the smaller between both configurations.
+
+        If maximum configurable I2T is detected before the user I2T levels, a fault is generated independently if the current loop is enabled or not.
+        ###
+
+        ###
+        https://drives.novantamotion.com/summit/0x2102-peak-current-time
+
+        <Register access="rw" address_type="NVM" address="0x0102"  dtype="u32" id="DRV_PROT_I2T_PEAK_TIME" units="ms" subnode="1" cyclic="CONFIG" desc="User allowed peak current time" cat_id="PROTECTIONS">
+
+        This register defines the maximum time the drive is able to source the peak current.
+
+        This register allows to configure the I2T parameters to protect the drive and/or motor in front of exceeding their thermal limit. It is a complementary protection that works together with temperature limits and current derating.
+
+        The main functionality of the I2T is to detect an instantaneous exceed of thermal energy on the drive. It covers the case where the temperature sensors are too slow to detect a dangerous situation.
+
+        This protection is always active. For modes of operation where current loop is not enabled, instead of limiting the current a fault is generated.
+
+        There is a maximum configurable I2T. If a user sets an I2T less restrictive than the allowed, the drive overwrites the user configuration with its own. The applied nominal current is the smaller between both configurations.
+
+        If maximum configurable I2T is detected before the user I2T levels, a fault is generated independently if the current loop is enabled or not.
+        ###
+
+        ###
+        https://drives.novantamotion.com/summit/0x260f-user-i2t-error-option-code
+
+        <Register access="rw" address_type="NVM" address="0x060F"  dtype="u16" id="ERROR_PROT_I2T_OPTION" units="-" subnode="1" cyclic="CONFIG" desc="Reaction option code for the &quot;I2T without current control&quot; error" cat_id="PROTECTIONS">
+
+        This register set the drive fault reaction for an I2T detection without active current control.
+        The value of this register determines the reaction of the drive when a fault is triggered:
+
+        0	Fault	Disable power stage
+        1	Warning	Do nothing
+        2	Fault	Slow down ramp
+        3	Fault	Quick stop ramp
+
+        Further information in Error management.
+        When using slow down ramp or quick stop ramp option codes, it is important to have the velocity loop operative and properly configured.
+        In the option codes that also disable the power stage after detecting that the motor has stopped, velocity threshold and velocity threshold time have to be also configured.
+        ###
+
+        ###
+        https://drives.novantamotion.com/summit/0x262b-fault-reaction-timeout
+
+        <Register access="rw" address_type="NVM" address="0x062B"  dtype="u32" id="FAULT_REACTION_TIMEOUT" units="ms" subnode="1" cyclic="CONFIG" desc="Timeout in milliseconds after which fault reaction state will be exited into fault state." cat_id="PROTECTIONS">
+
+        This register configures a timeout after which fault reaction active state will have to exit into fault state.
+        ###
+
+        ###
+        https://drives.novantamotion.com/summit/0x21d6-velocity-threshold
+        <Register access="rw" address_type="NVM" address="0x01D6"  dtype="float" id="PROF_VEL_THRESHOLD" units="rev/s" subnode="1" cyclic="CYCLIC_RX" desc="Threshold (in absolute value) below which, the velocity is considered to be zero." cat_id="THRESHOLDS">
+        This register sets the threshold (in absolute value) below which actual velocity can be considered to be zero
+        In profile velocity mode, the speed bit in the status word register will be set whenever the actual velocity (in absolute value)
+        stays below the Velocity threshold for longer than the amount of time defined in Velocity threshold time.
+
+        https://drives.novantamotion.com/summit/0x21d7-velocity-threshold-time
+        <Register access="rw" address_type="NVM" address="0x01D7"  dtype="u32" id="PROF_VEL_THRESHOLD_TIME" units="ms" subnode="1" cyclic="CYCLIC_RX" desc="Time that the velocity (in absolute value) has to remain below velocity threshold in order to detect zero velocity" cat_id="THRESHOLDS">
+        This register sets the time that the Actual velocity (in absolute value) has to stay below the Velocity threshold to consider it zero speed
+
+        In Profile velocity mode, the speed bit in the status word register will be set whenever the actual velocity (in absolute value)
+        stays below the Velocity threshold for longer than the amount of time defined in Velocity threshold time.
+
+        UNICORN IMPORTANT:
+        From https://drives.novantamotion.com/summit/0x260f-user-i2t-error-option-code:
+        When using slow down ramp or quick stop ramp option codes, it is important to have the velocity loop operative and properly configured.
+        In the option codes that also disable the power stage after detecting that the motor has stopped, ***velocity threshold and velocity threshold time have to be also configured***.
+        ###
+
+        ###
+        https://drives.novantamotion.com/summit/0x261b-over-current-without-current-control-error-
+        <Register access="rw" address_type="NVM" address="0x061B"  dtype="u16" id="ERROR_PROT_OVER_CUR_OPTION" units="-" subnode="1" cyclic="CONFIG" desc="Reaction option code for the &quot;Over current without current control&quot; error" cat_id="PROTECTIONS">
+
+        ###
+
+        '''
+
+        try:
+            if self.IngeniaMotionController_MainDict[SlaveID_Int]["MotorConnectedFlag"] == 1:
+
+                ##########################################################################################################
+                if self.IngeniaMotionController_MainDict[SlaveID_Int]["AllowWritingOfControllerConfigurationFlag"] == 1:
+
+                    PeakCurrentTimeMilliseconds_ToBeSet = self.LimitNumber_IntOutputOnly(0.0, 1.0*60.0*60.0*1000.0, PeakCurrentTimeMilliseconds_ToBeSet) #1hr worth of milliseconds
+
+                    FaultReactionTimeoutMilliseconds_ToBeSet = self.LimitNumber_IntOutputOnly(0.0, 1.0*60.0*60.0*1000.0, FaultReactionTimeoutMilliseconds_ToBeSet) #1hr worth of milliseconds
+
+                    PeakCurrentFaultModeInt_ToBeSet = int(PeakCurrentFaultModeInt_ToBeSet)
+
+                    if PeakCurrentFaultModeInt_ToBeSet not in [0, 1, 2, 3]:
+                        PeakCurrentFaultModeInt_ToBeSet = 0
+
+                    self.IngeniaMotionControllerObject.communication.set_register("DRV_PROT_I2T_PEAK_VALUE", PeakCurrentValue_ToBeSet, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"]) #"0x0101"
+                    self.IngeniaMotionControllerObject.communication.set_register("DRV_PROT_I2T_PEAK_TIME", PeakCurrentTimeMilliseconds_ToBeSet, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"]) #"0x0102"
+                    self.IngeniaMotionControllerObject.communication.set_register("ERROR_PROT_I2T_OPTION", PeakCurrentFaultModeInt_ToBeSet, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"]) #"0x060F"
+                    self.IngeniaMotionControllerObject.communication.set_register("ERROR_PROT_OVER_CUR_OPTION", 0, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])  #"0x061B"
+                    self.IngeniaMotionControllerObject.communication.set_register("FAULT_REACTION_TIMEOUT", 1, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"]) #"0x062B"
+
+                    ### I DON'T EVEN SEE THE "0x060F" REGISTER FROM XDF FILE
+
+                    #https://drives.novantamotion.com/summit/0x260f-user-i2t-error-option-code
+                    #https://drives.novantamotion.com/summit/0x261b-over-current-without-current-control-error-
+
+                    self.IngeniaMotionControllerObject.communication.set_register("PROF_VEL_THRESHOLD", 1.0, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"]) #"0x01D6"
+                    self.IngeniaMotionControllerObject.communication.set_register("PROF_VEL_THRESHOLD_TIME", 10, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"]) #"0x01D7"
+
+
+                    time.sleep(0.001)
+                ##########################################################################################################
+
+                ##########################################################################################################
+                else:
+                    if PrintDebugFlag == 1:
+                        print("__SetPeakCurrentValueTimeAndFaultParameters for SlaveID_Int = " + str(SlaveID_Int) + ", not allowed to write.")
+                ##########################################################################################################
+
+                ##########################################################################################################
+                self.__GetPeakCurrentValueTimeAndFaultParameters(SlaveID_Int)
+
+                #############################################
+                if self.IngeniaMotionController_MainDict[SlaveID_Int]["AllowWritingOfControllerConfigurationFlag"] == 0:
+                    self.IngeniaMotionController_MainDict[SlaveID_Int]["PeakCurrentValue_ToBeSet"] = self.IngeniaMotionController_MainDict[SlaveID_Int]["PeakCurrentValue_Actual"]
+                    self.IngeniaMotionController_MainDict[SlaveID_Int]["PeakCurrentTimeMilliseconds_ToBeSet"] = self.IngeniaMotionController_MainDict[SlaveID_Int]["PeakCurrentTimeMilliseconds_Actual"]
+                    self.IngeniaMotionController_MainDict[SlaveID_Int]["PeakCurrentFaultModeInt_ToBeSet"] = self.IngeniaMotionController_MainDict[SlaveID_Int]["PeakCurrentFaultModeInt_Actual"]
+                #############################################
+
+                if PrintDebugFlag == 1:
+                    print("__SetPeakCurrentValueTimeAndFaultParameters event fired for SlaveID_Int = " + str(SlaveID_Int))
+                ##########################################################################################################
+
+        except:
+            exceptions = sys.exc_info()[0]
+            print("__SetPeakCurrentValueTimeAndFaultParameters, exceptions: %s" % exceptions)
+            traceback.print_exc()
+
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
+    def SetPeakCurrentValueTimeAndFaultParameters_ExternalProgram(self, SlaveID_Int, PeakCurrentValue_ToBeSet, PeakCurrentTimeMilliseconds_ToBeSet, PeakCurrentFaultModeInt_ToBeSet, PrintDebugFlag = 0):
+        try:
+
+            self.IngeniaMotionController_MainDict[SlaveID_Int]["PeakCurrentValue_ToBeSet"] = PeakCurrentValue_ToBeSet
+            self.IngeniaMotionController_MainDict[SlaveID_Int]["PeakCurrentTimeMilliseconds_ToBeSet"] = PeakCurrentTimeMilliseconds_ToBeSet
+            self.IngeniaMotionController_MainDict[SlaveID_Int]["PeakCurrentFaultModeInt_ToBeSet"] = PeakCurrentFaultModeInt_ToBeSet
+
+            self.IngeniaMotionController_MainDict[SlaveID_Int]["PeakCurrentValueTimeAndFaultParameters_NeedsToBeSetFlag"] = 1
+
+            if PrintDebugFlag == 1:
+                print("SetPeakCurrentValueTimeAndFaultParameters_ExternalProgram event fired for SlaveID_Int = " + str(SlaveID_Int))
+
+        except:
+            exceptions = sys.exc_info()[0]
+            print("SetPeakCurrentValueTimeAndFaultParameters_ExternalProgram, exceptions: %s" % exceptions)
+            traceback.print_exc()
+
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
+    def __GetPeakCurrentValueTimeAndFaultParameters(self, SlaveID_Int, PrintDebugFlag=0):
+        try:
+            if self.IngeniaMotionController_MainDict[SlaveID_Int]["MotorConnectedFlag"] == 1:
+
+                self.IngeniaMotionController_MainDict[SlaveID_Int]["PeakCurrentValue_Actual"] = self.IngeniaMotionControllerObject.communication.get_register("DRV_PROT_I2T_PEAK_VALUE", servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+                self.IngeniaMotionController_MainDict[SlaveID_Int]["PeakCurrentTime_Actual"] = self.IngeniaMotionControllerObject.communication.get_register("DRV_PROT_I2T_PEAK_TIME", servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+                self.IngeniaMotionController_MainDict[SlaveID_Int]["PeakCurrentFaultModeInt_Actual"] = self.IngeniaMotionControllerObject.communication.get_register("ERROR_PROT_I2T_OPTION", servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+
+                if PrintDebugFlag == 1:
+                    print("__GetPeakCurrentValueTimeAndFaultParameters event fired for SlaveID_Int = " + str(SlaveID_Int))
+
+        except:
+            exceptions = sys.exc_info()[0]
+            print("__GetPeakCurrentValueTimeAndFaultParameters, exceptions: %s" % exceptions)
+            traceback.print_exc()
+
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
+    def __SetPositionFollowingErrorWindowTimeoutAndFaultParameters(self, SlaveID_Int, PositionFollowingErrorWindow_ToBeSet, PositionFollowingErrorTimeoutMilliseconds_ToBeSet, PositionFollowingErrorFaultModeInt_ToBeSet, PrintDebugFlag=0):
+
+        '''
+        ###
+        https://drives.novantamotion.com/summit/0x21ec-position-following-error-window
+        <Register access="rw" address_type="NVM" address="0x01EC"  dtype="float" id="CL_POS_ERROR_WINDOW" units="cnt" subnode="1" cyclic="CYCLIC_RX" desc="Indicates the maximum allowed difference between demand and actual position before generating a fault." cat_id="THRESHOLDS">
+        This object indicates the configured range of tolerated position values symmetrically to the position demand value.
+        If the position actual value is out of the position following error window for a position following error timeout time, a position following error occurs.
+        When the error condition is detected, the Following error bit (bit number 13) of the status word will be set. A following error may occur when a drive is blocked, when an unreachable profile velocity occurs, or when using wrong closed-loop coefficients.
+
+        https://drives.novantamotion.com/summit/0x21ed-position-following-error-timeout
+        <Register access="rw" address_type="NVM" address="0x01ED"  dtype="u32" id="CL_POS_ERROR_TIMEOUT" units="ms" subnode="1" cyclic="CYCLIC_RX" desc="Indicates the maximum time in which the difference between demand and actual position is allowed to be outside the position window." cat_id="THRESHOLDS">
+        This object indicates the minimum time that actual position must be out of position following error window in order to generate an error.
+        When the error condition is detected, the Following error bit (bit number 13) of the statusword will be set.
+
+        https://drives.novantamotion.com/summit/0x21ee-following-error
+        <Register access="r" address_type="NVM_NONE" address="0x01EE"  dtype="float" id="CL_ERROR_FOLLOWING_1" units="-" subnode="1" cyclic="CYCLIC_TX" desc="Difference between demand and actual value of active operation mode variables." cat_id="REPORTING">
+        This register contains the difference between demand and actual value of active operation mode variables.
+        Note *Following error parameter contains the following error of the active operation mode. If a velocity mode is selected, the units will be rev/s, if a position mode is selected, it will represent counts.
+
+        https://drives.novantamotion.com/summit/0x2612-position-following-error-option-code
+        <Register access="rw" address_type="NVM" address="0x0612"  dtype="u16" id="ERROR_POS_FOLLOWING_OPTION" units="-" subnode="1" cyclic="CONFIG" desc="Reaction option code for the &quot;Position following error&quot; error" cat_id="PROTECTIONS">
+        This register set the drive fault reaction for a position following error detection.
+        The value of this register determines the reaction of the drive when a fault is triggered:
+
+        0	Fault	Disable power stage
+        1	Warning	Do nothing
+        2	Fault	Slow down ramp
+        3	Fault	Quick stop ramp
+
+        Further information in Error management.
+
+        When using slow down ramp or quick stop ramp option codes, it is important to have the velocity loop operative and properly configured.
+        In the option codes that also disable the power stage after detecting that the motor has stopped, velocity threshold and velocity threshold time have to be also configured.
+        ###
+        '''
+
+        try:
+            if self.IngeniaMotionController_MainDict[SlaveID_Int]["MotorConnectedFlag"] == 1:
+
+                ##########################################################################################################
+                if self.IngeniaMotionController_MainDict[SlaveID_Int]["AllowWritingOfControllerConfigurationFlag"] == 1:
+
+                    PositionFollowingErrorWindow_ToBeSet = self.LimitNumber_IntOutputOnly(0.0, 1000000, PositionFollowingErrorWindow_ToBeSet)
+
+                    PositionFollowingErrorTimeoutMilliseconds_ToBeSet = self.LimitNumber_IntOutputOnly(0.0, 1.0*60.0*60.0*1000.0, PositionFollowingErrorTimeoutMilliseconds_ToBeSet) #1hr worth of milliseconds
+
+                    PositionFollowingErrorFaultModeInt_ToBeSet = int(PositionFollowingErrorFaultModeInt_ToBeSet)
+
+                    if PositionFollowingErrorFaultModeInt_ToBeSet not in [0, 1, 2, 3]:
+                        PositionFollowingErrorFaultModeInt_ToBeSet = 0
+
+                    self.IngeniaMotionControllerObject.communication.set_register("CL_POS_ERROR_WINDOW", PositionFollowingErrorWindow_ToBeSet, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+                    self.IngeniaMotionControllerObject.communication.set_register("CL_POS_ERROR_TIMEOUT", PositionFollowingErrorTimeoutMilliseconds_ToBeSet, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+                    self.IngeniaMotionControllerObject.communication.set_register("ERROR_POS_FOLLOWING_OPTION", PositionFollowingErrorFaultModeInt_ToBeSet, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+
+                    time.sleep(0.001)
+                ##########################################################################################################
+
+                ##########################################################################################################
+                else:
+                    if PrintDebugFlag == 1:
+                        print("__SetPositionFollowingErrorWindowTimeoutAndFaultParameters for SlaveID_Int = " + str(SlaveID_Int) + ", not allowed to write.")
+                ##########################################################################################################
+
+                ##########################################################################################################
+                self.__GetPositionFollowingErrorWindowTimeoutAndFaultParameters(SlaveID_Int, PrintDebugFlag=0)
+
+                #############################################
+                if self.IngeniaMotionController_MainDict[SlaveID_Int]["AllowWritingOfControllerConfigurationFlag"] == 0:
+                    self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionFollowingErrorWindow_ToBeSet"] = self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionFollowingErrorWindow_Actual"]
+                    self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionFollowingErrorTimeoutMilliseconds_ToBeSet"] = self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionFollowingErrorTimeoutMilliseconds_Actual"]
+                    self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionFollowingErrorFaultModeInt_ToBeSet"] = self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionFollowingErrorFaultModeInt_Actual"]
+                #############################################
+
+                if PrintDebugFlag == 1:
+                    print("__SetPositionFollowingErrorWindowTimeoutAndFaultParameters event fired for SlaveID_Int = " + str(SlaveID_Int))
+                ##########################################################################################################
+
+        except:
+            exceptions = sys.exc_info()[0]
+            print("__SetPositionFollowingErrorWindowTimeoutAndFaultParameters, exceptions: %s" % exceptions)
+            traceback.print_exc()
+
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
+    def SetPositionFollowingErrorWindowTimeoutAndFaultParameters_ExternalProgram(self, SlaveID_Int, PositionFollowingErrorWindow_ToBeSet, PositionFollowingErrorTimeoutMilliseconds_ToBeSet, PositionFollowingErrorFaultModeInt_ToBeSet, PrintDebugFlag = 0):
+        try:
+
+            self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionFollowingErrorWindow_ToBeSet"] = PositionFollowingErrorWindow_ToBeSet
+            self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionFollowingErrorTimeoutMilliseconds_ToBeSet"] = PositionFollowingErrorTimeoutMilliseconds_ToBeSet
+            self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionFollowingErrorFaultModeInt_ToBeSet"] = PositionFollowingErrorFaultModeInt_ToBeSet
+
+            self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionFollowingErrorWindowTimeoutAndFaultParameters_NeedsToBeSetFlag"] = 1
+
+            if PrintDebugFlag == 1:
+                print("SetPositionFollowingErrorWindowTimeoutAndFaultParameters_ExternalProgram event fired for SlaveID_Int = " + str(SlaveID_Int))
+
+        except:
+            exceptions = sys.exc_info()[0]
+            print("SetPositionFollowingErrorWindowTimeoutAndFaultParameters_ExternalProgram, exceptions: %s" % exceptions)
+            traceback.print_exc()
+
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
+    def __GetPositionFollowingErrorWindowTimeoutAndFaultParameters(self, SlaveID_Int, PrintDebugFlag=0):
+        try:
+            if self.IngeniaMotionController_MainDict[SlaveID_Int]["MotorConnectedFlag"] == 1:
+
+                self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionFollowingErrorWindow_Actual"] = self.IngeniaMotionControllerObject.communication.get_register("CL_POS_ERROR_WINDOW", servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+                self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionFollowingErrorTimeoutMilliseconds_Actual"] = self.IngeniaMotionControllerObject.communication.get_register("CL_POS_ERROR_TIMEOUT", servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+                self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionFollowingErrorFaultModeInt_Actual"] = self.IngeniaMotionControllerObject.communication.get_register("ERROR_POS_FOLLOWING_OPTION", servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+
+                if PrintDebugFlag == 1:
+                    print("__GetPositionFollowingErrorWindowTimeoutAndFaultParameters event fired for SlaveID_Int = " + str(SlaveID_Int) + \
+                        ", PositionFollowingErrorWindow_Actual: " + str(self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionFollowingErrorWindow_Actual"])+\
+                        ", PositionFollowingErrorTimeoutMilliseconds_Actual: " + str(self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionFollowingErrorTimeoutMilliseconds_Actual"])+\
+                        ", PositionFollowingErrorFaultModeInt_Actual: " + str(self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionFollowingErrorFaultModeInt_Actual"]))
+
+        except:
+            exceptions = sys.exc_info()[0]
+            print("__GetPositionFollowingErrorWindowTimeoutAndFaultParameters, exceptions: %s" % exceptions)
             traceback.print_exc()
 
     ##########################################################################################################
@@ -2438,14 +3295,30 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
         try:
             if self.IngeniaMotionController_MainDict[SlaveID_Int]["MotorConnectedFlag"] == 1:
 
-                self.IngeniaMotionControllerObject.communication.set_register("CL_VEL_REF_MAX", MaxVelocity_ToBeSet, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"]) #address="0x01E8" 
+                ##########################################################################################################
+                if self.IngeniaMotionController_MainDict[SlaveID_Int]["AllowWritingOfControllerConfigurationFlag"] == 1:
 
-                time.sleep(0.001)
+                    self.IngeniaMotionControllerObject.communication.set_register("CL_VEL_REF_MAX", MaxVelocity_ToBeSet, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"]) #address="0x01E8"
+                    time.sleep(0.001)
+                ##########################################################################################################
 
+                ##########################################################################################################
+                else:
+                    if PrintDebugFlag == 1:
+                        print("__SetMaxVelocity for SlaveID_Int = " + str(SlaveID_Int) + ", not allowed to write.")
+                ##########################################################################################################
+
+                ##########################################################################################################
                 self.__GetMaxVelocity(SlaveID_Int)
+
+                #############################################
+                if self.IngeniaMotionController_MainDict[SlaveID_Int]["AllowWritingOfControllerConfigurationFlag"] == 0:
+                    self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxVelocity_ToBeSet"] = self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxVelocity_Actual"]
+                #############################################
 
                 if PrintDebugFlag == 1:
                     print("__SetMaxVelocity event fired for SlaveID_Int = " + str(SlaveID_Int))
+                ##########################################################################################################
 
         except:
             exceptions = sys.exc_info()[0]
@@ -2500,14 +3373,30 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
         try:
             if self.IngeniaMotionController_MainDict[SlaveID_Int]["MotorConnectedFlag"] == 1:
 
-                self.IngeniaMotionControllerObject.communication.set_register("PROF_MAX_VEL", MaxProfileVelocity_ToBeSet, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+                ##########################################################################################################
+                if self.IngeniaMotionController_MainDict[SlaveID_Int]["AllowWritingOfControllerConfigurationFlag"] == 1:
+                    self.IngeniaMotionControllerObject.communication.set_register("PROF_MAX_VEL", MaxProfileVelocity_ToBeSet, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
 
-                time.sleep(0.001)
+                    time.sleep(0.001)
+                ##########################################################################################################
 
+                ##########################################################################################################
+                else:
+                    if PrintDebugFlag == 1:
+                        print("__SetMaxProfileVelocity for SlaveID_Int = " + str(SlaveID_Int) + ", not allowed to write.")
+                ##########################################################################################################
+
+                ##########################################################################################################
                 self.__GetMaxProfileVelocity(SlaveID_Int)
+
+                #############################################
+                if self.IngeniaMotionController_MainDict[SlaveID_Int]["AllowWritingOfControllerConfigurationFlag"] == 0:
+                    self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxProfileVelocity_ToBeSet"] = self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxProfileVelocity_Actual"]
+                #############################################
 
                 if PrintDebugFlag == 1:
                     print("__SetMaxProfileVelocity event fired for SlaveID_Int = " + str(SlaveID_Int))
+                ##########################################################################################################
 
         except:
             exceptions = sys.exc_info()[0]
@@ -2562,16 +3451,33 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
         try:
             if self.IngeniaMotionController_MainDict[SlaveID_Int]["MotorConnectedFlag"] == 1:
 
-                #self.IngeniaMotionControllerObject.configuration.set_max_acceleration(max_acceleration_deceleration, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"]) #deprecated
-                self.IngeniaMotionControllerObject.configuration.set_max_profile_acceleration(MaxProfileAcceleration_ToBeSet, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
-                self.IngeniaMotionControllerObject.configuration.set_max_profile_deceleration(MaxProfileAcceleration_ToBeSet, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+                ##########################################################################################################
+                if self.IngeniaMotionController_MainDict[SlaveID_Int]["AllowWritingOfControllerConfigurationFlag"] == 1:
 
-                time.sleep(0.001)
+                    #self.IngeniaMotionControllerObject.configuration.set_max_acceleration(max_acceleration_deceleration, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"]) #deprecated
+                    self.IngeniaMotionControllerObject.configuration.set_max_profile_acceleration(MaxProfileAcceleration_ToBeSet, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+                    self.IngeniaMotionControllerObject.configuration.set_max_profile_deceleration(MaxProfileAcceleration_ToBeSet, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
 
+                    time.sleep(0.001)
+                ##########################################################################################################
+
+                ##########################################################################################################
+                else:
+                    if PrintDebugFlag == 1:
+                        print("__SetMaxProfileAcceleration for SlaveID_Int = " + str(SlaveID_Int) + ", not allowed to write.")
+                ##########################################################################################################
+
+                ##########################################################################################################
                 self.__GetMaxProfileAcceleration(SlaveID_Int)
+
+                #############################################
+                if self.IngeniaMotionController_MainDict[SlaveID_Int]["AllowWritingOfControllerConfigurationFlag"] == 0:
+                    self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxProfileAcceleration_ToBeSet"] = self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxProfileAcceleration_Actual"]
+                #############################################
 
                 if PrintDebugFlag == 1:
                     print("__SetMaxProfileAcceleration event fired for SlaveID_Int = " + str(SlaveID_Int))
+                ##########################################################################################################
 
         except:
             exceptions = sys.exc_info()[0]
@@ -2647,14 +3553,31 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
         try:
             if self.IngeniaMotionController_MainDict[SlaveID_Int]["MotorConnectedFlag"] == 1:
 
-                self.IngeniaMotionControllerObject.configuration.homing_on_current_position(int(EncoderOffset_ToBeSet), servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+                ##########################################################################################################
+                if self.IngeniaMotionController_MainDict[SlaveID_Int]["AllowWritingOfControllerConfigurationFlag"] == 1:
+                    self.IngeniaMotionControllerObject.configuration.homing_on_current_position(int(EncoderOffset_ToBeSet), servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
 
-                time.sleep(0.001)
+                    time.sleep(0.001)
+                ##########################################################################################################
 
+                ##########################################################################################################
+                else:
+                    if PrintDebugFlag == 1:
+                        print("__SetEncoderOffset for SlaveID_Int = " + str(SlaveID_Int) + ", not allowed to write.")
+                ##########################################################################################################
+
+                ##########################################################################################################
                 #self.__GetEncoderOffset(SlaveID_Int)
+
+                #############################################
+                if self.IngeniaMotionController_MainDict[SlaveID_Int]["AllowWritingOfControllerConfigurationFlag"] == 0:
+                    pass
+                    #self.IngeniaMotionController_MainDict[SlaveID_Int]["EncoderOffset_ToBeSet"] = self.IngeniaMotionController_MainDict[SlaveID_Int]["EncoderOffset_Actual"] #Currently, EncoderOffset_Actual doesn't exist
+                #############################################
 
                 if PrintDebugFlag == 1:
                     print("__SetEncoderOffset event fired for SlaveID_Int = " + str(SlaveID_Int))
+                ##########################################################################################################
 
         except:
             exceptions = sys.exc_info()[0]
@@ -2693,18 +3616,38 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
 
                 if PositionMin_EncoderTicks <= PositionMax_EncoderTicks:
 
-                    self.IngeniaMotionControllerObject.communication.set_register("CL_POS_REF_MIN_RANGE", -2147483648, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"]) #Signed 32-bit int. Minimum position value range. On reaching or exceeding this limit, the position set-point and position actual are wrapped automatically to the other end of the range.
-                    self.IngeniaMotionControllerObject.communication.set_register("CL_POS_REF_MAX_RANGE", 2147483647, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"]) #Signed 32-bit int. Maximum position value range. On reaching or exceeding this limit, the position set-point and position actual are wrapped automatically to the other end of the range.\
+                    ##########################################################################################################
+                    if self.IngeniaMotionController_MainDict[SlaveID_Int]["AllowWritingOfControllerConfigurationFlag"] == 1:
 
-                    self.IngeniaMotionControllerObject.communication.set_register("CL_POS_REF_MIN", int(PositionMin_EncoderTicks), servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"]) #User minimum allowed position.
-                    self.IngeniaMotionControllerObject.communication.set_register("CL_POS_REF_MAX", int(PositionMax_EncoderTicks), servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"]) #User maximum allowed position.
+                        self.IngeniaMotionControllerObject.communication.set_register("CL_POS_REF_MIN_RANGE", -2147483648, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"]) #Signed 32-bit int. Minimum position value range. On reaching or exceeding this limit, the position set-point and position actual are wrapped automatically to the other end of the range.
+                        self.IngeniaMotionControllerObject.communication.set_register("CL_POS_REF_MAX_RANGE", 2147483647, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"]) #Signed 32-bit int. Maximum position value range. On reaching or exceeding this limit, the position set-point and position actual are wrapped automatically to the other end of the range.\
 
-                    time.sleep(0.001)
+                        self.IngeniaMotionControllerObject.communication.set_register("CL_POS_REF_MIN", int(PositionMin_EncoderTicks), servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"]) #User minimum allowed position.
+                        self.IngeniaMotionControllerObject.communication.set_register("CL_POS_REF_MAX", int(PositionMax_EncoderTicks), servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"]) #User maximum allowed position.
 
+                        time.sleep(0.001)
+                    ##########################################################################################################
+
+                    ##########################################################################################################
+                    else:
+                        if PrintDebugFlag == 1:
+                            print("__SetPositionMinAndMaxInEncoderTicks for SlaveID_Int = " + str(SlaveID_Int) + ", not allowed to write.")
+                    ##########################################################################################################
+
+                    ##########################################################################################################
                     self.__GetPositionMinAndMaxInEncoderTicks(SlaveID_Int)
+
+                    #############################################
+                    if self.IngeniaMotionController_MainDict[SlaveID_Int]["AllowWritingOfControllerConfigurationFlag"] == 0:
+                        self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionMinRange_EncoderTicks_ToBeSet"] = self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionMinRange_EncoderTicks_Actual"]
+                        self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionMaxRange_EncoderTicks_ToBeSet"] = self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionMaxRange_EncoderTicks_Actual"]
+                        self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionMin_EncoderTicks_ToBeSet"] = self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionMin_EncoderTicks_Actual"]
+                        self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionMax_EncoderTicks_ToBeSet"] = self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionMax_EncoderTicks_Actual"]
+                    #############################################
 
                     if PrintDebugFlag == 1:
                         print("__SetPositionMinAndMaxInEncoderTicks event fired for SlaveID_Int = " + str(SlaveID_Int))
+                    ##########################################################################################################
 
                 else:
                     print("__SetPositionMinAndMaxInEncoderTicks: Error, PositionMin_EncoderTicks must be <= PositionMax_EncoderTicks.")
@@ -2749,7 +3692,9 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
     ##########################################################################################################
     ##########################################################################################################
     def TPDOcallbackFunction_UpdateAllTPDOvariables_General(self, SlaveID_Int, ActualAllTPDOvariables_ListOfTPDOitems):
-        # Callback to set new values to registers for each cycle.
+        #Callback to set new values to registers for each cycle.
+
+        #print("TPDOcallbackFunction_UpdateAllTPDOvariables_General: SlaveID_Int = " + str(SlaveID_Int))
 
         try:
             for Index, Element in enumerate(ActualAllTPDOvariables_ListOfTPDOitems):
@@ -2839,11 +3784,22 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
     ##########################################################################################################
     ##########################################################################################################
     def RPDOcallbackFunction_NotifyAllRPDOvariablesActualValue_General(self, SlaveID_Int, ActualAllRPDOvariables_ListOfRPDOitems):
-        # Callback that is subscribed to get the actual variables for each cycle. Args: actual_AllPDOvariables:
+        #Callback that is subscribed to get the actual variables for each cycle. Args: actual_AllPDOvariables:
+
+        #print("RPDOcallbackFunction_NotifyAllRPDOvariablesActualValue_General: SlaveID_Int = " + str(SlaveID_Int))
 
         try:
             for Index, Element in enumerate(ActualAllRPDOvariables_ListOfRPDOitems):
+
+                ########################################################################################################## UNICORN. This is the line where RPDO data gets written to the main dictionary.
+                #!@#!@#!@#!@#!@#!@#
+                #!@#!@#!@#!@#!@#!@#
+                #!@#!@#!@#!@#!@#!@#
                 self.IngeniaMotionController_MainDict[SlaveID_Int][self.IngeniaMotionController_RPDOandTPDOobjectsOnlyDict[SlaveID_Int]["PDO_ListOfRPDOvariableNames"][Index]] = Element.value
+                #!@#!@#!@#!@#!@#!@#
+                #!@#!@#!@#!@#!@#!@#
+                #!@#!@#!@#!@#!@#!@#
+                ##########################################################################################################
 
                 ##########################################################################################################
                 if self.IngeniaMotionController_RPDOandTPDOobjectsOnlyDict[SlaveID_Int]["PDO_ListOfRPDOvariableNames"][Index] == "Position_Actual_EncoderTicks":
@@ -2861,19 +3817,35 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                 ##########################################################################################################
 
                 ##########################################################################################################
-                if self.IngeniaMotionController_RPDOandTPDOobjectsOnlyDict[SlaveID_Int]["PDO_ListOfRPDOvariableNames"][Index] == "PDOitem_Current_Quadrature_Actual":
-                    print("RPDOcallbackFunction_NotifyAllRPDOvariablesActualValue_General, Time = " + str(self.getPreciseSecondsTimeStampString()) + ", SlaveID_Int = " + str(SlaveID_Int) + ", PDOitem_Current_Quadrature_Actual received with a value of: " + str(Element.value))
+                if self.IngeniaMotionController_RPDOandTPDOobjectsOnlyDict[SlaveID_Int]["PDO_ListOfRPDOvariableNames"][Index] == "Current_Direct_Actual":
+                    pass
+                    #print("RPDOcallbackFunction_NotifyAllRPDOvariablesActualValue_General, Time = " + str(self.getPreciseSecondsTimeStampString()) + ", SlaveID_Int = " + str(SlaveID_Int) + ", PDOitem_Current_Direct_Actual received with a value of: " + str(Element.value))
                 ##########################################################################################################
 
                 ##########################################################################################################
-                if self.IngeniaMotionController_RPDOandTPDOobjectsOnlyDict[SlaveID_Int]["PDO_ListOfRPDOvariableNames"][Index] == "PDOitem_Status_Word":
-                    print("RPDOcallbackFunction_NotifyAllRPDOvariablesActualValue_General, Time = " + str(self.getPreciseSecondsTimeStampString()) + ", SlaveID_Int = " + str(SlaveID_Int) + ", PDOitem_Status_Word received with a value of: " + str(Element.value))
+                if self.IngeniaMotionController_RPDOandTPDOobjectsOnlyDict[SlaveID_Int]["PDO_ListOfRPDOvariableNames"][Index] == "Current_Quadrature_Actual":
+                    pass
+                    #print("RPDOcallbackFunction_NotifyAllRPDOvariablesActualValue_General, Time = " + str(self.getPreciseSecondsTimeStampString()) + ", SlaveID_Int = " + str(SlaveID_Int) + ", PDOitem_Current_Quadrature_Actual received with a value of: " + str(Element.value))
                 ##########################################################################################################
 
                 ##########################################################################################################
-                if self.IngeniaMotionController_RPDOandTPDOobjectsOnlyDict[SlaveID_Int]["PDO_ListOfRPDOvariableNames"][Index] == "PDOitem_STO_Status":
-                    print("RPDOcallbackFunction_NotifyAllRPDOvariablesActualValue_General, Time = " + str(self.getPreciseSecondsTimeStampString()) + ", SlaveID_Int = " + str(SlaveID_Int) + ", PDOitem_STO_Status received with a value of: " + str(Element.value))
+                if self.IngeniaMotionController_RPDOandTPDOobjectsOnlyDict[SlaveID_Int]["PDO_ListOfRPDOvariableNames"][Index] == "Status_Word":
+                    pass
+                    #print("RPDOcallbackFunction_NotifyAllRPDOvariablesActualValue_General, Time = " + str(self.getPreciseSecondsTimeStampString()) + ", SlaveID_Int = " + str(SlaveID_Int) + ", PDOitem_Status_Word received with a value of: " + str(Element.value))
                 ##########################################################################################################
+
+                ##########################################################################################################
+                if self.IngeniaMotionController_RPDOandTPDOobjectsOnlyDict[SlaveID_Int]["PDO_ListOfRPDOvariableNames"][Index] == "STO_Status":
+                    pass
+                    #print("RPDOcallbackFunction_NotifyAllRPDOvariablesActualValue_General, Time = " + str(self.getPreciseSecondsTimeStampString()) + ", SlaveID_Int = " + str(SlaveID_Int) + ", PDOitem_STO_Status received with a value of: " + str(Element.value))
+                ##########################################################################################################
+
+                ##########################################################################################################
+                if self.IngeniaMotionController_RPDOandTPDOobjectsOnlyDict[SlaveID_Int]["PDO_ListOfRPDOvariableNames"][Index] == "Error_Last_HexCode":
+                    pass
+                    #print("RPDOcallbackFunction_NotifyAllRPDOvariablesActualValue_General, Time = " + str(self.getPreciseSecondsTimeStampString()) + ", SlaveID_Int = " + str(SlaveID_Int) + ", Error_Last_HexCode received with a value of: " + str(Element.value))
+                ##########################################################################################################
+
 
                 '''
                 ##########################################################################################################
@@ -2985,6 +3957,8 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
             ##########################################################################################################
             for SlaveID_Int in self.DetectedSlaveID_List:
 
+                print("InitializeAndStartPDOdataExchange: SlaveID_Int = " + str(SlaveID_Int))
+
                 ##########################################################################################################
                 ##########################################################################################################
                 ##########################################################################################################
@@ -3040,6 +4014,7 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                 elif self.IngeniaMotionController_MainDict[SlaveID_Int]["OperationMode"] == "CyclicVoltage":
 
                     ####################################################
+                    #The units controlled are volts, so you would use the limit of your design (24VDC, then CAN command to +/- 24VDC?) not duty cycle.
                     self.IngeniaMotionController_RPDOandTPDOobjectsOnlyDict[SlaveID_Int]["PDOitem_Voltage_Quadrature_Setpoint"] = self.IngeniaMotionControllerObject.capture.pdo.create_pdo_item("CL_VOL_Q_SET_POINT",
                                                                                                                                                            value=int(0),
                                                                                                                                                            servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
@@ -3084,6 +4059,11 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                 ##########################################################################################################
 
                 ##########################################################################################################
+                self.IngeniaMotionController_RPDOandTPDOobjectsOnlyDict[SlaveID_Int]["PDOitem_Current_Direct_Actual"] = self.IngeniaMotionControllerObject.capture.pdo.create_pdo_item("CL_CUR_D_VALUE",
+                                                                                                                                                    servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"]) #Create a RPDO map item
+                ##########################################################################################################
+
+                ##########################################################################################################
                 self.IngeniaMotionController_RPDOandTPDOobjectsOnlyDict[SlaveID_Int]["PDOitem_Current_Quadrature_Actual"] = self.IngeniaMotionControllerObject.capture.pdo.create_pdo_item("CL_CUR_Q_VALUE",
                                                                                                                                                     servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"]) #Create a RPDO map item
                 ##########################################################################################################
@@ -3099,22 +4079,38 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                 ##########################################################################################################
 
                 ##########################################################################################################
+                #https://drives.novantamotion.com/summit/0x200f-last-error
+                #https://drives.novantamotion.com/summit/0x580f-last-error
+                #https://drives.novantamotion.com/summit/0x5e49-system-last-error
+                #DRV_DIAG_ERROR_LAST #works
+                #DRV_DIAG_ERROR_LIST_CODE #Works
+                #DRV_DIAG_ERROR_LAST_COM #KeyError: 'DRV_DIAG_ERROR_LAST_COM'
+                #DRV_DIAG_SYS_ERROR_LAST #KeyError: 'DRV_DIAG_SYS_ERROR_LAST'
+                self.IngeniaMotionController_RPDOandTPDOobjectsOnlyDict[SlaveID_Int]["PDOitem_Error_Last_HexCode"] = self.IngeniaMotionControllerObject.capture.pdo.create_pdo_item("DRV_DIAG_ERROR_LAST",
+                                                                                                                     servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"]) #Create a RPDO map item
+                ##########################################################################################################
+
+                ##########################################################################################################
                 self.IngeniaMotionController_RPDOandTPDOobjectsOnlyDict[SlaveID_Int]["ListOfRPDOitems"] = []
                 self.IngeniaMotionController_RPDOandTPDOobjectsOnlyDict[SlaveID_Int]["ListOfRPDOitems"].append(self.IngeniaMotionController_RPDOandTPDOobjectsOnlyDict[SlaveID_Int]["PDOitem_Position_Actual"])
                 #self.IngeniaMotionController_RPDOandTPDOobjectsOnlyDict[SlaveID_Int]["ListOfRPDOitems"].append(self.IngeniaMotionController_RPDOandTPDOobjectsOnlyDict[SlaveID_Int]["PDOitem_PositionSetPoint_Actual"])
                 self.IngeniaMotionController_RPDOandTPDOobjectsOnlyDict[SlaveID_Int]["ListOfRPDOitems"].append(self.IngeniaMotionController_RPDOandTPDOobjectsOnlyDict[SlaveID_Int]["PDOitem_Velocity_Actual"])
+                self.IngeniaMotionController_RPDOandTPDOobjectsOnlyDict[SlaveID_Int]["ListOfRPDOitems"].append(self.IngeniaMotionController_RPDOandTPDOobjectsOnlyDict[SlaveID_Int]["PDOitem_Current_Direct_Actual"])
                 self.IngeniaMotionController_RPDOandTPDOobjectsOnlyDict[SlaveID_Int]["ListOfRPDOitems"].append(self.IngeniaMotionController_RPDOandTPDOobjectsOnlyDict[SlaveID_Int]["PDOitem_Current_Quadrature_Actual"])
                 self.IngeniaMotionController_RPDOandTPDOobjectsOnlyDict[SlaveID_Int]["ListOfRPDOitems"].append(self.IngeniaMotionController_RPDOandTPDOobjectsOnlyDict[SlaveID_Int]["PDOitem_Status_Word"])
                 self.IngeniaMotionController_RPDOandTPDOobjectsOnlyDict[SlaveID_Int]["ListOfRPDOitems"].append(self.IngeniaMotionController_RPDOandTPDOobjectsOnlyDict[SlaveID_Int]["PDOitem_STO_Status"])
+                self.IngeniaMotionController_RPDOandTPDOobjectsOnlyDict[SlaveID_Int]["ListOfRPDOitems"].append(self.IngeniaMotionController_RPDOandTPDOobjectsOnlyDict[SlaveID_Int]["PDOitem_Error_Last_HexCode"])
                 ##########################################################################################################
 
                 ##########################################################################################################
                 self.IngeniaMotionController_RPDOandTPDOobjectsOnlyDict[SlaveID_Int]["PDO_ListOfRPDOvariableNames"].append("Position_Actual_EncoderTicks")
                 #self.IngeniaMotionController_RPDOandTPDOobjectsOnlyDict[SlaveID_Int]["PDO_ListOfRPDOvariableNames"].append("PositionSetPoint_Actual_EncoderTicks")
                 self.IngeniaMotionController_RPDOandTPDOobjectsOnlyDict[SlaveID_Int]["PDO_ListOfRPDOvariableNames"].append("Velocity_Actual_EncoderTicks")
+                self.IngeniaMotionController_RPDOandTPDOobjectsOnlyDict[SlaveID_Int]["PDO_ListOfRPDOvariableNames"].append("Current_Direct_Actual")
                 self.IngeniaMotionController_RPDOandTPDOobjectsOnlyDict[SlaveID_Int]["PDO_ListOfRPDOvariableNames"].append("Current_Quadrature_Actual")
                 self.IngeniaMotionController_RPDOandTPDOobjectsOnlyDict[SlaveID_Int]["PDO_ListOfRPDOvariableNames"].append("Status_Word")
                 self.IngeniaMotionController_RPDOandTPDOobjectsOnlyDict[SlaveID_Int]["PDO_ListOfRPDOvariableNames"].append("STO_Status")
+                self.IngeniaMotionController_RPDOandTPDOobjectsOnlyDict[SlaveID_Int]["PDO_ListOfRPDOvariableNames"].append("Error_Last_HexCode")
                 ##########################################################################################################
 
                 ##########################################################################################################
@@ -3431,6 +4427,13 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                         ##########################################################################################################
 
                         ##########################################################################################################
+                        if self.IngeniaMotionController_MainDict[SlaveID_Int]["FaultReset_EventNeedsToBeFiredFlag"] == 1:
+                            self.__ResetFaults(SlaveID_Int, PrintDebugFlag=1)
+
+                            self.IngeniaMotionController_MainDict[SlaveID_Int]["FaultReset_EventNeedsToBeFiredFlag"] = 0
+                        ##########################################################################################################
+
+                        ##########################################################################################################
                         if self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionMinAndMaxInEncoderTicks_NeedsToBeSetFlag"] == 1:
 
                             self.__SetPositionMinAndMaxInEncoderTicks(SlaveID_Int,
@@ -3439,6 +4442,18 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                                                                         PrintDebugFlag=1)
 
                             self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionMinAndMaxInEncoderTicks_NeedsToBeSetFlag"] = 0
+                        ##########################################################################################################
+
+                        ##########################################################################################################
+                        if self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionFollowingErrorWindowTimeoutAndFaultParameters_NeedsToBeSetFlag"] == 1:
+
+                            Window = self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionFollowingErrorWindow_ToBeSet"]
+                            Timeout = self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionFollowingErrorTimeoutMilliseconds_ToBeSet"]
+                            FaultModeInt = self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionFollowingErrorFaultModeInt_ToBeSet"]
+
+                            self.__SetPositionFollowingErrorWindowTimeoutAndFaultParameters(SlaveID_Int, Window, Timeout, FaultModeInt, PrintDebugFlag=1)
+
+                            self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionFollowingErrorWindowTimeoutAndFaultParameters_NeedsToBeSetFlag"] = 0
                         ##########################################################################################################
 
                         ##########################################################################################################
@@ -3507,13 +4522,35 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                         ##########################################################################################################
 
                         ##########################################################################################################
-                        if self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxCurrent_NeedsToBeSetFlag"] == 1:
+                        if self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxCurrentHardLimit_NeedsToBeSetFlag"] == 1:
 
-                            self.__SetMaxCurrent(SlaveID_Int,
-                                                 self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxCurrent_ToBeSet"],
+                            self.__SetMaxCurrentHardLimit(SlaveID_Int,
+                                                 self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxCurrentHardLimit_ToBeSet"],
                                                  PrintDebugFlag=1)
 
-                            self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxCurrent_NeedsToBeSetFlag"] = 0
+                            self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxCurrentHardLimit_NeedsToBeSetFlag"] = 0
+                        ##########################################################################################################
+                        
+                        ##########################################################################################################
+                        if self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxContinuousCurrent_NeedsToBeSetFlag"] == 1:
+
+                            self.__SetMaxContinuousCurrent(SlaveID_Int,
+                                                 self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxContinuousCurrent_ToBeSet"],
+                                                 PrintDebugFlag=1)
+
+                            self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxContinuousCurrent_NeedsToBeSetFlag"] = 0
+                        ##########################################################################################################
+
+                        ########################################################################################################## dragon
+                        if self.IngeniaMotionController_MainDict[SlaveID_Int]["PeakCurrentValueTimeAndFaultParameters_NeedsToBeSetFlag"] == 1:
+
+                            Value = self.IngeniaMotionController_MainDict[SlaveID_Int]["PeakCurrentValue_ToBeSet"]
+                            Time = self.IngeniaMotionController_MainDict[SlaveID_Int]["PeakCurrentTimeMilliseconds_ToBeSet"]
+                            FaultModeInt = self.IngeniaMotionController_MainDict[SlaveID_Int]["PeakCurrentFaultModeInt_ToBeSet"]
+
+                            self.__SetPeakCurrentValueTimeAndFaultParameters(SlaveID_Int, Value, Time, FaultModeInt, FaultReactionTimeoutMilliseconds_ToBeSet=1, PrintDebugFlag=1)
+
+                            self.IngeniaMotionController_MainDict[SlaveID_Int]["PeakCurrentValueTimeAndFaultParameters_NeedsToBeSetFlag"] = 0
                         ##########################################################################################################
 
                     ##########################################################################################################
@@ -3631,7 +4668,6 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
             try:
 
                 if self.SDOcommands_Rx_EnabledFlag == 1:
-                    print("goat")
                     ##########################################################################################################
                     ##########################################################################################################
                     ##########################################################################################################
@@ -3654,25 +4690,31 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                                     ##########################################################################################################
                                     if "STO_Status" in self.ListOfVariableNameStringsToGetViaSDO:
                                         self.IngeniaMotionController_MainDict[SlaveID_Int]["STO_Status"] = self.IngeniaMotionControllerObject.configuration.get_STO_Status(servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+                                        print("DedicatedRxThread, SDO query made for STO_Status.")
 
                                     if "Status_Word" in self.ListOfVariableNameStringsToGetViaSDO:
                                         self.IngeniaMotionController_MainDict[SlaveID_Int]["Status_Word"] = self.IngeniaMotionControllerObject.configuration.get_status_word(servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+                                        print("DedicatedRxThread, SDO query made for Status_Word.")
 
                                     if "Position_Actual_EncoderTicks" in self.ListOfVariableNameStringsToGetViaSDO:
                                         self.IngeniaMotionController_MainDict[SlaveID_Int]["Position_Actual_EncoderTicks"] = self.IngeniaMotionControllerObject.motion.get_actual_position(servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+                                        print("DedicatedRxThread, SDO query made for Position_Actual_EncoderTicks.")
 
                                     if "Velocity_Actual_EncoderTicks" in self.ListOfVariableNameStringsToGetViaSDO:
                                         self.IngeniaMotionController_MainDict[SlaveID_Int]["Velocity_Actual_EncoderTicks"] = self.IngeniaMotionControllerObject.motion.get_actual_velocity(servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+                                        print("DedicatedRxThread, SDO query made for Velocity_Actual_EncoderTicks.")
 
-                                    #if "Current_Direct_Actual" in self.ListOfVariableNameStringsToGetViaSDO: #All we need is quadrature current
-                                    #    self.IngeniaMotionController_MainDict[SlaveID_Int]["Current_Direct_Actual"] = self.IngeniaMotionControllerObject.motion.get_actual_current_direct(servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+                                    if "Current_Direct_Actual" in self.ListOfVariableNameStringsToGetViaSDO:
+                                        self.IngeniaMotionController_MainDict[SlaveID_Int]["Current_Direct_Actual"] = self.IngeniaMotionControllerObject.motion.get_actual_current_direct(servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+                                        print("DedicatedRxThread, SDO query made for Current_Direct_Actual.")
 
                                     if "Current_Quadrature_Actual" in self.ListOfVariableNameStringsToGetViaSDO:
                                         self.IngeniaMotionController_MainDict[SlaveID_Int]["Current_Quadrature_Actual"] = self.IngeniaMotionControllerObject.motion.get_actual_current_quadrature(servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+                                        print("DedicatedRxThread, SDO query made for Current_Quadrature_Actual.")
 
                                     if "EnabledState_Actual" in self.ListOfVariableNameStringsToGetViaSDO:
                                         self.IngeniaMotionController_MainDict[SlaveID_Int]["EnabledState_Actual"] = self.IngeniaMotionControllerObject.configuration.is_motor_enabled(servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
-
+                                        print("DedicatedRxThread, SDO query made for EnabledState_Actual.")
                                     ##########################################################################################################
 
                                     ##########################################################################################################
@@ -3724,7 +4766,11 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                     self.IngeniaMotionController_MainDict[SlaveID_Int]["StatusWordFlagStates_DictEnglishNameAsKey"] = self.StatusWordInterpretation(self.IngeniaMotionController_MainDict[SlaveID_Int]["Status_Word"])
                     self.IngeniaMotionController_MainDict[SlaveID_Int]["STOstatusFlagStates_DictEnglishNameAsKey"] = self.STOstatusInterpretation(self.IngeniaMotionController_MainDict[SlaveID_Int]["STO_Status"])
 
+                    self.IngeniaMotionController_MainDict[SlaveID_Int]["Error_Last_EnglishName"] = self.ErrorHexCodeInterpretation(self.IngeniaMotionController_MainDict[SlaveID_Int]["Error_Last_HexCode"])
+
                     self.IngeniaMotionController_MainDict[SlaveID_Int]["EnabledState_Actual"] = self.IngeniaMotionController_MainDict[SlaveID_Int]["StatusWordFlagStates_DictEnglishNameAsKey"]["OperationEnabled"] #unicorn
+
+                    self.IngeniaMotionController_MainDict[SlaveID_Int]["Current_FOCcombinedDQ_Actual"] = math.sqrt(math.pow(self.IngeniaMotionController_MainDict[SlaveID_Int]["Current_Direct_Actual"], 2) + math.pow(self.IngeniaMotionController_MainDict[SlaveID_Int]["Current_Quadrature_Actual"], 2))
                 ##########################################################################################################
 
                 ##########################################################################################################
@@ -3790,6 +4836,31 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
     ##########################################################################################################
     ##########################################################################################################
     ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
+    def ErrorHexCodeInterpretation(self, ErrorHexCodeToIntrepret, PrintDebugFlag=0):
+
+        try:
+
+            if PrintDebugFlag == 1:
+                print("ErrorHexCodeInterpretation: ErrorHexCodeToIntrepret = " + str(ErrorHexCodeToIntrepret))
+
+            if ErrorHexCodeToIntrepret in self.ErrorCodes_DictHexNumberAsKey:
+                return self.ErrorCodes_DictHexNumberAsKey[ErrorHexCodeToIntrepret]
+
+            else:
+                return ""
+
+        except:
+            exceptions = sys.exc_info()[0]
+            print("ErrorHexCodeInterpretation, exceptions: %s" % exceptions)
+            return self.ErrorCodes_DictHexNumberAsKey.copy()
+            traceback.print_exc()
+
+    ##########################################################################################################
+    ##########################################################################################################
+
 
     ##########################################################################################################
     ##########################################################################################################
@@ -4017,6 +5088,16 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
             #################################################
 
             #################################################
+            self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["FaultReset_Button"] = Button(self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfo_ButtonsFrame"],
+                                                                                                         text="FaultReset_Button " + str(SlaveID_Int), state="normal",
+                                                                                                         width=20,
+                                                                                                         bg=self.TKinter_DefaultGrayColor,
+                                                                                                         command=lambda name=SlaveID_Int: self.FaultReset_Button_Response(name))
+
+            self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["FaultReset_Button"].grid(row=0, column=2, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
+            #################################################
+
+            #################################################
             self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_ReubenPython2and3ClassObject_GUIparametersDict"] = dict([("root", self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfoCanvas"]),
                                                                                                                                                     ("UseBorderAroundThisGuiObjectFlag", 0),
                                                                                                                                                     ("GUI_ROW", 3),
@@ -4069,12 +5150,12 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                 GUIscale_ScaleObject_TO = self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionMax_AllUnitsDict"]["EncoderTicks"]
 
                 if GUIscale_ScaleObject_FROM == 0.0 and GUIscale_ScaleObject_TO == 0.0:
-                    GUIscale_ScaleObject_FROM = -1.0*self.IngeniaMotionController_MainDict[SlaveID_Int]["EncoderTicksPerRevolution"] #Still want to be able to use sliders even with infinite rotation enabled
-                    GUIscale_ScaleObject_TO = self.IngeniaMotionController_MainDict[SlaveID_Int]["EncoderTicksPerRevolution"] #Still want to be able to use sliders even with infinite rotation enabled
+                    GUIscale_ScaleObject_FROM = -1.0*self.IngeniaMotionController_MainDict[SlaveID_Int]["EncoderTicksPerRevolution_Actual"] #Still want to be able to use sliders even with infinite rotation enabled
+                    GUIscale_ScaleObject_TO = self.IngeniaMotionController_MainDict[SlaveID_Int]["EncoderTicksPerRevolution_Actual"] #Still want to be able to use sliders even with infinite rotation enabled
 
             elif self.IngeniaMotionController_MainDict[SlaveID_Int]["OperationMode"] == "CyclicCurrent":
-                GUIscale_ScaleObject_FROM = -1.0*self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxCurrent_ToBeSet"]
-                GUIscale_ScaleObject_TO = self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxCurrent_ToBeSet"]
+                GUIscale_ScaleObject_FROM = -1.0*self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxCurrentHardLimit_ToBeSet"]
+                GUIscale_ScaleObject_TO = self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxCurrentHardLimit_ToBeSet"]
 
             elif self.IngeniaMotionController_MainDict[SlaveID_Int]["OperationMode"] == "CyclicVoltage":
                 GUIscale_ScaleObject_FROM = -24.0 #-1.0*self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxVoltage_ToBeSet"] #WHERE SHOULD THESE NUMBERS COME FROM?
@@ -4169,6 +5250,23 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
 
     ##########################################################################################################
     ##########################################################################################################
+    def FaultReset_Button_Response(self, name):
+
+        SlaveID_Int = int(name)
+
+        ##########################################################################################################
+        self.IngeniaMotionController_MainDict[SlaveID_Int]["FaultReset_EventNeedsToBeFiredFlag"] = 1
+        ##########################################################################################################
+
+        ##########################################################################################################
+        print("FaultReset_Button_Response: Event fired for SlaveID_Int = " + str(SlaveID_Int))
+        ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
     def IndividualMotorMotionSetpoint_GUIscale_EventResponse(self, event, name):
 
         SlaveID_Int = int(name)
@@ -4178,7 +5276,7 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
         ##########################################################################################################
         if self.IngeniaMotionController_MainDict[SlaveID_Int]["OperationMode"] == "CyclicPosition":
             self.IngeniaMotionController_MainDict[SlaveID_Int]["Position_ToBeSet_EncoderTicks"] = GUIscale_Value
-            self.IngeniaMotionController_MainDict[SlaveID_Int]["Position_NeedsToBeSetFlag"] = 1
+            #self.IngeniaMotionController_MainDict[SlaveID_Int]["Position_NeedsToBeSetFlag"] = 1 #Not needed when using TPDO
         ##########################################################################################################
         
         ##########################################################################################################
@@ -4264,21 +5362,41 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                         #######################################################
                         #######################################################
                         DictToDisplay = dict([("JointEnglishName", self.IngeniaMotionController_MainDict[SlaveID_Int]["JointEnglishName"]),
+                                            ("SerialNumber_Actual", self.IngeniaMotionController_MainDict[SlaveID_Int]["SerialNumber_Actual"]),
                                             ("SlaveID_Int", self.IngeniaMotionController_MainDict[SlaveID_Int]["SlaveID_Int"]),
+                                            ("AllowWritingOfControllerConfigurationFlag", self.IngeniaMotionController_MainDict[SlaveID_Int]["AllowWritingOfControllerConfigurationFlag"]),
                                             ("MotorConnectedFlag", self.IngeniaMotionController_MainDict[SlaveID_Int]["MotorConnectedFlag"]),
                                             ("OperationMode_Actual_EnglishName", self.IngeniaMotionController_MainDict[SlaveID_Int]["OperationMode_Actual_EnglishName"]),
-                                            ("EncoderTicksPerRevolution", self.IngeniaMotionController_MainDict[SlaveID_Int]["EncoderTicksPerRevolution"]),
+                                            ("EncoderTicksPerRevolution_Actual", self.IngeniaMotionController_MainDict[SlaveID_Int]["EncoderTicksPerRevolution_Actual"]),
                                             ("EnabledState_Actual", self.IngeniaMotionController_MainDict[SlaveID_Int]["EnabledState_Actual"]),
+                                            ("Error_Last_HexCode", self.IngeniaMotionController_MainDict[SlaveID_Int]["Error_Last_HexCode"]),
+                                            ("Error_Last_EnglishName", self.IngeniaMotionController_MainDict[SlaveID_Int]["Error_Last_EnglishName"]),
                                             ("Position_ToBeSet_EncoderTicks", self.IngeniaMotionController_MainDict[SlaveID_Int]["Position_ToBeSet_EncoderTicks"]),
                                             ("Current_Quadrature_ToBeSet", self.IngeniaMotionController_MainDict[SlaveID_Int]["Current_Quadrature_ToBeSet"]),
                                             ("Voltage_Quadrature_ToBeSet", self.IngeniaMotionController_MainDict[SlaveID_Int]["Voltage_Quadrature_ToBeSet"]),
-                                            ("MaxCurrent_Actual", self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxCurrent_Actual"]),
+                                            ("MaxCurrentHardLimit_Actual", self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxCurrentHardLimit_Actual"]),
+                                            ("MaxContinuousCurrent_Actual", self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxContinuousCurrent_Actual"]),
+                                            ("PeakCurrentValue_Actual", self.IngeniaMotionController_MainDict[SlaveID_Int]["PeakCurrentValue_Actual"]),
+                                            ("PeakCurrentTime_Actual", self.IngeniaMotionController_MainDict[SlaveID_Int]["PeakCurrentTime_Actual"]),
+                                            ("PeakCurrentFaultModeInt_Actual", self.IngeniaMotionController_MainDict[SlaveID_Int]["PeakCurrentFaultModeInt_Actual"]),
+                                            ("Current_Direct_Actual", self.IngeniaMotionController_MainDict[SlaveID_Int]["Current_Direct_Actual"]),
                                             ("Current_Quadrature_Actual", self.IngeniaMotionController_MainDict[SlaveID_Int]["Current_Quadrature_Actual"]),
                                             ("MaxProfileVelocity_Actual", self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxProfileVelocity_Actual"]),
                                             ("MaxProfileAcceleration_Actual", self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxProfileAcceleration_Actual"]),
                                             ("PositionMin_AllUnitsDict", self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionMin_AllUnitsDict"]),
-                                            ("PositionMax_AllUnitsDict", self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionMax_AllUnitsDict"])])
+                                            ("PositionMax_AllUnitsDict", self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionMax_AllUnitsDict"]),
+                                            ("PositionMin_EncoderTicks_Actual", self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionMin_EncoderTicks_Actual"]),
+                                            ("PositionMax_EncoderTicks_Actual", self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionMax_EncoderTicks_Actual"])])
+
                         '''
+                        ("PositionMinRange_EncoderTicks_Actual", self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionMinRange_EncoderTicks_Actual"]),
+                        ("PositionMaxRange_EncoderTicks_Actual", self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionMaxRange_EncoderTicks_Actual"]),
+                        ("PositionFollowingErrorWindow_Actual", self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionFollowingErrorWindow_Actual"]),
+                        ("PositionFollowingErrorTimeoutMilliseconds_Actual", self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionFollowingErrorTimeoutMilliseconds_Actual"]),
+                        ("PositionFollowingErrorFaultModeInt_Actual", self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionFollowingErrorFaultModeInt_Actual"])
+                        ("PeakCurrentValue_Actual", self.IngeniaMotionController_MainDict[SlaveID_Int]["PeakCurrentValue_Actual"]),
+                        ("PeakCurrentTime_Actual", self.IngeniaMotionController_MainDict[SlaveID_Int]["PeakCurrentTime_Actual"]),
+                        ("PeakCurrentFaultModeInt_Actual", self.IngeniaMotionController_MainDict[SlaveID_Int]["PeakCurrentFaultModeInt_Actual"])
                         ("PositionMinRange_EncoderTicks_Actual", self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionMinRange_EncoderTicks_Actual"]),
                         ("PositionMaxRange_EncoderTicks_Actual", self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionMaxRange_EncoderTicks_Actual"]),
                         ("PositionMin_EncoderTicks_Actual", self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionMin_EncoderTicks_Actual"]),
@@ -4323,10 +5441,10 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                         #######################################################
                         self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfo_Label"]["text"] = self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfo_Label"]["text"] + \
                                                                                                                             "\nPosition Actual" +\
-                                                                                                                            self.ConvertDictToProperlyFormattedStringForPrinting(self.IngeniaMotionController_MainDict[SlaveID_Int]["Position_Actual_AllUnitsDict"], 3, 1, 1) + \
-                                                                                                                            "\nPositionSetPoint_Actual_EncoderTicks" + self.ConvertFloatToStringWithNumberOfLeadingNumbersAndDecimalPlaces_NumberOrListInput(self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionSetPoint_Actual_AllUnitsDict"]["EncoderTicks"], 0, 3) + \
-                                                                                                                            "\nVelocity Actual" + \
-                                                                                                                            self.ConvertDictToProperlyFormattedStringForPrinting(self.IngeniaMotionController_MainDict[SlaveID_Int]["Velocity_Actual_AllUnitsDict"], 6, 1, 1)
+                                                                                                                            self.ConvertDictToProperlyFormattedStringForPrinting(self.IngeniaMotionController_MainDict[SlaveID_Int]["Position_Actual_AllUnitsDict"], 3, 1, 1) #+ \
+                                                                                                                            #"\nPositionSetPoint_Actual_EncoderTicks" + self.ConvertFloatToStringWithNumberOfLeadingNumbersAndDecimalPlaces_NumberOrListInput(self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionSetPoint_Actual_AllUnitsDict"]["EncoderTicks"], 0, 3) + \
+                                                                                                                            #"\nVelocity Actual" + \
+                                                                                                                            #self.ConvertDictToProperlyFormattedStringForPrinting(self.IngeniaMotionController_MainDict[SlaveID_Int]["Velocity_Actual_AllUnitsDict"], 6, 1, 1)
                         #######################################################
                         
                         #######################################################

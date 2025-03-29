@@ -6,7 +6,7 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision H, 02/10/2025
+Software Revision I, 03/28/2025
 
 Verified working on: Python 3.12 for Windows 10, 11 64-bit.
 '''
@@ -559,7 +559,7 @@ if __name__ == '__main__':
     USE_KEYBOARD_FLAG = 1
 
     global USE_SINUSOIDAL_INPUT_FLAG
-    USE_SINUSOIDAL_INPUT_FLAG = 0
+    USE_SINUSOIDAL_INPUT_FLAG = 1
     #################################################
     #################################################
 
@@ -681,7 +681,7 @@ if __name__ == '__main__':
     root_width = 1600
 
     global root_height
-    root_height = 1080 - root_Ypos
+    root_height = 1200
 
     global TabControlObject
     global Tab_MainControls
@@ -694,13 +694,13 @@ if __name__ == '__main__':
     global ZeroEncoderOffsetOnAllMotors_EventNeedsToBeFiredFlag
     ZeroEncoderOffsetOnAllMotors_EventNeedsToBeFiredFlag = 0
 
-    ''' #CyclicPosition
+    #''' #CyclicPosition
     global SinusoidalMotionInput_MinValue
     SinusoidalMotionInput_MinValue = -360.0 #degrees
 
     global SinusoidalMotionInput_MaxValue
     SinusoidalMotionInput_MaxValue = 360.0 #degrees
-    ''' #CyclicPosition
+    #''' #CyclicPosition
 
     ''' #CyclicCurrent
     global SinusoidalMotionInput_MinValue
@@ -710,13 +710,13 @@ if __name__ == '__main__':
     SinusoidalMotionInput_MaxValue = 0.9
     ''' #CyclicCurrent
 
-    #''' #CyclicVoltage
+    ''' #CyclicVoltage
     global SinusoidalMotionInput_MinValue
     SinusoidalMotionInput_MinValue = -0.5
 
     global SinusoidalMotionInput_MaxValue
     SinusoidalMotionInput_MaxValue = 0.5
-    #''' #CyclicVoltage
+    ''' #CyclicVoltage
 
     global SinusoidalMotionInput_ROMtestTimeToPeakAngle
     SinusoidalMotionInput_ROMtestTimeToPeakAngle = 2.0
@@ -728,11 +728,87 @@ if __name__ == '__main__':
     SinusoidalMotionInput_CommandedValue = 0.0
 
     global DesiredSlaves_DictOfDicts
-    DesiredSlaves_DictOfDicts = dict([(1, dict([("JointEnglishName", "Motor_1"), ("SlaveID_Int", 1), ("XDFfileDictionaryPath", os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "cap-xcr-e_eoe_2.4.1.xdf"), ("OperationMode", "CyclicPosition"), ("ZeroEncoder_FireEventOnStartupFlag", 1), ("Position_Max_Rev", 0.0), ("Position_Min_Rev", 0.0), ("MaxCurrent_ToBeSet", 4.21), ("MaxVelocity_ToBeSet", 50000000), ("MaxProfileAcceleration_ToBeSet", 100000), ("EncoderTicksPerRevolution", 8192.0), ("PositionPIDgains_Kp_ToBeSet", 0.01), ("PositionPIDgains_Ki_ToBeSet", 0.2), ("PositionPIDgains_Kd_ToBeSet", 0.1), ("CurrentQuadraturePIgains_Kp_ToBeSet", 1.8), ("CurrentQuadraturePIgains_Ki_ToBeSet", 2500.0)])),
-                                      (2, dict([("JointEnglishName", "Motor_2"), ("SlaveID_Int", 2), ("XDFfileDictionaryPath", os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "cap-xcr-e_eoe_2.4.1.xdf"), ("OperationMode", "CyclicPosition"), ("ZeroEncoder_FireEventOnStartupFlag", 1), ("Position_Max_Rev", 0.0), ("Position_Min_Rev", 0.0), ("MaxCurrent_ToBeSet", 4.21), ("MaxProfileVelocity_ToBeSet", 50000), ("MaxProfileAcceleration_ToBeSet", 100000), ("EncoderTicksPerRevolution", 8192.0), ("PositionPIDgains_Kp_ToBeSet", 0.01), ("PositionPIDgains_Ki_ToBeSet", 0.2), ("PositionPIDgains_Kd_ToBeSet", 0.1)])),
-                                      (3, dict([("JointEnglishName", "Motor_3"), ("SlaveID_Int", 3), ("XDFfileDictionaryPath", os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "cap-xcr-e_eoe_2.4.1.xdf"), ("OperationMode", "CyclicPosition"), ("ZeroEncoder_FireEventOnStartupFlag", 1), ("Position_Max_Rev", 0.0), ("Position_Min_Rev", 0.0), ("MaxCurrent_ToBeSet", 4.21), ("MaxProfileVelocity_ToBeSet", 50000), ("MaxProfileAcceleration_ToBeSet", 100000), ("EncoderTicksPerRevolution", 8192.0), ("PositionPIDgains_Kp_ToBeSet", 0.01), ("PositionPIDgains_Ki_ToBeSet", 0.2), ("PositionPIDgains_Kd_ToBeSet", 0.1)])),
-                                      (4, dict([("JointEnglishName", "Motor_4"), ("SlaveID_Int", 4), ("XDFfileDictionaryPath", os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "cap-xcr-e_eoe_2.4.1.xdf"), ("OperationMode", "CyclicPosition"), ("ZeroEncoder_FireEventOnStartupFlag", 1), ("Position_Max_Rev", 0.0), ("Position_Min_EncoderTicks", 0.0), ("MaxCurrent_ToBeSet", 4.21), ("MaxProfileVelocity_ToBeSet", 50000), ("MaxProfileAcceleration_ToBeSet", 100000), ("EncoderTicksPerRevolution", 8192.0), ("PositionPIDgains_Kp_ToBeSet", 0.01), ("PositionPIDgains_Ki_ToBeSet", 0.2), ("PositionPIDgains_Kd_ToBeSet", 0.1)])),
-                                      (5, dict([("JointEnglishName", "Motor_5"), ("SlaveID_Int", 5), ("XDFfileDictionaryPath", os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "den-xcr-e_eoe_2.5.0.xdf"), ("OperationMode", "CyclicPosition"), ("ZeroEncoder_FireEventOnStartupFlag", 1), ("Position_Max_EncoderTicks", 10000.00), ("Position_Min_EncoderTicks", -10000.00), ("MaxCurrent_ToBeSet", 3.5), ("MaxProfileVelocity_ToBeSet", 50000), ("MaxProfileAcceleration_ToBeSet", 100000), ("EncoderTicksPerRevolution", 8192.0), ("PositionPIDgains_Kp_ToBeSet", 0.0055), ("PositionPIDgains_Ki_ToBeSet", 0.015), ("PositionPIDgains_Kd_ToBeSet", 0.0055)]))])
+    '''
+    DesiredSlaves_DictOfDicts = dict([(3, dict([("JointEnglishName", "Motor_3"),
+                                                ("SlaveID_Int", 3),
+                                                
+                                                ("AllowWritingOfControllerConfigurationFlag", 1),
+                                                                                                
+                                                ("XDFfileDictionaryPath", os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "cap-xcr-e_eoe_2.4.1.xdf"),
+
+                                                ("OperationMode", "CyclicPosition"),
+
+                                                ("ZeroEncoder_FireEventOnStartupFlag", 1),
+
+                                                ("Position_Max_Rev", 0.0),
+                                                ("Position_Min_Rev", 0.0),
+
+                                                ("MaxCurrentHardLimit_ToBeSet", 10.00),
+                                                ("MaxContinuousCurrent_ToBeSet", 4.24),
+                                                ("PeakCurrentValue_ToBeSet", 8.48),
+                                                ("PeakCurrentTimeMilliseconds_ToBeSet", 400),
+                                                ("PeakCurrentFaultModeInt_ToBeSet", 0),
+
+                                                ("PositionFollowingErrorWindow_ToBeSet", 10000000),
+                                                ("PositionFollowingErrorTimeoutMilliseconds_ToBeSet", 2),
+                                                ("PositionFollowingErrorFaultModeInt_ToBeSet", 0),
+
+                                                ("MaxVelocity_ToBeSet", 3.0),
+                                                ("MaxProfileVelocity_ToBeSet", 3.0),
+                                                ("MaxProfileAcceleration_ToBeSet", 30.0),
+
+                                                ("EncoderTicksPerRevolution_ToBeSet", 5000.0), #unicorn
+
+                                                ("PositionPIDgains_Kp_ToBeSet", 0.1),
+                                                ("PositionPIDgains_Ki_ToBeSet", 0.0),
+                                                ("PositionPIDgains_Kd_ToBeSet", 0.0),
+
+                                                ("CurrentQuadraturePIgains_Kp_ToBeSet", 1.8),
+                                                ("CurrentQuadraturePIgains_Ki_ToBeSet", 2500.0)])),
+
+                                      (1, dict([("JointEnglishName", "Motor_1"), ("SlaveID_Int", 1), ("AllowWritingOfControllerConfigurationFlag", 0), ("XDFfileDictionaryPath", os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "cap-xcr-e_eoe_2.4.1.xdf"), ("OperationMode", "CyclicPosition"), ("ZeroEncoder_FireEventOnStartupFlag", 1), ("Position_Max_Rev", 0.0), ("Position_Min_Rev", 0.0), ("MaxCurrentHardLimit_ToBeSet", 4.21), ("MaxProfileVelocity_ToBeSet", 50000), ("MaxProfileAcceleration_ToBeSet", 100000), ("EncoderTicksPerRevolution_ToBeSet", 8192.0), ("PositionPIDgains_Kp_ToBeSet", 0.01), ("PositionPIDgains_Ki_ToBeSet", 0.2), ("PositionPIDgains_Kd_ToBeSet", 0.1)]))])
+                                      #(3, dict([("JointEnglishName", "Motor_3"), ("SlaveID_Int", 3), ("AllowWritingOfControllerConfigurationFlag", 0), ("XDFfileDictionaryPath", os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "cap-xcr-e_eoe_2.4.1.xdf"), ("OperationMode", "CyclicPosition"), ("ZeroEncoder_FireEventOnStartupFlag", 1), ("Position_Max_Rev", 0.0), ("Position_Min_Rev", 0.0), ("MaxCurrentHardLimit_ToBeSet", 4.21), ("MaxProfileVelocity_ToBeSet", 50000), ("MaxProfileAcceleration_ToBeSet", 100000), ("EncoderTicksPerRevolution_ToBeSet", 8192.0), ("PositionPIDgains_Kp_ToBeSet", 0.01), ("PositionPIDgains_Ki_ToBeSet", 0.2), ("PositionPIDgains_Kd_ToBeSet", 0.1)])),
+                                      #(4, dict([("JointEnglishName", "Motor_4"), ("SlaveID_Int", 4), ("AllowWritingOfControllerConfigurationFlag", 0), ("XDFfileDictionaryPath", os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "cap-xcr-e_eoe_2.4.1.xdf"), ("OperationMode", "CyclicPosition"), ("ZeroEncoder_FireEventOnStartupFlag", 1), ("Position_Max_Rev", 0.0), ("Position_Min_EncoderTicks", 0.0), ("MaxCurrentHardLimit_ToBeSet", 4.21), ("MaxProfileVelocity_ToBeSet", 50000), ("MaxProfileAcceleration_ToBeSet", 100000), ("EncoderTicksPerRevolution_ToBeSet", 8192.0), ("PositionPIDgains_Kp_ToBeSet", 0.01), ("PositionPIDgains_Ki_ToBeSet", 0.2), ("PositionPIDgains_Kd_ToBeSet", 0.1)])),
+                                      #(5, dict([("JointEnglishName", "Motor_5"), ("SlaveID_Int", 5), ("AllowWritingOfControllerConfigurationFlag", 0), ("XDFfileDictionaryPath", os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "den-xcr-e_eoe_2.5.0.xdf"), ("OperationMode", "CyclicPosition"), ("ZeroEncoder_FireEventOnStartupFlag", 1), ("Position_Max_EncoderTicks", 10000.00), ("Position_Min_EncoderTicks", -10000.00), ("MaxCurrentHardLimit_ToBeSet", 3.5), ("MaxProfileVelocity_ToBeSet", 50000), ("MaxProfileAcceleration_ToBeSet", 100000), ("EncoderTicksPerRevolution_ToBeSet", 8192.0), ("PositionPIDgains_Kp_ToBeSet", 0.0055), ("PositionPIDgains_Ki_ToBeSet", 0.015), ("PositionPIDgains_Kd_ToBeSet", 0.0055)]))])
+    '''
+
+    #'''
+    DesiredSlaves_DictOfDicts = dict([(1, dict([("JointEnglishName", "Motor_1"),
+                                                ("SlaveID_Int", 1),
+
+                                                ("AllowWritingOfControllerConfigurationFlag", 1),
+
+                                                ("XDFfileDictionaryPath", os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "cap-xcr-e_eoe_2.4.1.xdf"),
+
+                                                ("OperationMode", "CyclicPosition"),
+
+                                                ("EncoderTicksPerRevolution_ToBeSet", 8192.0),
+                                                ("ZeroEncoder_FireEventOnStartupFlag", 1),
+
+                                                ("Position_Max_Rev", 0.0),
+                                                ("Position_Min_Rev", 0.0),
+
+                                                ("MaxCurrentHardLimit_ToBeSet", 10.00),
+                                                ("MaxContinuousCurrent_ToBeSet", 4.24),
+                                                ("PeakCurrentValue_ToBeSet", 5.48),
+                                                ("PeakCurrentTimeMilliseconds_ToBeSet", 500),
+                                                ("PeakCurrentFaultModeInt_ToBeSet", 0),
+
+                                                ("PositionFollowingErrorWindow_ToBeSet", 1000000),
+                                                ("PositionFollowingErrorTimeoutMilliseconds_ToBeSet", 2),
+                                                ("PositionFollowingErrorFaultModeInt_ToBeSet", 0),
+
+                                                ("MaxVelocity_ToBeSet", 3.0),
+                                                ("MaxProfileVelocity_ToBeSet", 3.0),
+                                                ("MaxProfileAcceleration_ToBeSet", 30.0),
+
+                                                ("PositionPIDgains_Kp_ToBeSet", 0.002),
+                                                ("PositionPIDgains_Ki_ToBeSet", 0.0),
+                                                ("PositionPIDgains_Kd_ToBeSet", 0.0),
+
+                                                ("CurrentQuadraturePIgains_Kp_ToBeSet", 1.8),
+                                                ("CurrentQuadraturePIgains_Ki_ToBeSet", 2500.0)]))])
+    #'''
 
     #################################################
     #################################################
@@ -865,8 +941,8 @@ if __name__ == '__main__':
     global IngeniaBLDC_setup_dict
     IngeniaBLDC_setup_dict = dict([("GUIparametersDict", IngeniaBLDC_GUIparametersDict),
                                     ("NameToDisplay_UserSet", "IngeniaBLDC"),
-                                    ("DesiredInterfaceName", "Dell"), #likely "Intel(R) Ethernet Connection (2) I219-LM" or "Realtek USB GbE Family Controller"
-                                    ("DesiredInterfaceName_MustItBeExactMatchFlag", 0), #IMPORTANT
+                                    ("DesiredInterfaceName", "Realtek USB GbE Family Controller"), #likely "Intel(R) Ethernet Connection (2) I219-LM" or "Realtek USB GbE Family Controller"
+                                    ("DesiredInterfaceName_MustItBeExactMatchFlag", 1), #IMPORTANT
                                     ("DesiredSlaves_DictOfDicts", DesiredSlaves_DictOfDicts),
                                     ("LaunchFlag_MotionLab3_IngEcatGateway_EoEservice", 0),
                                     ("DedicatedRxThread_TimeToSleepEachLoop", 0.002),
@@ -1053,7 +1129,7 @@ if __name__ == '__main__':
     #################################################
     #################################################
     global MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_NameList
-    MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_NameList = ["Channel0", "Channel1", "Channel2", "Channel3", "Channel4", "Channel5"]
+    MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_NameList = ["Direct", "Quad", "FOCcombbinedFOC", "Channel3", "Channel4", "Channel5"]
 
     global MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_ColorList
     MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_ColorList = ["Red", "Green", "Blue", "Black", "Purple", "Orange"]
@@ -1085,8 +1161,8 @@ if __name__ == '__main__':
                                                                                         ("YaxisAutoscaleFlag", 1),
                                                                                         ("X_min", 0.0),
                                                                                         ("X_max", 20.0),
-                                                                                        ("Y_min", -0.02),
-                                                                                        ("Y_max", 0.02),
+                                                                                        ("Y_min", -1.00),
+                                                                                        ("Y_max", 1.00),
                                                                                         ("XaxisDrawnAtBottomOfGraph", 0),
                                                                                         ("XaxisLabelString", "Time (sec)"),
                                                                                         ("YaxisLabelString", "Y-units (units)"),
@@ -1135,7 +1211,7 @@ if __name__ == '__main__':
             dummy = 0
             #IngeniaBLDC_Object.SetPositionPIDgains_ExternalProgram(SlaveID_Int, Kp_ToBeSet=0.005, Ki_ToBeSet=0.001, Kd_ToBeSet=0.001, PrintDebugFlag=1)
             #IngeniaBLDC_Object.SetCurrentQuadraturePIgains_ExternalProgram(SlaveID_Int, Kp_ToBeSet=1.81, Ki_ToBeSet=2501.00, PrintDebugFlag=1)
-            #IngeniaBLDC_Object.SetMaxCurrent_ExternalProgram(SlaveID_Int, 2.0, PrintDebugFlag=1)
+            #IngeniaBLDC_Object.SetMaxCurrentHardLimit_ExternalProgram(SlaveID_Int, 2.0, PrintDebugFlag=1)
             #IngeniaBLDC_Object.SetMaxProfileVelocity_ExternalProgram(SlaveID_Int, 50000.0, PrintDebugFlag=1)
             #IngeniaBLDC_Object.SetMaxProfileAcceleration_ExternalProgram(SlaveID_Int, 100000.0, PrintDebugFlag=1)
         #################################################
@@ -1191,7 +1267,7 @@ if __name__ == '__main__':
                 #print("DataUpdateNumber = " + str(EntryListWithBlinking_MostRecentDict_DataUpdateNumber) + ", EntryListWithBlinking_MostRecentDict: " + str(EntryListWithBlinking_MostRecentDict))
 
                 if EntryListWithBlinking_MostRecentDict_DataUpdateNumber > 1:
-                    USE_SINUSOIDAL_INPUT_FLAG = int(EntryListWithBlinking_MostRecentDict["SinusoidalMotionInput_MaxValue"])
+                    USE_SINUSOIDAL_INPUT_FLAG = int(EntryListWithBlinking_MostRecentDict["USE_SINUSOIDAL_INPUT_FLAG"])
                     SinusoidalMotionInput_MaxValue = EntryListWithBlinking_MostRecentDict["SinusoidalMotionInput_MaxValue"]
                     SinusoidalMotionInput_ROMtestTimeToPeakAngle = EntryListWithBlinking_MostRecentDict["SinusoidalMotionInput_ROMtestTimeToPeakAngle"]
         ###################################################
@@ -1277,7 +1353,10 @@ if __name__ == '__main__':
 
             for SlaveID_Int in IngeniaBLDC_MostRecentDict_DetectedSlaveID_List:
                 ListToWrite.append(IngeniaBLDC_MostRecentDict["IngeniaMotionController_MainDict"][SlaveID_Int]["Position_Actual_AllUnitsDict"]["Deg"])
+
+                ListToWrite.append(IngeniaBLDC_MostRecentDict["IngeniaMotionController_MainDict"][SlaveID_Int]["Current_Direct_Actual"])
                 ListToWrite.append(IngeniaBLDC_MostRecentDict["IngeniaMotionController_MainDict"][SlaveID_Int]["Current_Quadrature_Actual"])
+                ListToWrite.append(IngeniaBLDC_MostRecentDict["IngeniaMotionController_MainDict"][SlaveID_Int]["Current_FOCcombinedDQ_Actual"])
 
             #print("ListToWrite: " + str(ListToWrite))
             ####################################################
@@ -1306,8 +1385,10 @@ if __name__ == '__main__':
                             ####################################################
                             ListOfValuesToPlot = []
                             for SlaveID_Int in IngeniaBLDC_MostRecentDict_DetectedSlaveID_List:
-                                ListOfValuesToPlot.append(IngeniaBLDC_MostRecentDict["IngeniaMotionController_MainDict"][SlaveID_Int]["Position_Actual_AllUnitsDict"]["Deg"])
-                                #ListOfValuesToPlot.append(IngeniaBLDC_MostRecentDict["IngeniaMotionController_MainDict"][SlaveID_Int]["Current_Quadrature_Actual"])
+                                #ListOfValuesToPlot.append(IngeniaBLDC_MostRecentDict["IngeniaMotionController_MainDict"][SlaveID_Int]["Position_Actual_AllUnitsDict"]["Deg"])
+                                ListOfValuesToPlot.append(IngeniaBLDC_MostRecentDict["IngeniaMotionController_MainDict"][SlaveID_Int]["Current_Direct_Actual"])
+                                ListOfValuesToPlot.append(IngeniaBLDC_MostRecentDict["IngeniaMotionController_MainDict"][SlaveID_Int]["Current_Quadrature_Actual"])
+                                ListOfValuesToPlot.append(IngeniaBLDC_MostRecentDict["IngeniaMotionController_MainDict"][SlaveID_Int]["Current_FOCcombinedDQ_Actual"])
                             ####################################################
 
                             ####################################################
