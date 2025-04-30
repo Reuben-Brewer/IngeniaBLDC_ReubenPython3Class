@@ -6,7 +6,7 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision I, 03/28/2025
+Software Revision J, 04/30/2025
 
 Verified working on: Python 3.12 for Windows 10, 11 64-bit.
 '''
@@ -144,14 +144,14 @@ if __name__ == '__main__':
     ##########################################################################################################
 
     ######## $$$$$$$ %%%%%%% ^^^^^^^ IMPORTANT FLAG
-    ApplyNewSettingsToMotorFlag = 1
+    ApplyNewSettingsToMotorFlag = 0
     ######## $$$$$$$ %%%%%%% ^^^^^^^ IMPORTANT FLAG
 
     #DesiredInterfaceName = "ASIX USB to Gigabit Ethernet Family Adapter"
     #DesiredInterfaceName = "Intel(R) Ethernet Connection (2) I219-LM"
-    #DesiredInterfaceName = "Realtek USB GbE Family Controller"
+    DesiredInterfaceName = "Realtek USB GbE Family Controller"
     #DesiredInterfaceName = "Dell Realtek USB GbE Family Controller"
-    DesiredInterfaceName = "Anker Realtek USB GbE Family Controller #2"
+    #DesiredInterfaceName = "Anker Realtek USB GbE Family Controller #2"
 
     XDFfileDictionaryPath = os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "cap-xcr-e_eoe_2.4.1.xdf"
     #XDFfileDictionaryPath = os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "den-xcr-e_eoe_2.5.0.xdf"

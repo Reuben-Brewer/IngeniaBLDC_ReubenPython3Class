@@ -6,7 +6,7 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision I, 03/28/2025
+Software Revision J, 04/30/2025
 
 Verified working on: Python 3.12 for Windows 10, 11 64-bit.
 '''
@@ -559,7 +559,7 @@ if __name__ == '__main__':
     USE_KEYBOARD_FLAG = 1
 
     global USE_SINUSOIDAL_INPUT_FLAG
-    USE_SINUSOIDAL_INPUT_FLAG = 1
+    USE_SINUSOIDAL_INPUT_FLAG = 0
     #################################################
     #################################################
 
@@ -681,7 +681,7 @@ if __name__ == '__main__':
     root_width = 1600
 
     global root_height
-    root_height = 1200
+    root_height = 1300
 
     global TabControlObject
     global Tab_MainControls
@@ -772,7 +772,7 @@ if __name__ == '__main__':
                                       #(5, dict([("JointEnglishName", "Motor_5"), ("SlaveID_Int", 5), ("AllowWritingOfControllerConfigurationFlag", 0), ("XDFfileDictionaryPath", os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "den-xcr-e_eoe_2.5.0.xdf"), ("OperationMode", "CyclicPosition"), ("ZeroEncoder_FireEventOnStartupFlag", 1), ("Position_Max_EncoderTicks", 10000.00), ("Position_Min_EncoderTicks", -10000.00), ("MaxCurrentHardLimit_ToBeSet", 3.5), ("MaxProfileVelocity_ToBeSet", 50000), ("MaxProfileAcceleration_ToBeSet", 100000), ("EncoderTicksPerRevolution_ToBeSet", 8192.0), ("PositionPIDgains_Kp_ToBeSet", 0.0055), ("PositionPIDgains_Ki_ToBeSet", 0.015), ("PositionPIDgains_Kd_ToBeSet", 0.0055)]))])
     '''
 
-    #'''
+    '''
     DesiredSlaves_DictOfDicts = dict([(1, dict([("JointEnglishName", "Motor_1"),
                                                 ("SlaveID_Int", 1),
 
@@ -780,17 +780,19 @@ if __name__ == '__main__':
 
                                                 ("XDFfileDictionaryPath", os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "cap-xcr-e_eoe_2.4.1.xdf"),
 
-                                                ("OperationMode", "CyclicPosition"),
+                                                ("CommutationMode_ToBeSet_EnglishName", "BrushedDC_2phase"), #"Brushless_3phase_SVM_Sinusoidal", "Brushless_3phase_SVM_Trapezoidal", "BrushedDC_2phase"
 
-                                                ("EncoderTicksPerRevolution_ToBeSet", 8192.0),
+                                                ("OperationMode", "CyclicCurrent"),
+
+                                                ("EncoderTicksPerRevolution_ToBeSet", 1.0),
                                                 ("ZeroEncoder_FireEventOnStartupFlag", 1),
 
                                                 ("Position_Max_Rev", 0.0),
                                                 ("Position_Min_Rev", 0.0),
 
-                                                ("MaxCurrentHardLimit_ToBeSet", 10.00),
-                                                ("MaxContinuousCurrent_ToBeSet", 4.24),
-                                                ("PeakCurrentValue_ToBeSet", 5.48),
+                                                ("MaxCurrentHardLimit_ToBeSet", 5.00),
+                                                ("MaxContinuousCurrent_ToBeSet", 1.5),
+                                                ("PeakCurrentValue_ToBeSet", 2.5),
                                                 ("PeakCurrentTimeMilliseconds_ToBeSet", 500),
                                                 ("PeakCurrentFaultModeInt_ToBeSet", 0),
 
@@ -806,9 +808,53 @@ if __name__ == '__main__':
                                                 ("PositionPIDgains_Ki_ToBeSet", 0.0),
                                                 ("PositionPIDgains_Kd_ToBeSet", 0.0),
 
-                                                ("CurrentQuadraturePIgains_Kp_ToBeSet", 1.8),
-                                                ("CurrentQuadraturePIgains_Ki_ToBeSet", 2500.0)]))])
-    #'''
+                                                ("CurrentDirectPIgains_Kp_ToBeSet", 1.0),
+                                                ("CurrentDirectPIgains_Ki_ToBeSet", 50.0),
+
+                                                ("CurrentQuadraturePIgains_Kp_ToBeSet", 1.0),
+                                                ("CurrentQuadraturePIgains_Ki_ToBeSet", 50.0)]))])
+    '''
+
+    DesiredSlaves_DictOfDicts = dict([(1, dict([("JointEnglishName", "Motor_1"),
+                                                ("SlaveID_Int", 1),
+
+                                                ("AllowWritingOfControllerConfigurationFlag", 0),
+
+                                                ("XDFfileDictionaryPath", os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "cap-xcr-e_eoe_2.4.1.xdf"),
+
+                                                ("CommutationMode_ToBeSet_EnglishName", "Brushless_3phase_SVM_Sinusoidal"),  # "Brushless_3phase_SVM_Sinusoidal", "Brushless_3phase_SVM_Trapezoidal", "BrushedDC_2phase"
+
+                                                ("OperationMode", "CyclicPosition"),
+
+                                                ("EncoderTicksPerRevolution_ToBeSet", 1.0),
+                                                ("ZeroEncoder_FireEventOnStartupFlag", 1),
+
+                                                ("Position_Max_Rev", 0.0),
+                                                ("Position_Min_Rev", 0.0),
+
+                                                ("MaxCurrentHardLimit_ToBeSet", 5.00),
+                                                ("MaxContinuousCurrent_ToBeSet", 1.5),
+                                                ("PeakCurrentValue_ToBeSet", 2.5),
+                                                ("PeakCurrentTimeMilliseconds_ToBeSet", 500),
+                                                ("PeakCurrentFaultModeInt_ToBeSet", 0),
+
+                                                ("PositionFollowingErrorWindow_ToBeSet", 1000000),
+                                                ("PositionFollowingErrorTimeoutMilliseconds_ToBeSet", 2),
+                                                ("PositionFollowingErrorFaultModeInt_ToBeSet", 0),
+
+                                                ("MaxVelocity_ToBeSet", 3.0),
+                                                ("MaxProfileVelocity_ToBeSet", 3.0),
+                                                ("MaxProfileAcceleration_ToBeSet", 30.0),
+
+                                                ("PositionPIDgains_Kp_ToBeSet", 0.002),
+                                                ("PositionPIDgains_Ki_ToBeSet", 0.0),
+                                                ("PositionPIDgains_Kd_ToBeSet", 0.0),
+
+                                                ("CurrentDirectPIgains_Kp_ToBeSet", 1.0),
+                                                ("CurrentDirectPIgains_Ki_ToBeSet", 50.0),
+
+                                                ("CurrentQuadraturePIgains_Kp_ToBeSet", 1.0),
+                                                ("CurrentQuadraturePIgains_Ki_ToBeSet", 50.0)]))])
 
     #################################################
     #################################################

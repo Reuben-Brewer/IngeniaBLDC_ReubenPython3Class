@@ -6,7 +6,7 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision I, 03/28/2025
+Software Revision J, 04/30/2025
 
 Verified working on: Python 3.12 for Windows 10, 11 64-bit.
 '''
@@ -558,6 +558,13 @@ def FindAllIngeniaSlavesOnAllNetworkInterfaces():
         NetworkInterface_List = IngeniaMotionControllerObject.communication.get_interface_name_list()
 
         NetworkInterface_Dict = dict()
+
+        ##########################################################################################################
+        print("### Start of NetworkInterface_List:\n")
+        for IntegerIndex, EnglishName in enumerate(NetworkInterface_List):
+            print(str(IntegerIndex) + ": " + str(EnglishName) + "\n")
+        print("### End of NetworkInterface_List:\n")
+        ##########################################################################################################
 
         ##########################################################################################################
         ##########################################################################################################
