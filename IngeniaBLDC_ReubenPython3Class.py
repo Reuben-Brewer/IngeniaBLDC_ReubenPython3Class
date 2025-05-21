@@ -6,7 +6,7 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision J, 04/30/2025
+Software Revision K, 05/21/2025
 
 Verified working on: Python 3.12 for Windows 10, 11 64-bit.
 '''
@@ -79,13 +79,12 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
 
         self.DetectedSlaveID_List = []
 
-        self.AskForInfrequentDataReadLoopCounter = 0
-
         self.STO_EstopPRESSEDValue = 0x4
         self.STO_EstopNOTpressedValue = 0x17
 
         #########################################################
-        self.SDOcommands_Rx_EnabledFlag = 0 #unicorn
+        self.SDOcommands_Rx_EnabledFlag = 1 #unicorn
+        self.SDOcommands_Rx_PrintDebuggingStatementsFlag = 0
         #########################################################
 
         self.Position_AcceptableUnitsList = ["EncoderTicks", "Deg", "Rad", "Rev"]
@@ -704,6 +703,8 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                                                                         ("Position_Actual_EncoderTicks", -11111.0),
                                                                         ("Position_Actual_AllUnitsDict", dict([("EncoderTicks", -1.11111), ("Deg", -1.11111), ("Rad", -1.11111), ("Rev", -1.11111)])),
 
+                                                                        ("HallEffectValue_Actual_Int", -1),
+
                                                                         ("PositionSetPoint_Actual_EncoderTicks", -11111.0),
                                                                         ("PositionSetPoint_Actual_AllUnitsDict", dict([("EncoderTicks", -1.11111), ("Deg", -1.11111), ("Rad", -1.11111), ("Rev", -1.11111)])),
 
@@ -800,7 +801,11 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
 
                                                                         ("CommutationMode_ToBeSet_EnglishName", "Brushless_3phase_SVM_Sinusoidal"),
                                                                         ("CommutationMode_Actual_Int", -1),
-                                                                        ("CommutationMode_Actual_EnglishName", "default")])
+                                                                        ("CommutationMode_Actual_EnglishName", "default"),
+
+                                                                        ("ListOfVariableNameStringsToGetViaSDO", []),
+                                                                        ("GetSDOvariablesEveryNloopsCycles", 0),
+                                                                        ("AskForInfrequentDataReadLoopCounter", 0)])
             #########################################################
             #########################################################
             #########################################################
@@ -987,41 +992,6 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
             self.EnableMotorAtStartOfProgramFlag = 0
 
         print("IngeniaBLDC_ReubenPython3Class __init__: EnableMotorAtStartOfProgramFlag: " + str(self.EnableMotorAtStartOfProgramFlag))
-        #########################################################
-        #########################################################
-
-        #########################################################
-        #########################################################
-        if "GetSDOvariablesEveryNloopsCycles" in setup_dict:
-            self.GetSDOvariablesEveryNloopsCycles = self.PassThroughFloatValuesInRange_ExitProgramOtherwise("GetSDOvariablesEveryNloopsCycles", setup_dict["GetSDOvariablesEveryNloopsCycles"], 0, 1000000000)
-        else:
-            self.GetSDOvariablesEveryNloopsCycles = -1
-
-        print("IngeniaBLDC_ReubenPython3Class __init__: GetSDOvariablesEveryNloopsCycles: " + str(self.GetSDOvariablesEveryNloopsCycles))
-        #########################################################
-        #########################################################
-
-        #########################################################
-        #########################################################
-        self.ListOfVariableNameStringsToGetViaSDO = []
-        if "ListOfVariableNameStringsToGet" in setup_dict:
-            ListOfVariableNameStringsToGet_temp = setup_dict["ListOfVariableNameStringsToGet"]
-
-            for VariableNameString in ListOfVariableNameStringsToGet_temp:
-                if VariableNameString in self.ListOfAcceptableVariableNameStringsForReading:
-                    self.ListOfVariableNameStringsToGetViaSDO.append(VariableNameString)
-                else:
-                    print("ERROR: VariableNameString no an acceptable value.")
-
-        if "STO_Status" not in self.ListOfVariableNameStringsToGetViaSDO:
-            pass #We're now querying this automatically via RPDO.
-            #self.ListOfVariableNameStringsToGetViaSDO.append("STO_Status") #Required for the motors to to be detected as connected and then be drive.
-
-        if "EnabledState_Actual" not in self.ListOfVariableNameStringsToGetViaSDO:
-            pass #We're now querying this automatically via RPDO.
-            #self.ListOfVariableNameStringsToGetViaSDO.append("EnabledState_Actual") #Required for the motors to to be detected as connected and then be drive.
-
-        print("IngeniaBLDC_ReubenPython3Class __init__: ListOfVariableNameStringsToGet: " + str(self.ListOfVariableNameStringsToGetViaSDO))
         #########################################################
         #########################################################
 
@@ -2069,16 +2039,14 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
     ##########################################################################################################
     ##########################################################################################################
 
-    ##########################################################################################################
+    ########################################################################################################## THIS IS AN SDO CALL
     ##########################################################################################################
     def __SetPosition(self, SlaveID_Int, PositionTarget_EncoderTicks, PrintDebugFlag = 0):
         try:
 
             if self.IngeniaMotionController_MainDict[SlaveID_Int]["MotorConnectedFlag"]  == 1:
 
-                PositionTarget_EncoderTicks_Limited = self.LimitNumber_FloatOutputOnly(self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionMin_AllUnitsDict"]["EncoderTicks"],
-                                                                                       self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionMax_AllUnitsDict"]["EncoderTicks"],
-                                                                                       PositionTarget_EncoderTicks)
+
 
                 #MUST PASS IN AN INT FOR COMMAND
                 self.IngeniaMotionControllerObject.motion.move_to_position(int(PositionTarget_EncoderTicks_Limited), servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])  # , blocking=False, timeout=2.0
@@ -2098,28 +2066,52 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
 
     ##########################################################################################################
     ##########################################################################################################
-    def SetPosition_ExternalProgram(self, SlaveID_Int, PositionTarget, Units="EncoderTicks", PrintDebugFlag = 0):
+    def LimitValue_ConvertUnits_And_SetVariable___PositionToBeSet(self, SlaveID_Int, PositionTarget, Units="EncoderTicks", PrintDebugFlag = 0):
         try:
 
             PositionTarget_ConvertedToAllUnitsDict = self.ConvertPositionToAllUnits(SlaveID_Int, PositionTarget, Units, VelocityInsteadOfPositionFlag=0)
             PositionTarget_EncoderTicks = PositionTarget_ConvertedToAllUnitsDict["EncoderTicks"]
 
-            #PositionTarget_EncoderTicks_Limited = self.LimitNumber_FloatOutputOnly(self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionMin_AllUnitsDict"]["EncoderTicks"],
-            #                                                                       self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionMax_AllUnitsDict"]["EncoderTicks"],
-            #                                                                       PositionTarget_EncoderTicks)
+            if self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionMin_AllUnitsDict"]["EncoderTicks"] == 0.0 and self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionMax_AllUnitsDict"]["EncoderTicks"] == 0:
+                PositionTarget_EncoderTicks_Limited = PositionTarget_EncoderTicks  # We set min and max both to 0 to tell teh Ingenia controller to disable the position limits.
 
-            PositionTarget_EncoderTicks_Limited = PositionTarget_EncoderTicks
+            else:
+                PositionTarget_EncoderTicks_Limited = self.LimitNumber_FloatOutputOnly(self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionMin_AllUnitsDict"]["EncoderTicks"],
+                                                                                       self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionMax_AllUnitsDict"]["EncoderTicks"],
+                                                                                       PositionTarget_EncoderTicks)
 
             self.IngeniaMotionController_MainDict[SlaveID_Int]["Position_ToBeSet_EncoderTicks"] = PositionTarget_EncoderTicks_Limited
             #self.IngeniaMotionController_MainDict[SlaveID_Int]["Position_NeedsToBeSetFlag"] = 1 #Not needed when using TPDO
 
-            self.IngeniaMotionController_MainDict[SlaveID_Int]["Position_ToBeSet_AllUnitsDict"] = self.ConvertPositionToAllUnits(SlaveID_Int, PositionTarget_EncoderTicks_Limited, Units, VelocityInsteadOfPositionFlag=0)
+            self.IngeniaMotionController_MainDict[SlaveID_Int]["Position_ToBeSet_AllUnitsDict"] = self.ConvertPositionToAllUnits(SlaveID_Int, PositionTarget_EncoderTicks_Limited, "EncoderTicks", VelocityInsteadOfPositionFlag=0)
+
+            ##########################################################################################################
+            if PrintDebugFlag == 1:
+                print("LimitValue_ConvertUnits_And_SetVariable___PositionToBeSet event fired for SlaveID_Int = " + str(SlaveID_Int) + ", PositionTarget = " + str(PositionTarget))
+            ##########################################################################################################
+
+        except:
+            exceptions = sys.exc_info()[0]
+            print("LimitValue_ConvertUnits_And_SetVariable___PositionToBeSet, exceptions: %s" % exceptions)
+            traceback.print_exc()
+
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
+    def SetPosition_ExternalProgram(self, SlaveID_Int, PositionTarget, Units="EncoderTicks", PrintDebugFlag = 0):
+        try:
+
+            self.LimitValue_ConvertUnits_And_SetVariable___PositionToBeSet(SlaveID_Int, PositionTarget, Units, PrintDebugFlag=PrintDebugFlag)
+
+            #self.IngeniaMotionController_MainDict[SlaveID_Int]["Position_NeedsToBeSetFlag"] = 1 #Not needed when using TPDO
 
             self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorMotionSetpoint_GUIscale_ScaleObject_ValueNeedsToBeUpdated"] = 1
 
             ##########################################################################################################
             if PrintDebugFlag == 1:
-                print("SetPosition_ExternalProgram event fired for SlaveID_Int = " + str(SlaveID_Int) + ", PositionTarget_EncoderTicks_Limited = " + str(PositionTarget_EncoderTicks_Limited))
+                print("SetPosition_ExternalProgram event fired for SlaveID_Int = " + str(SlaveID_Int) + ", PositionTarget = " + str(PositionTarget))
             ##########################################################################################################
 
         except:
@@ -2130,7 +2122,7 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
     ##########################################################################################################
     ##########################################################################################################
 
-    ###########################################################################################################
+    ##########################################################################################################
     ##########################################################################################################
     def __SetCurrentQuadrature(self, SlaveID_Int, CurrentQuadratureTarget, PrintDebugFlag = 0):
         try:
@@ -2377,6 +2369,28 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
         except:
             exceptions = sys.exc_info()[0]
             print("__ResetFaults, exceptions: %s" % exceptions)
+            traceback.print_exc()
+
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
+    def __GetHallEffectValue(self, SlaveID_Int, PrintDebugFlag = 0):
+
+        try:
+            if self.IngeniaMotionController_MainDict[SlaveID_Int]["MotorConnectedFlag"] == 1:
+
+                self.IngeniaMotionController_MainDict[SlaveID_Int]["HallEffectValue_Actual_Int"] = self.IngeniaMotionControllerObject.communication.get_register("FBK_DIGHALL_VALUE", #Contains digital input values of digital hall sensors A, B and C, where A is the least significant bit.
+                                                                                                                                                               servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+                ##########################################################################################################
+                if PrintDebugFlag == 1:
+                    print("__GetHallEffectValue event fired for SlaveID_Int = " + str(SlaveID_Int) + ", HallEffectValue_Actual_Int: "  + str(self.IngeniaMotionController_MainDict[SlaveID_Int]["HallEffectValue_Actual_Int"]))
+                ##########################################################################################################
+
+        except:
+            exceptions = sys.exc_info()[0]
+            print("__GetHallEffectValue, exceptions: %s" % exceptions)
             traceback.print_exc()
 
     ##########################################################################################################
@@ -4910,94 +4924,95 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
             ##########################################################################################################
             try:
 
-                if self.SDOcommands_Rx_EnabledFlag == 1:
-                    ##########################################################################################################
-                    ##########################################################################################################
-                    ##########################################################################################################
-                    ##########################################################################################################
-                    if self.GetSDOvariablesEveryNloopsCycles >= 0:
+                ##########################################################################################################
+                ##########################################################################################################
+                ##########################################################################################################
+                ##########################################################################################################
+                if self.SDOcommands_Rx_EnabledFlag == 1: #GLOBAL, SET AT TOP OF THE CLASS
 
-                        if self.AskForInfrequentDataReadLoopCounter == 0:
+                    for SlaveID_Int in self.DetectedSlaveID_List:
 
-                            self.AskForInfrequentDataReadLoopCounter = self.AskForInfrequentDataReadLoopCounter + 1
+                        ##########################################################################################################
+                        ##########################################################################################################
+                        ##########################################################################################################
+                        if self.IngeniaMotionController_MainDict[SlaveID_Int]["MotorConnectedFlag"] == 1:
 
                             ##########################################################################################################
                             ##########################################################################################################
-                            ##########################################################################################################
-                            for SlaveID_Int in self.DetectedSlaveID_List:
+                            if self.IngeniaMotionController_MainDict[SlaveID_Int]["GetSDOvariablesEveryNloopsCycles"] > 0:
 
                                 ##########################################################################################################
-                                ##########################################################################################################
-                                if self.IngeniaMotionController_MainDict[SlaveID_Int]["MotorConnectedFlag"] == 1:
+                                if self.IngeniaMotionController_MainDict[SlaveID_Int]["AskForInfrequentDataReadLoopCounter"] == 0:
 
-                                    ##########################################################################################################
-                                    if "STO_Status" in self.ListOfVariableNameStringsToGetViaSDO:
+                                    ####################################################
+                                    self.IngeniaMotionController_MainDict[SlaveID_Int]["AskForInfrequentDataReadLoopCounter"] = self.IngeniaMotionController_MainDict[SlaveID_Int]["AskForInfrequentDataReadLoopCounter"] + 1
+                                    ####################################################
+
+                                    ####################################################
+                                    if "STO_Status" in self.IngeniaMotionController_MainDict[SlaveID_Int]["ListOfVariableNameStringsToGetViaSDO"]:
                                         self.IngeniaMotionController_MainDict[SlaveID_Int]["STO_Status"] = self.IngeniaMotionControllerObject.configuration.get_STO_Status(servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
-                                        print("DedicatedRxThread, SDO query made for STO_Status.")
+                                        if self.SDOcommands_Rx_PrintDebuggingStatementsFlag == 1:
+                                            print("DedicatedRxThread, SDO query made for STO_Status on SlaveID_Int = " + str(SlaveID_Int))
 
-                                    if "Status_Word" in self.ListOfVariableNameStringsToGetViaSDO:
+                                    if "Status_Word" in self.IngeniaMotionController_MainDict[SlaveID_Int]["ListOfVariableNameStringsToGetViaSDO"]:
                                         self.IngeniaMotionController_MainDict[SlaveID_Int]["Status_Word"] = self.IngeniaMotionControllerObject.configuration.get_status_word(servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
-                                        print("DedicatedRxThread, SDO query made for Status_Word.")
+                                        if self.SDOcommands_Rx_PrintDebuggingStatementsFlag == 1:
+                                            print("DedicatedRxThread, SDO query made for Status_Word on SlaveID_Int = " + str(SlaveID_Int))
 
-                                    if "Position_Actual_EncoderTicks" in self.ListOfVariableNameStringsToGetViaSDO:
+                                    if "Position_Actual_EncoderTicks" in self.IngeniaMotionController_MainDict[SlaveID_Int]["ListOfVariableNameStringsToGetViaSDO"]:
                                         self.IngeniaMotionController_MainDict[SlaveID_Int]["Position_Actual_EncoderTicks"] = self.IngeniaMotionControllerObject.motion.get_actual_position(servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
-                                        print("DedicatedRxThread, SDO query made for Position_Actual_EncoderTicks.")
+                                        if self.SDOcommands_Rx_PrintDebuggingStatementsFlag == 1:
+                                            print("DedicatedRxThread, SDO query made for Position_Actual_EncoderTicks on SlaveID_Int = " + str(SlaveID_Int))
 
-                                    if "Velocity_Actual_EncoderTicks" in self.ListOfVariableNameStringsToGetViaSDO:
+                                    if "Velocity_Actual_EncoderTicks" in self.IngeniaMotionController_MainDict[SlaveID_Int]["ListOfVariableNameStringsToGetViaSDO"]:
                                         self.IngeniaMotionController_MainDict[SlaveID_Int]["Velocity_Actual_EncoderTicks"] = self.IngeniaMotionControllerObject.motion.get_actual_velocity(servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
-                                        print("DedicatedRxThread, SDO query made for Velocity_Actual_EncoderTicks.")
+                                        if self.SDOcommands_Rx_PrintDebuggingStatementsFlag == 1:
+                                            print("DedicatedRxThread, SDO query made for Velocity_Actual_EncoderTicks on SlaveID_Int = " + str(SlaveID_Int))
 
-                                    if "Current_Direct_Actual" in self.ListOfVariableNameStringsToGetViaSDO:
+                                    if "Current_Direct_Actual" in self.IngeniaMotionController_MainDict[SlaveID_Int]["ListOfVariableNameStringsToGetViaSDO"]:
                                         self.IngeniaMotionController_MainDict[SlaveID_Int]["Current_Direct_Actual"] = self.IngeniaMotionControllerObject.motion.get_actual_current_direct(servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
-                                        print("DedicatedRxThread, SDO query made for Current_Direct_Actual.")
+                                        if self.SDOcommands_Rx_PrintDebuggingStatementsFlag == 1:
+                                            print("DedicatedRxThread, SDO query made for Current_Direct_Actual on SlaveID_Int = " + str(SlaveID_Int))
 
-                                    if "Current_Quadrature_Actual" in self.ListOfVariableNameStringsToGetViaSDO:
+                                    if "Current_Quadrature_Actual" in self.IngeniaMotionController_MainDict[SlaveID_Int]["ListOfVariableNameStringsToGetViaSDO"]:
                                         self.IngeniaMotionController_MainDict[SlaveID_Int]["Current_Quadrature_Actual"] = self.IngeniaMotionControllerObject.motion.get_actual_current_quadrature(servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
-                                        print("DedicatedRxThread, SDO query made for Current_Quadrature_Actual.")
+                                        if self.SDOcommands_Rx_PrintDebuggingStatementsFlag == 1:
+                                            print("DedicatedRxThread, SDO query made for Current_Quadrature_Actual on SlaveID_Int = " + str(SlaveID_Int))
 
-                                    if "EnabledState_Actual" in self.ListOfVariableNameStringsToGetViaSDO:
+                                    if "EnabledState_Actual" in self.IngeniaMotionController_MainDict[SlaveID_Int]["ListOfVariableNameStringsToGetViaSDO"]:
                                         self.IngeniaMotionController_MainDict[SlaveID_Int]["EnabledState_Actual"] = self.IngeniaMotionControllerObject.configuration.is_motor_enabled(servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
-                                        print("DedicatedRxThread, SDO query made for EnabledState_Actual.")
-                                    ##########################################################################################################
+                                        if self.SDOcommands_Rx_PrintDebuggingStatementsFlag == 1:
+                                            print("DedicatedRxThread, SDO query made for EnabledState_Actual on SlaveID_Int = " + str(SlaveID_Int))
 
-                                    ##########################################################################################################
+                                    if "HallEffectValue_Actual_Int" in self.IngeniaMotionController_MainDict[SlaveID_Int]["ListOfVariableNameStringsToGetViaSDO"]:
+                                        self.__GetHallEffectValue(SlaveID_Int, PrintDebugFlag=0)
+                                        if self.SDOcommands_Rx_PrintDebuggingStatementsFlag == 1:
+                                            print("DedicatedRxThread, SDO query made for HallEffectValue_Actual_Int on SlaveID_Int = " + str(SlaveID_Int))
+                                    ####################################################
+
+                                    ####################################################
                                     self.IngeniaMotionController_MainDict[SlaveID_Int]["STO_Status_last"] = self.IngeniaMotionController_MainDict[SlaveID_Int]["STO_Status"]
-                                    ##########################################################################################################
+                                    ####################################################
 
                                 ##########################################################################################################
+                                else:
+                                    self.IngeniaMotionController_MainDict[SlaveID_Int]["AskForInfrequentDataReadLoopCounter"] = self.IngeniaMotionController_MainDict[SlaveID_Int]["AskForInfrequentDataReadLoopCounter"] + 1
+
+                                    if self.IngeniaMotionController_MainDict[SlaveID_Int]["AskForInfrequentDataReadLoopCounter"] >= self.IngeniaMotionController_MainDict[SlaveID_Int]["GetSDOvariablesEveryNloopsCycles"]:
+                                        self.IngeniaMotionController_MainDict[SlaveID_Int]["AskForInfrequentDataReadLoopCounter"] = 0
                                 ##########################################################################################################
 
                             ##########################################################################################################
                             ##########################################################################################################
-                            ##########################################################################################################
-
-                            ##########################################################################################################
-                            ##########################################################################################################
-                            ##########################################################################################################
-                            #self.UpdateFrequencyCalculation_DedicatedRxThread_Filtered()
-                            ##########################################################################################################
-                            ##########################################################################################################
-                            ##########################################################################################################
 
                         ##########################################################################################################
                         ##########################################################################################################
                         ##########################################################################################################
-                        ##########################################################################################################
 
-                        ##########################################################################################################
-                        ##########################################################################################################
-                        ##########################################################################################################
-                        ##########################################################################################################
-                        else:
-
-                            self.AskForInfrequentDataReadLoopCounter = self.AskForInfrequentDataReadLoopCounter + 1
-
-                            if self.AskForInfrequentDataReadLoopCounter >= self.GetSDOvariablesEveryNloopsCycles:
-                                self.AskForInfrequentDataReadLoopCounter = 0
-                        ##########################################################################################################
-                        ##########################################################################################################
-                        ##########################################################################################################
-                        ##########################################################################################################
+                ##########################################################################################################
+                ##########################################################################################################
+                ##########################################################################################################
+                ##########################################################################################################
 
                 ##########################################################################################################
                 ##########################################################################################################
@@ -5223,11 +5238,14 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
 
         #################################################
         #################################################
+        #################################################
         self.root = parent
         self.parent = parent
         #################################################
         #################################################
+        #################################################
 
+        #################################################
         #################################################
         #################################################
         self.myFrame = Frame(self.root)
@@ -5245,7 +5263,9 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                           sticky = self.GUI_STICKY)
         #################################################
         #################################################
+        #################################################
 
+        #################################################
         #################################################
         #################################################
         self.TKinter_LightGreenColor = '#%02x%02x%02x' % (150, 255, 150) #RGB
@@ -5257,7 +5277,9 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
         self.TkinterScaleLength = 250
         #################################################
         #################################################
+        #################################################
 
+        #################################################
         #################################################
         #################################################
         self.DeviceInfo_Label = Label(self.myFrame, text="Device Info", width=50)
@@ -5265,32 +5287,41 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
         self.DeviceInfo_Label.grid(row=0, column=0, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
         #################################################
         #################################################
+        #################################################
 
+        #################################################
         #################################################
         #################################################
         self.Data_Label = Label(self.myFrame, text="Data_Label", width=120)
         self.Data_Label.grid(row=1, column=0, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
         #################################################
         #################################################
+        #################################################
 
+        #################################################
         #################################################
         #################################################
         self.AllMotorsInfoFrame = Frame(self.myFrame)
         self.AllMotorsInfoFrame.grid(row = 2, column = 0, padx = self.GUI_PADX, pady = self.GUI_PADY, rowspan = 1, columnspan = 2)
         #################################################
         #################################################
+        #################################################
 
+        #################################################
         #################################################
         #################################################
         for SlaveID_Int in self.DetectedSlaveID_List:
         
+            #################################################
             #################################################
             self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfoFrame"] = Frame(self.AllMotorsInfoFrame)
             self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfoFrame"]["borderwidth"] = 2
             self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfoFrame"]["relief"] = "ridge"
             self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfoFrame"].grid(row=0, column=SlaveID_Int-1, padx=self.GUI_PADX, pady=self.GUI_PADY, rowspan=1, columnspan=1)
             #################################################
+            #################################################
 
+            #################################################
             #################################################
             self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfoCanvas"] = Canvas(self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfoFrame"])
             self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfoCanvas"].grid(row=0, column=0, padx=self.GUI_PADX, pady=self.GUI_PADY, rowspan=1, columnspan=1)
@@ -5299,7 +5330,9 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
             #self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfoCanvas_Scrollbar"].grid(row=0, column=1, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
             #self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfoCanvas_Scrollbar"].config(command = self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfoCanvas"].yview)
             #################################################
+            #################################################
 
+            #################################################
             #################################################
             self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfo_Label"] = Label(self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfoCanvas"],
                                                                                                               text="IndividualMotorInfo_Label " + str(SlaveID_Int),
@@ -5307,12 +5340,16 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
 
             self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfo_Label"].grid(row=0, column=0, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
             #################################################
+            #################################################
 
+            #################################################
             #################################################
             self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfo_ButtonsFrame"] = Frame(self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfoCanvas"])
             self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfo_ButtonsFrame"].grid(row=1, column=0, padx=self.GUI_PADX, pady=self.GUI_PADY, rowspan=1, columnspan=1)
             #################################################
+            #################################################
 
+            #################################################
             #################################################
             self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EnabledState_Button"] = Button(self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfo_ButtonsFrame"],
                                                                                                          text="EnabledState_Button " + str(SlaveID_Int), state="normal",
@@ -5322,7 +5359,9 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
 
             self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EnabledState_Button"].grid(row=0, column=0, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
             #################################################
-            
+            #################################################
+
+            #################################################
             #################################################
             self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["ZeroEncoder_Button"] = Button(self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfo_ButtonsFrame"],
                                                                                                          text="ZeroEncoder_Button " + str(SlaveID_Int), state="normal",
@@ -5335,7 +5374,9 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
 
             self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["ZeroEncoder_Button"].grid(row=0, column=1, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
             #################################################
+            #################################################
 
+            #################################################
             #################################################
             self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["FaultReset_Button"] = Button(self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfo_ButtonsFrame"],
                                                                                                          text="FaultReset_Button " + str(SlaveID_Int), state="normal",
@@ -5345,7 +5386,9 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
 
             self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["FaultReset_Button"].grid(row=0, column=2, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
             #################################################
+            #################################################
 
+            #################################################
             #################################################
             self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_ReubenPython2and3ClassObject_GUIparametersDict"] = dict([("root", self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfoCanvas"]),
                                                                                                                                                     ("UseBorderAroundThisGuiObjectFlag", 0),
@@ -5389,8 +5432,24 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                 print("GUI_Thread EntryListWithBlinking_ReubenPython2and3ClassObject: Exceptions: %s" % exceptions)
                 traceback.print_exc()
             #################################################
+            #################################################
 
-            ###################################################
+            #################################################
+            #################################################
+
+            ################################################# Frame
+            self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorMotionSetpoint_GUIscale_Frame"] = Frame(self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfoCanvas"])
+            self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorMotionSetpoint_GUIscale_Frame"].grid(row=2, column=0, padx=self.GUI_PADX, pady=self.GUI_PADY, rowspan=1, columnspan=1)
+            #################################################
+
+            ################################################# Label
+            self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorMotionSetpoint_GUIscale_Label"] = Label(self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorMotionSetpoint_GUIscale_Frame"],
+                                                                                                              text="EncTicks",
+                                                                                                              width=10)
+            self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorMotionSetpoint_GUIscale_Label"].grid(row=0, column=0, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
+            #################################################
+
+            ################################################# Scale
             self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorMotionSetpoint_GUIscale_Value"] = DoubleVar()
 
             if self.IngeniaMotionController_MainDict[SlaveID_Int]["OperationMode"] == "CyclicPosition":
@@ -5414,9 +5473,9 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                 GUIscale_ScaleObject_FROM = -11111.0
                 GUIscale_ScaleObject_TO = 11111.0
 
-            GUIscale_ScaleObject_RESOLUTION = abs(GUIscale_ScaleObject_TO - GUIscale_ScaleObject_FROM)/100.0 #100 tick marks
+            GUIscale_ScaleObject_RESOLUTION = 1#abs(GUIscale_ScaleObject_TO - GUIscale_ScaleObject_FROM)/100.0 #100 tick marks
 
-            self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorMotionSetpoint_GUIscale_ScaleObject"] = Scale(self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfoCanvas"],
+            self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorMotionSetpoint_GUIscale_ScaleObject"] = Scale(self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorMotionSetpoint_GUIscale_Frame"],
                                                                                                                                        from_=GUIscale_ScaleObject_FROM,
                                                                                                                                        to=GUIscale_ScaleObject_TO,
                                                                                                                                        orient=HORIZONTAL,
@@ -5431,13 +5490,28 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
             self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorMotionSetpoint_GUIscale_ScaleObject"].bind('<B1-Motion>', lambda event, name=SlaveID_Int: self.IndividualMotorMotionSetpoint_GUIscale_EventResponse(event, name))
             self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorMotionSetpoint_GUIscale_ScaleObject"].bind('<ButtonRelease-1>', lambda event, name=SlaveID_Int: self.IndividualMotorMotionSetpoint_GUIscale_EventResponse(event, name))
             self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorMotionSetpoint_GUIscale_ScaleObject"].set(self.IngeniaMotionController_MainDict[SlaveID_Int]["Position_ToBeSet_EncoderTicks"])
-            self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorMotionSetpoint_GUIscale_ScaleObject"].grid(row=2, column=0, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
+            self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorMotionSetpoint_GUIscale_ScaleObject"].grid(row=0, column=1, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
             self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorMotionSetpoint_GUIscale_ScaleObject_ValueNeedsToBeUpdated"] = 0
-            ###################################################
+            #################################################
+
+            ################################################# Button
+            self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorMotionSetpoint_GUIscale_ZeroScaleButton"] = Button(self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorMotionSetpoint_GUIscale_Frame"],
+                                                                                                         text="GoTo0",
+                                                                                                         state="normal",
+                                                                                                         width=5,
+                                                                                                         bg=self.TKinter_DefaultGrayColor,
+                                                                                                         command=lambda name=SlaveID_Int: self.ZeroScale_Button_Response(name))
+            self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorMotionSetpoint_GUIscale_ZeroScaleButton"].grid(row=0, column=2, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
+            #################################################
+
+            #################################################
+            #################################################
 
         #################################################
         #################################################
+        #################################################
 
+        #################################################
         #################################################
         #################################################
         self.PrintToGui_Label = Label(self.myFrame, text="PrintToGui_Label", width=75)
@@ -5445,10 +5519,13 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
             self.PrintToGui_Label.grid(row=3, column=0, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=10, rowspan=10)
         #################################################
         #################################################
+        #################################################
 
         #################################################
         #################################################
+        #################################################
         self.GUI_ready_to_be_updated_flag = 1
+        #################################################
         #################################################
         #################################################
 
@@ -5524,7 +5601,7 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
 
         ##########################################################################################################
         if self.IngeniaMotionController_MainDict[SlaveID_Int]["OperationMode"] == "CyclicPosition":
-            self.IngeniaMotionController_MainDict[SlaveID_Int]["Position_ToBeSet_EncoderTicks"] = GUIscale_Value
+            self.LimitValue_ConvertUnits_And_SetVariable___PositionToBeSet(SlaveID_Int, GUIscale_Value, "EncoderTicks", PrintDebugFlag=0)
             #self.IngeniaMotionController_MainDict[SlaveID_Int]["Position_NeedsToBeSetFlag"] = 1 #Not needed when using TPDO
         ##########################################################################################################
         
@@ -5543,6 +5620,41 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
         
         #print("IndividualMotorMotionSetpoint_GUIscale_EventResponse for SlaveID_Int = " + str(SlaveID_Int) +
         #      ", Position set to " + str(self.IngeniaMotionController_MainDict[SlaveID_Int]["Position_ToBeSet_EncoderTicks"]))
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
+    def ZeroScale_Button_Response(self, name):
+
+        SlaveID_Int = int(name)
+
+        ##########################################################################################################
+        if self.IngeniaMotionController_MainDict[SlaveID_Int]["OperationMode"] == "CyclicPosition":
+            self.LimitValue_ConvertUnits_And_SetVariable___PositionToBeSet(SlaveID_Int, 0, "EncoderTicks", PrintDebugFlag=0)
+            # self.IngeniaMotionController_MainDict[SlaveID_Int]["Position_NeedsToBeSetFlag"] = 1 #Not needed when using TPDO
+        ##########################################################################################################
+
+        ##########################################################################################################
+        elif self.IngeniaMotionController_MainDict[SlaveID_Int]["OperationMode"] == "CyclicCurrent":
+            self.IngeniaMotionController_MainDict[SlaveID_Int]["Current_Quadrature_ToBeSet"] = 0
+            self.IngeniaMotionController_MainDict[SlaveID_Int]["Current_Quadrature_NeedsToBeSetFlag"] = 1
+        ##########################################################################################################
+
+        ##########################################################################################################
+        elif self.IngeniaMotionController_MainDict[SlaveID_Int]["OperationMode"] == "CyclicVoltage":
+            self.IngeniaMotionController_MainDict[SlaveID_Int]["Voltage_Quadrature_ToBeSet"] = 0
+            self.IngeniaMotionController_MainDict[SlaveID_Int]["Voltage_Quadrature_NeedsToBeSetFlag"] = 1
+        ##########################################################################################################
+
+        ##########################################################################################################
+        self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorMotionSetpoint_GUIscale_ScaleObject_ValueNeedsToBeUpdated"] = 1
+        ##########################################################################################################
+
+        ##########################################################################################################
+        print("ZeroScale_Button_Response: Event fired for SlaveID_Int = " + str(SlaveID_Int))
+        ##########################################################################################################
+
     ##########################################################################################################
     ##########################################################################################################
 
@@ -5702,11 +5814,12 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
 
                         #######################################################
                         self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfo_Label"]["text"] = self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfo_Label"]["text"] + \
-                                                                                                                            "\nPosition Actual" +\
-                                                                                                                            self.ConvertDictToProperlyFormattedStringForPrinting(self.IngeniaMotionController_MainDict[SlaveID_Int]["Position_Actual_AllUnitsDict"], 3, 1, 1) #+ \
-                                                                                                                            #"\nPositionSetPoint_Actual_EncoderTicks" + self.ConvertFloatToStringWithNumberOfLeadingNumbersAndDecimalPlaces_NumberOrListInput(self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionSetPoint_Actual_AllUnitsDict"]["EncoderTicks"], 0, 3) + \
-                                                                                                                            #"\nVelocity Actual" + \
-                                                                                                                            #self.ConvertDictToProperlyFormattedStringForPrinting(self.IngeniaMotionController_MainDict[SlaveID_Int]["Velocity_Actual_AllUnitsDict"], 6, 1, 1)
+                                                                                                                            "\nPosition ToBeSet: " + \
+                                                                                                                            self.ConvertDictToProperlyFormattedStringForPrinting(self.IngeniaMotionController_MainDict[SlaveID_Int]["Position_ToBeSet_AllUnitsDict"], 3, 1, 1) +\
+                                                                                                                            "\nPosition Actual: " +\
+                                                                                                                            self.ConvertDictToProperlyFormattedStringForPrinting(self.IngeniaMotionController_MainDict[SlaveID_Int]["Position_Actual_AllUnitsDict"], 3, 1, 1) + \
+                                                                                                                            "\nHallEffect Actual: " + \
+                                                                                                                            str(self.IngeniaMotionController_MainDict[SlaveID_Int]["HallEffectValue_Actual_Int"])
                         #######################################################
                         
                         #######################################################

@@ -6,7 +6,7 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision E, 09/07/2024
+Software Revision F, 05/21/2025
 
 Verified working on: Python 3.8 for Windows 10 64-bit, Ubuntu 20.04, and Raspberry Pi Buster (no Mac testing yet).
 '''
@@ -421,9 +421,9 @@ class LowPassFilterForDictsOfLists_ReubenPython2and3Class():
             ###############################################
 
             ###############################################
-            if self.VariablesDict[VariableNameStr]["UseExponentialSmoothingFilterFlag"] == 1:
+            if self.VariablesDict[VariableNameStr]["UseExponentialSmoothingFilterFlag"] == 1: #FORMER ERROR: THIS USED TO WORK ON __SignalInRawHistoryList INSTEAD OF __SignalOutFilteredHistoryList, SO IT ERASED MEDIAN FILTER
                 #new_filtered_value = k * raw_sensor_value + (1 - k) * old_filtered_value
-                self.VariablesDict[VariableNameStr]["__SignalOutFilteredHistoryList"][ListIndex][0] = self.VariablesDict[VariableNameStr]["ExponentialSmoothingFilterLambda"] * self.VariablesDict[VariableNameStr]["__SignalInRawHistoryList"][ListIndex][0] + (1.0 - self.VariablesDict[VariableNameStr]["ExponentialSmoothingFilterLambda"]) * self.VariablesDict[VariableNameStr]["__SignalOutFilteredHistoryList"][ListIndex][1]
+                self.VariablesDict[VariableNameStr]["__SignalOutFilteredHistoryList"][ListIndex][0] = self.VariablesDict[VariableNameStr]["ExponentialSmoothingFilterLambda"] * self.VariablesDict[VariableNameStr]["__SignalOutFilteredHistoryList"][ListIndex][0] + (1.0 - self.VariablesDict[VariableNameStr]["ExponentialSmoothingFilterLambda"]) * self.VariablesDict[VariableNameStr]["__SignalOutFilteredHistoryList"][ListIndex][1]
             ###############################################
 
             ###############################################
