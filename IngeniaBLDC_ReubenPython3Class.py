@@ -2046,10 +2046,8 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
 
             if self.IngeniaMotionController_MainDict[SlaveID_Int]["MotorConnectedFlag"]  == 1:
 
-
-
                 #MUST PASS IN AN INT FOR COMMAND
-                self.IngeniaMotionControllerObject.motion.move_to_position(int(PositionTarget_EncoderTicks_Limited), servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])  # , blocking=False, timeout=2.0
+                self.IngeniaMotionControllerObject.motion.move_to_position(int(PositionTarget_EncoderTicks), servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])  # , blocking=False, timeout=2.0
 
                 ##########################################################################################################
                 if PrintDebugFlag == 1:
