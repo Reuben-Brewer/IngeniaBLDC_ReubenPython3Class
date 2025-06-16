@@ -83,4 +83,12 @@ pip install xlwt            #version 1.3.0 as of 10/17/24
 
 ############
 
+############
+
+ResetWinPCAPdriver.bat/py:
+
+from elevate import elevate #https://pypi.org/project/elevate/
+
+############
+
 ###########################
