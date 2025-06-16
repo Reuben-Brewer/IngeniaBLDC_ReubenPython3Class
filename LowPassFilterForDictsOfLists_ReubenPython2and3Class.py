@@ -6,9 +6,9 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision F, 05/21/2025
+Software Revision G, 05/27/2025
 
-Verified working on: Python 3.8 for Windows 10 64-bit, Ubuntu 20.04, and Raspberry Pi Buster (no Mac testing yet).
+Verified working on: Python 3.11/3.12 for Windows 10/11 64-bit, Ubuntu 20.04, and Raspberry Pi Bookworm (no Mac testing yet).
 '''
 
 __author__ = 'reuben.brewer'

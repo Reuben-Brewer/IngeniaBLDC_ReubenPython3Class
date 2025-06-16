@@ -6,15 +6,15 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision H, 11/05/2024
+Software Revision L, 06/16/2025
 
-Verified working on: Python 3.12 for Windows 11 64-bit and Raspberry Pi Buster (may work on Mac in non-GUI mode, but haven't tested yet).
+Verified working on: Python 3.11/3.12 for Windows 10/11 64-bit and Raspberry Pi Bookworm.
 '''
 
 __author__ = 'reuben.brewer'
 
 ###########################################################
-from LowPassFilter_ReubenPython2and3Class import *
+from EntryListWithBlinking_ReubenPython2and3Class import *
 ###########################################################
 
 ###########################################################
@@ -29,6 +29,7 @@ from copy import * #for deepcopy
 import inspect #To enable 'TellWhichFileWereIn'
 import threading
 import traceback
+import queue as Queue
 ###########################################################
 
 ###########################################################
@@ -36,14 +37,6 @@ from tkinter import *
 import tkinter.font as tkFont
 from tkinter import ttk
 ###########################################################
-
-###########################################################
-import queue as Queue
-###########################################################
-
-###########################################################
-from future.builtins import input as input
-########################################################### "sudo pip3 install future" (Python 3) AND "sudo pip install future" (Python 2)
 
 ###########################################################
 import platform
@@ -79,6 +72,10 @@ class CSVdataLogger_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
         self.CSVfile_SaveFlag = 0
         self.CSVfile_SaveFlag_NeedsToBeChangedFlag = 0
         self.AcceptNewDataFlag = 0
+
+        self.FilenamePrefix = ""
+        self.TrialNumber = 0
+        self.NoteToAddToFile = " " #Excel needs a non-zero str-length if it's in the header-row (can't use "").
 
         self.MostRecentDataDict = dict()
         #########################################################
@@ -264,17 +261,6 @@ class CSVdataLogger_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
 
         #########################################################
         #########################################################
-        if "NameToDisplay_UserSet" in setup_dict:
-            self.NameToDisplay_UserSet = str(setup_dict["NameToDisplay_UserSet"])
-        else:
-            self.NameToDisplay_UserSet = ""
-
-        print("CSVdataLogger_ReubenPython3Class __init__: NameToDisplay_UserSet: " + str(self.NameToDisplay_UserSet))
-        #########################################################
-        #########################################################
-
-        #########################################################
-        #########################################################
         if "SaveOnStartupFlag" in setup_dict:
             self.SaveOnStartupFlag = self.PassThrough0and1values_ExitProgramOtherwise("SaveOnStartupFlag", setup_dict["SaveOnStartupFlag"])
         else:
@@ -290,7 +276,11 @@ class CSVdataLogger_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
         #########################################################
         #########################################################
 
+        #########################################################
+        #########################################################
         self.DataQueue = Queue.Queue()
+        #########################################################
+        #########################################################
 
         #########################################################
         #########################################################
@@ -346,17 +336,6 @@ class CSVdataLogger_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
 
         #########################################################
         #########################################################
-        if "FileNamePrefix" in setup_dict:
-            self.FileNamePrefix = str(setup_dict["FileNamePrefix"])
-        else:
-            self.FileNamePrefix = "CSVdataLogger_"
-
-        print("CSVdataLogger_ReubenPython3Class __init__: FileNamePrefix: " + str(self.FileNamePrefix))
-        #########################################################
-        #########################################################
-
-        #########################################################
-        #########################################################
         self.VariableNamesForHeaderList = list()
         self.VariablesHeaderStringCommaDelimited = ""
 
@@ -374,16 +353,12 @@ class CSVdataLogger_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                         self.VariablesHeaderStringCommaDelimited = self.VariablesHeaderStringCommaDelimited + ", "
 
                     else:
-                        self.VariablesHeaderStringCommaDelimited = self.VariablesHeaderStringCommaDelimited + "\n"
+                        self.VariablesHeaderStringCommaDelimited = self.VariablesHeaderStringCommaDelimited
                     ###################################################
 
             else:
                 print("CSVdataLogger_ReubenPython3Class __init__: Error, 'VariableNamesForHeaderList' must be a list.")
                 return
-
-        #else:
-        #    print("CSVdataLogger_ReubenPython3Class __init__: Error, must input 'VariableNamesForHeaderList'")
-        #    return
 
         print("CSVdataLogger_ReubenPython3Class __init__: VariableNamesForHeaderList: " + str(self.VariableNamesForHeaderList))
         #########################################################
@@ -398,6 +373,52 @@ class CSVdataLogger_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
             self.MainThread_TimeToSleepEachLoop = 0.005
 
         print("CSVdataLogger_ReubenPython3Class __init__: MainThread_TimeToSleepEachLoop: " + str(self.MainThread_TimeToSleepEachLoop))
+        #########################################################
+        #########################################################
+        
+        #########################################################
+        #########################################################
+        if "FilenamePrefix" in setup_dict:
+            self.FilenamePrefix = str(setup_dict["FilenamePrefix"])
+        else:
+            self.FilenamePrefix = "CSVdataLogger_"
+
+        print("CSVdataLogger_ReubenPython3Class __init__: FilenamePrefix: " + str(self.FilenamePrefix))
+        #########################################################
+        #########################################################
+        
+        #########################################################
+        #########################################################
+        if "TrialNumber" in setup_dict:
+            self.TrialNumber = int(self.PassThroughFloatValuesInRange_ExitProgramOtherwise("TrialNumber", setup_dict["TrialNumber"], 0, 100000))
+
+        else:
+            self.TrialNumber = 0
+
+        print("CSVdataLogger_ReubenPython3Class __init__: TrialNumber: " + str(self.TrialNumber))
+        #########################################################
+        #########################################################
+        
+        #########################################################
+        #########################################################
+        if "NoteToAddToFile" in setup_dict:
+            self.NoteToAddToFile = str(setup_dict["NoteToAddToFile"])
+
+        else:
+            self.NoteToAddToFile = " " #Excel needs a non-zero str-length if it's in the header-row (can't use "").
+
+        print("CSVdataLogger_ReubenPython3Class __init__: NoteToAddToFile: " + str(self.NoteToAddToFile))
+        #########################################################
+        #########################################################
+        
+        #########################################################
+        #########################################################
+        if "EnableSaveButtonFlag" in setup_dict:
+            self.EnableSaveButtonFlag = self.PassThrough0and1values_ExitProgramOtherwise("EnableSaveButtonFlag", setup_dict["EnableSaveButtonFlag"])
+        else:
+            self.EnableSaveButtonFlag = 1
+
+        print("CSVdataLogger_ReubenPython3Class __init__: EnableSaveButtonFlag: " + str(self.EnableSaveButtonFlag))
         #########################################################
         #########################################################
 
@@ -685,43 +706,121 @@ class CSVdataLogger_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
             #print("CreateNewDirectoryIfItDoesntExist, directory: " + directory)
             if os.path.isdir(directory) == 0: #No directory with this name exists
                 os.makedirs(directory)
+
+            return 1
         except:
             exceptions = sys.exc_info()[0]
             print("CreateNewDirectoryIfItDoesntExist, Exceptions: %s" % exceptions)
-            traceback.print_exc()
+            return 0
+            #traceback.print_exc()
     ##########################################################################################################
     ##########################################################################################################
 
     ##########################################################################################################
     ##########################################################################################################
-    def CreateCSVfileAndStartWritingData(self, CSVfile_DirectoryPath_Input = "", FileNamePrefix_Input = ""):
+    ##########################################################################################################
+    ##########################################################################################################
+    def CreateCSVfileAndStartWritingData(self, CSVfile_DirectoryPath_Input = "", FilenamePrefix_Input = "", TrialNumber_Input = -1, NoteToAddToFile_Input = ""):
 
+        ##########################################################################################################
+        ##########################################################################################################
+        ##########################################################################################################
         try:
 
+            ##########################################################################################################
+            ##########################################################################################################
             if CSVfile_DirectoryPath_Input != "":
                 self.CSVfile_DirectoryPath = CSVfile_DirectoryPath_Input
-                self.CreateNewDirectoryIfItDoesntExist(self.CSVfile_DirectoryPath)
+            ##########################################################################################################
+            ##########################################################################################################
 
-            if FileNamePrefix_Input != "":
-                self.FileNamePrefix = FileNamePrefix_Input
+            ##########################################################################################################
+            ##########################################################################################################
+            if FilenamePrefix_Input != "":
+                self.FilenamePrefix = FilenamePrefix_Input
+                self.EntryListWithBlinking_ReubenPython2and3ClassObject_NeedsToBeUpdatedByExternalValueFlag = 1
+            ##########################################################################################################
+            ##########################################################################################################
 
+            ##########################################################################################################
+            ##########################################################################################################
+            if TrialNumber_Input != -1:
+                self.TrialNumber = TrialNumber_Input
+                self.EntryListWithBlinking_ReubenPython2and3ClassObject_NeedsToBeUpdatedByExternalValueFlag = 1
+            ##########################################################################################################
+            ##########################################################################################################
+
+            ##########################################################################################################
+            ##########################################################################################################
+            if NoteToAddToFile_Input != "":
+                self.NoteToAddToFile = NoteToAddToFile_Input
+                self.EntryListWithBlinking_ReubenPython2and3ClassObject_NeedsToBeUpdatedByExternalValueFlag = 1
+            ##########################################################################################################
+            ##########################################################################################################
+
+            ##########################################################################################################
+            ##########################################################################################################
             self.CreateNewDirectoryIfItDoesntExist(self.CSVfile_DirectoryPath)
 
-            self.CSVfile_FilepathFull = self.CSVfile_DirectoryPath + "//" + self.FileNamePrefix + self.getTimeStampString() + ".csv"
+            self.CSVfile_FilepathFull = self.CSVfile_DirectoryPath + "//" +\
+                                         self.FilenamePrefix +\
+                                         "_Trial_" + str(self.TrialNumber) +\
+                                         "_" + self.getTimeStampString() +\
+                                         ".csv"
 
             self.CSVfile_FileObject = open(self.CSVfile_FilepathFull, "a") #Will append to file if it exists, create new file with this as first entry if file doesn't exist.
-            self.CSVfile_FileObject.write(self.VariablesHeaderStringCommaDelimited + "\n")
+
+            ##########################################################################################################
+            self.CSVfile_FileObject.write(self.VariablesHeaderStringCommaDelimited + ",NoteToAddToFile," + str(self.NoteToAddToFile) + "\n")
+            ##########################################################################################################
+
+            '''
+            ##########################################################################################################
+            #Most parsers (like Python's pandas.read_csv() or Excel import tools) ignore lines starting with # if configured to do so.
+
+            # This file contains test data collected on June 15
+            # Columns: Time (s), Position (mm)
+            #Time,Position
+            #0.0,0
+            #1.0,10
+            #2.0,20
+            
+            #In pandas, you can explicitly ignore comments with:
+            
+            #import pandas as pd
+            #df = pd.read_csv("file.csv", comment="#")
+            
+            self.CSVfile_FileObject.write("#NoteToAddToFile," + self.NoteToAddToFile + "\n")
+            ##########################################################################################################
+            '''
 
             self.AcceptNewDataFlag = 1
             self.CSVfile_SaveFlag = 1
 
             print("CreateCSVfileAndStartWritingData: Opened file " + self.CSVfile_FilepathFull + " and started writing data!")
 
+            return 1
+        ##########################################################################################################
+        ##########################################################################################################
+
+        ##########################################################################################################
+        ##########################################################################################################
+        ##########################################################################################################
+
+        ##########################################################################################################
+        ##########################################################################################################
+        ##########################################################################################################
         except:
             exceptions = sys.exc_info()[0]
             print("CreateCSVfileAndStartWritingData, Exceptions: %s" % exceptions)
-            traceback.print_exc()
+            return 0
+            #traceback.print_exc()
+        ##########################################################################################################
+        ##########################################################################################################
+        ##########################################################################################################
 
+    ##########################################################################################################
+    ##########################################################################################################
     ##########################################################################################################
     ##########################################################################################################
 
@@ -739,10 +838,13 @@ class CSVdataLogger_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
 
                 print("CloseCSVfileAndStopWritingData: Closed file " + self.CSVfile_FilepathFull + " and stopped writing data!")
 
+                return 1
+
         except:
             exceptions = sys.exc_info()[0]
             print("CloseCSVfileAndStopWritingData, Exceptions: %s" % exceptions)
-            traceback.print_exc()
+            return 0
+            #traceback.print_exc()
 
     ##########################################################################################################
     ##########################################################################################################
@@ -894,6 +996,9 @@ class CSVdataLogger_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                 self.MostRecentDataDict["DataQueue_qsize"] = self.DataQueue.qsize()
                 self.MostRecentDataDict["VariableNamesForHeaderList"] = self.VariableNamesForHeaderList
                 self.MostRecentDataDict["FilepathFull"] = self.CSVfile_FilepathFull
+                self.MostRecentDataDict["FilenamePrefix"] = self.FilenamePrefix
+                self.MostRecentDataDict["TrialNumber"] = self.TrialNumber
+                self.MostRecentDataDict["NoteToAddToFile"] = self.NoteToAddToFile
 
                 if self.MainThread_TimeToSleepEachLoop > 0.0:
                     time.sleep(self.MainThread_TimeToSleepEachLoop)
@@ -934,10 +1039,6 @@ class CSVdataLogger_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
     ##########################################################################################################
     ##########################################################################################################
     def StartGUI(self, GuiParent):
-
-        #self.GUI_Thread_ThreadingObject = threading.Thread(target=self.GUI_Thread, args=(GuiParent,))
-        #self.GUI_Thread_ThreadingObject.setDaemon(True) #Should mean that the GUI thread is destroyed automatically when the main thread is destroyed.
-        #self.GUI_Thread_ThreadingObject.start()
 
         self.GUI_Thread(GuiParent)
     ##########################################################################################################
@@ -985,25 +1086,53 @@ class CSVdataLogger_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
 
         #################################################
         #################################################
-        self.DeviceInfo_Label = Label(self.myFrame, text="Device Info", width=125)
+        self.CSVfile_SaveFlag_Button = Button(self.myFrame, text='Save CSV', state="normal", width=20, font=("Helvetica", 12), command=lambda i=1: self.CSVfile_SaveFlag_ButtonResponse())
+        self.CSVfile_SaveFlag_Button.grid(row=0, column=0, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
+        #################################################
+        #################################################
 
-        self.DeviceInfo_Label["text"] = self.NameToDisplay_UserSet
+        #################################################
+        #################################################
+        self.EntryListWithBlinking_ReubenPython2and3ClassObject_NeedsToBeUpdatedByExternalValueFlag = 0
 
-        self.DeviceInfo_Label.grid(row=0, column=0, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
+        self.EntryWidth = 60
+        self.LabelWidth = 20
+        self.FontSize = 12
+
+        self.EntryListWithBlinking_ReubenPython2and3ClassObject_GUIparametersDict = dict([("root", self.myFrame),
+                                                                                          ("UseBorderAroundThisGuiObjectFlag", 0),
+                                                                                          ("GUI_ROW", 0),
+                                                                                          ("GUI_COLUMN", 1),
+                                                                                          ("GUI_PADX", 10),
+                                                                                          ("GUI_PADY", 10),
+                                                                                          ("GUI_ROWSPAN", 1),
+                                                                                          ("GUI_COLUMNSPAN", 1),
+                                                                                          ("GUI_STICKY", "w")])
+
+        self.EntryListWithBlinking_Variables_ListOfDicts = [dict([("Name", "FilenamePrefix"),("Type", "str"), ("StartingVal", self.FilenamePrefix), ("EntryWidth", self.EntryWidth), ("LabelWidth", self.LabelWidth), ("FontSize", self.FontSize)]),
+                                                            dict([("Name", "TrialNumber"),("Type", "int"), ("StartingVal", self.TrialNumber), ("MinVal", 0), ("MaxVal", 1000000), ("EntryWidth", self.EntryWidth), ("LabelWidth", self.LabelWidth), ("FontSize", self.FontSize)]),
+                                                            dict([("Name", "NoteToAddToFile"),("Type", "str"), ("StartingVal", self.NoteToAddToFile), ("EntryWidth", self.EntryWidth), ("LabelWidth", self.LabelWidth), ("FontSize", self.FontSize)])]
+
+        self.EntryListWithBlinking_ReubenPython2and3ClassObject_setup_dict = dict([("GUIparametersDict", self.EntryListWithBlinking_ReubenPython2and3ClassObject_GUIparametersDict),
+                                                                              ("EntryListWithBlinking_Variables_ListOfDicts", self.EntryListWithBlinking_Variables_ListOfDicts),
+                                                                              ("DebugByPrintingVariablesFlag", 0)])
+
+        try:
+            self.EntryListWithBlinking_ReubenPython2and3ClassObject = EntryListWithBlinking_ReubenPython2and3Class(self.EntryListWithBlinking_ReubenPython2and3ClassObject_setup_dict)
+            time.sleep(0.010)
+            self.EntryListWithBlinking_OPEN_FLAG = self.EntryListWithBlinking_ReubenPython2and3ClassObject.OBJECT_CREATED_SUCCESSFULLY_FLAG
+
+        except:
+            exceptions = sys.exc_info()[0]
+            print("GUI_Thread for CSVdataLogger_ReubenPython3Class, EntryListWithBlinking_ReubenPython2and3ClassObject __init__: Exceptions: %s" % exceptions)
+            traceback.print_exc()
         #################################################
         #################################################
 
         #################################################
         #################################################
         self.Data_Label = Label(self.myFrame, text="Data_Label", width=125)
-        self.Data_Label.grid(row=1, column=0, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
-        #################################################
-        #################################################
-
-        #################################################
-        #################################################
-        self.CSVfile_SaveFlag_Button = Button(self.myFrame, text='Save CSV', state="normal", width=20, font=("Helvetica", 12), command=lambda i=1: self.CSVfile_SaveFlag_ButtonResponse())
-        self.CSVfile_SaveFlag_Button.grid(row=2, column=0, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
+        self.Data_Label.grid(row=1, column=0, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=2, rowspan=1)
         #################################################
         #################################################
 
@@ -1011,7 +1140,7 @@ class CSVdataLogger_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
         #################################################
         self.PrintToGui_Label = Label(self.myFrame, text="PrintToGui_Label", width=125)
         if self.EnableInternal_MyPrint_Flag == 1:
-            self.PrintToGui_Label.grid(row=3, column=0, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=10, rowspan=10)
+            self.PrintToGui_Label.grid(row=2, column=0, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=10, rowspan=10)
         #################################################
         #################################################
 
@@ -1038,72 +1167,135 @@ class CSVdataLogger_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
 
     ##########################################################################################################
     ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
     def GUI_update_clock(self):
 
-        #######################################################
-        #######################################################
-        #######################################################
-        #######################################################
-        #######################################################
+        ##########################################################################################################
+        ##########################################################################################################
+        ##########################################################################################################
+        ##########################################################################################################
+        ##########################################################################################################
+        ##########################################################################################################
         if self.USE_GUI_FLAG == 1:
 
-            #######################################################
-            #######################################################
-            #######################################################
-            #######################################################
+            ##########################################################################################################
+            ##########################################################################################################
+            ##########################################################################################################
+            ##########################################################################################################
+            ##########################################################################################################
             if self.EXIT_PROGRAM_FLAG == 0:
 
-                #######################################################
-                #######################################################
-                #######################################################
+                ##########################################################################################################
+                ##########################################################################################################
+                ##########################################################################################################
+                ##########################################################################################################
                 if self.GUI_ready_to_be_updated_flag == 1:
 
-                    #######################################################
-                    #######################################################
+                    ##########################################################################################################
+                    ##########################################################################################################
+                    ##########################################################################################################
                     try:
 
-                        #######################################################
+                        ##########################################################################################################
+                        ##########################################################################################################
+                        if self.EnableSaveButtonFlag == 1 and self.CSVfile_SaveFlag_Button["state"] != "normal":
+                            self.CSVfile_SaveFlag_Button["state"] = "normal"
+
+                        elif self.EnableSaveButtonFlag == 0 and self.CSVfile_SaveFlag_Button["state"] != "disabled":
+                            self.CSVfile_SaveFlag_Button["state"] = "disabled"
+                        ##########################################################################################################
+                        ##########################################################################################################
+
+                        ##########################################################################################################
+                        ##########################################################################################################
                         self.Data_Label["text"] = self.ConvertDictToProperlyFormattedStringForPrinting(self.MostRecentDataDict,
                                                                                                     NumberOfDecimalsPlaceToUse = 5,
                                                                                                     NumberOfEntriesPerLine = 1,
                                                                                                     NumberOfTabsBetweenItems = 3)
-                        #######################################################
+                        ##########################################################################################################
+                        ##########################################################################################################
 
-                        #######################################################
+                        ##########################################################################################################
+                        ##########################################################################################################
                         if self.CSVfile_SaveFlag == 1:
                             self.CSVfile_SaveFlag_Button["bg"] = self.TKinter_LightGreenColor
                             self.CSVfile_SaveFlag_Button["text"] = "Saving CSV"
                         else:
                             self.CSVfile_SaveFlag_Button["bg"] = self.TKinter_LightRedColor
                             self.CSVfile_SaveFlag_Button["text"] = "NOT saving CSV"
-                        #######################################################
+                        ##########################################################################################################
+                        ##########################################################################################################
 
-                        #######################################################
+                        ##########################################################################################################
+                        ##########################################################################################################
+                        if self.EntryListWithBlinking_OPEN_FLAG == 1:
+
+                            ##########################################################################################################
+                            if self.EntryListWithBlinking_ReubenPython2and3ClassObject_NeedsToBeUpdatedByExternalValueFlag == 1:
+
+                                self.EntryListWithBlinking_ReubenPython2and3ClassObject.SetEntryValue("FilenamePrefix", self.FilenamePrefix)
+                                self.EntryListWithBlinking_ReubenPython2and3ClassObject.SetEntryValue("TrialNumber", self.TrialNumber)
+                                self.EntryListWithBlinking_ReubenPython2and3ClassObject.SetEntryValue("NoteToAddToFile", self.NoteToAddToFile)
+
+                                self.EntryListWithBlinking_ReubenPython2and3ClassObject_NeedsToBeUpdatedByExternalValueFlag = 0
+                            ##########################################################################################################
+
+                            ##########################################################################################################
+                            self.EntryListWithBlinking_ReubenPython2and3ClassObject.GUI_update_clock()
+                            ##########################################################################################################
+
+                            ##########################################################################################################
+                            MostRecentDataDict_EntryListWithBlinking = self.EntryListWithBlinking_ReubenPython2and3ClassObject.GetMostRecentDataDict()  # Get latest gain values
+
+                            self.FilenamePrefix = MostRecentDataDict_EntryListWithBlinking["FilenamePrefix"]
+                            self.TrialNumber = MostRecentDataDict_EntryListWithBlinking["TrialNumber"]
+                            self.NoteToAddToFile = MostRecentDataDict_EntryListWithBlinking["NoteToAddToFile"]
+                            ##########################################################################################################
+
+                        ##########################################################################################################
+                        ##########################################################################################################
+
+                        ##########################################################################################################
+                        ##########################################################################################################
                         self.PrintToGui_Label.config(text=self.PrintToGui_Label_TextInput_Str)
-                        #######################################################
+                        ##########################################################################################################
+                        ##########################################################################################################
 
                     except:
                         exceptions = sys.exc_info()[0]
                         print("CSVdataLogger_ReubenPython3Class GUI_update_clock ERROR: Exceptions: %s" % exceptions)
                         traceback.print_exc()
-                    #######################################################
-                    #######################################################
+                    ##########################################################################################################
+                    ##########################################################################################################
+                    ##########################################################################################################
 
-                #######################################################
-                #######################################################
-                #######################################################
+                ##########################################################################################################
+                ##########################################################################################################
+                ##########################################################################################################
+                ##########################################################################################################
 
-            #######################################################
-            #######################################################
-            #######################################################
-            #######################################################
+            ##########################################################################################################
+            ##########################################################################################################
+            ##########################################################################################################
+            ##########################################################################################################
+            ##########################################################################################################
 
-        #######################################################
-        #######################################################
-        #######################################################
-        #######################################################
-        #######################################################
+        ##########################################################################################################
+        ##########################################################################################################
+        ##########################################################################################################
+        ##########################################################################################################
+        ##########################################################################################################
+        ##########################################################################################################
 
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
     ##########################################################################################################
     ##########################################################################################################
 
@@ -1305,34 +1497,45 @@ class CSVdataLogger_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
     ##########################################################################################################
     def ConvertDictToProperlyFormattedStringForPrinting(self, DictToPrint, NumberOfDecimalsPlaceToUse = 3, NumberOfEntriesPerLine = 1, NumberOfTabsBetweenItems = 3):
 
-        ProperlyFormattedStringForPrinting = ""
-        ItemsPerLineCounter = 0
+        try:
+            ProperlyFormattedStringForPrinting = ""
+            ItemsPerLineCounter = 0
 
-        for Key in DictToPrint:
+            for Key in DictToPrint:
 
-            ##########################################################################################################
-            if isinstance(DictToPrint[Key], dict): #RECURSION
-                ProperlyFormattedStringForPrinting = ProperlyFormattedStringForPrinting + \
-                                                     Key + ":\n" + \
-                                                     self.ConvertDictToProperlyFormattedStringForPrinting(DictToPrint[Key], NumberOfDecimalsPlaceToUse, NumberOfEntriesPerLine, NumberOfTabsBetweenItems)
+                ##########################################################################################################
+                if isinstance(DictToPrint[Key], dict): #RECURSION
+                    ProperlyFormattedStringForPrinting = ProperlyFormattedStringForPrinting + \
+                                                         str(Key) + ":\n" + \
+                                                         self.ConvertDictToProperlyFormattedStringForPrinting(DictToPrint[Key],
+                                                                                                              NumberOfDecimalsPlaceToUse,
+                                                                                                              NumberOfEntriesPerLine,
+                                                                                                              NumberOfTabsBetweenItems)
 
-            else:
-                ProperlyFormattedStringForPrinting = ProperlyFormattedStringForPrinting + \
-                                                     Key + ": " + \
-                                                     self.ConvertFloatToStringWithNumberOfLeadingNumbersAndDecimalPlaces_NumberOrListInput(DictToPrint[Key], 0, NumberOfDecimalsPlaceToUse)
-            ##########################################################################################################
+                else:
+                    ProperlyFormattedStringForPrinting = ProperlyFormattedStringForPrinting + \
+                                                         str(Key) + ": " + \
+                                                         self.ConvertFloatToStringWithNumberOfLeadingNumbersAndDecimalPlaces_NumberOrListInput(DictToPrint[Key],
+                                                                                                                                               0,
+                                                                                                                                               NumberOfDecimalsPlaceToUse)
+                ##########################################################################################################
 
-            ##########################################################################################################
-            if ItemsPerLineCounter < NumberOfEntriesPerLine - 1:
-                ProperlyFormattedStringForPrinting = ProperlyFormattedStringForPrinting + "\t"*NumberOfTabsBetweenItems
-                ItemsPerLineCounter = ItemsPerLineCounter + 1
-            else:
-                ProperlyFormattedStringForPrinting = ProperlyFormattedStringForPrinting + "\n"
-                ItemsPerLineCounter = 0
-            ##########################################################################################################
+                ##########################################################################################################
+                if ItemsPerLineCounter < NumberOfEntriesPerLine - 1:
+                    ProperlyFormattedStringForPrinting = ProperlyFormattedStringForPrinting + "\t"*NumberOfTabsBetweenItems
+                    ItemsPerLineCounter = ItemsPerLineCounter + 1
+                else:
+                    ProperlyFormattedStringForPrinting = ProperlyFormattedStringForPrinting + "\n"
+                    ItemsPerLineCounter = 0
+                ##########################################################################################################
 
-        return ProperlyFormattedStringForPrinting
+            return ProperlyFormattedStringForPrinting
+
+        except:
+            exceptions = sys.exc_info()[0]
+            print("ConvertDictToProperlyFormattedStringForPrinting, Exceptions: %s" % exceptions)
+            return ""
+            #traceback.print_exc()
     ##########################################################################################################
     ##########################################################################################################
-
 

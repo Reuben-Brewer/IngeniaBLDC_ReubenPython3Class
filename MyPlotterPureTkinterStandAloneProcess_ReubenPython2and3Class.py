@@ -6,9 +6,9 @@ reuben.brewer@gmail.com,
 www.reubotics.com
 
 Apache 2 License
-Software Revision R, 03/27/2025
+Software Revision S, 05/27/2025
 
-Verified working on: Python 3.12 for Windows 11 64-bit, Ubuntu 20.04, and Raspberry Pi Buster.
+Verified working on: Python 3.12 for Windows 10/11 64-bit, Ubuntu 20.04, and Raspberry Pi Bookworm.
 THE SEPARATE-PROCESS-SPAWNING COMPONENT OF THIS CLASS IS NOT AVAILABLE IN PYTHON 2 DUE TO LIMITATION OF
 "multiprocessing.set_start_method('spawn', force=True)" ONLY BEING AVAILABLE IN PYTHON 3. PLOTTING WITHIN A SINGLE PROCESS STILL WORKS.
 '''
@@ -336,28 +336,6 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
         print("MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class __init__: YaxisNumberOfDecimalPlacesForLabels: " + str(self.YaxisNumberOfDecimalPlacesForLabels))
         ##########################################
         ##########################################
-
-        ##########################################
-        ##########################################
-        if "MarkerSize" in setup_dict:
-            self.MarkerSize = int(self.PassThroughFloatValuesInRange_ExitProgramOtherwise("MarkerSize", setup_dict["MarkerSize"], 0.0, 10.0))
-        else:
-            self.MarkerSize = 1.0
-
-        print("MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class __init__: MarkerSize: " + str(self.MarkerSize))
-        ##########################################
-        ##########################################
-        
-        ##########################################
-        ##########################################
-        if "LineWidth" in setup_dict:
-            self.LineWidth = int(self.PassThroughFloatValuesInRange_ExitProgramOtherwise("LineWidth", setup_dict["LineWidth"], 0.0, 10.0))
-        else:
-            self.LineWidth = 1.0
-
-        print("MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class __init__: LineWidth: " + str(self.LineWidth))
-        ##########################################
-        ##########################################
         
         ##########################################
         ##########################################
@@ -491,16 +469,29 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
 
         ##########################################
         self.CurvesToPlotDictOfDicts = dict()
+
         if "NameList" in self.CurvesToPlotNamesAndColorsDictOfLists:
             NameList = self.CurvesToPlotNamesAndColorsDictOfLists["NameList"]
+
             if "ColorList" in self.CurvesToPlotNamesAndColorsDictOfLists:
                 ColorList = self.CurvesToPlotNamesAndColorsDictOfLists["ColorList"]
 
-                if len(NameList) == len(ColorList):
-                    for counter, element in enumerate(NameList):
-                        self.AddCurveToPlot(NameList[counter], ColorList[counter])
+                if "MarkerSizeList" in self.CurvesToPlotNamesAndColorsDictOfLists:
+                    MarkerSizeList = self.CurvesToPlotNamesAndColorsDictOfLists["MarkerSizeList"]
                 else:
-                    print("MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class __init__: Error, 'CurveList' and 'NameList' must be the same length in self.CurvesToPlotNamesAndColorsDictOfLists.")
+                    MarkerSizeList = [3]*len(NameList)
+
+                if "LineWidthList" in self.CurvesToPlotNamesAndColorsDictOfLists:
+                    LineWidthList = self.CurvesToPlotNamesAndColorsDictOfLists["LineWidthList"]
+                else:
+                    LineWidthList = [3]*len(NameList)
+
+                if len(NameList) == len(ColorList) and len(NameList) == len(MarkerSizeList) and len(NameList) == len(LineWidthList):
+                    for counter, element in enumerate(NameList):
+                        self.AddCurveToPlot(NameList[counter], ColorList[counter], MarkerSizeList[counter], LineWidthList[counter])
+
+                else:
+                    print("MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class __init__: Error, 'NameList','CurveList','MarkerSizeList', and 'LineWidthList' must be the same length in self.CurvesToPlotNamesAndColorsDictOfLists.")
                     return
             else:
                 print("MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class __init__: Error, 'CurveList' key must be in self.CurvesToPlotNamesAndColorsDictOfLists.")
@@ -999,9 +990,14 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
 
     ##########################################################################################################
     ##########################################################################################################
-    def AddCurveToPlot(self, CurveName, Color):
+    def AddCurveToPlot(self, CurveName, Color, MarkerSize=3, LineWidth=3):
         if CurveName not in self.CurvesToPlotDictOfDicts:
-            self.CurvesToPlotDictOfDicts[CurveName] = (dict([("CurveName", CurveName), ("Color", Color), ("PointToDrawList", []), ("AddPointOrListOfPointsToPlot_TimeLastCalled", -11111.0)]))
+            self.CurvesToPlotDictOfDicts[CurveName] = (dict([("CurveName", CurveName),
+                                                             ("Color", Color),
+                                                             ("MarkerSize", MarkerSize),
+                                                             ("LineWidth", LineWidth),
+                                                             ("PointToDrawList", []),
+                                                             ("AddPointOrListOfPointsToPlot_TimeLastCalled", -11111.0)]))
             return 1
         else:
             self.MyPrint_WithoutLogFile("AddCurveToPlot ERROR: '" + CurveName + "' already in the CurvesToPlotDictOfDicts.")
@@ -1063,17 +1059,19 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
         ########################################### At this level, we don't have scope to check if CurveNameStringElement is contained in self.CurvesToPlotDictOfDicts
         for CurveIndex, CurveNameString in enumerate(CurveNameStringList):
 
+            #print("XdataList[CurveIndex]: " + str(XdataList[CurveIndex]))
+            #print("YdataList[CurveIndex]: " + str(YdataList[CurveIndex]))
+            self.MultiprocessingQueue_Rx.put(dict([("CurveName", CurveNameString), ("x", XdataList[CurveIndex]), ("y", YdataList[CurveIndex])]))
+
+            '''
+            if self.IsInputList(XdataList[CurveIndex]) == 1:
+
+                for PointIndex, PointXvalue in enumerate(XdataList):
+                    self.MultiprocessingQueue_Rx.put(dict([("CurveName", CurveNameString), ("x", XdataList[CurveIndex][PointIndex]), ("y", YdataList[CurveIndex][PointIndex])]))
+
+            else:
                 self.MultiprocessingQueue_Rx.put(dict([("CurveName", CurveNameString), ("x", XdataList[CurveIndex]), ("y", YdataList[CurveIndex])]))
-
-                '''
-                if self.IsInputList(XdataList[CurveIndex]) == 1:
-
-                    for PointIndex, PointXvalue in enumerate(XdataList):
-                        self.MultiprocessingQueue_Rx.put(dict([("CurveName", CurveNameString), ("x", XdataList[CurveIndex][PointIndex]), ("y", YdataList[CurveIndex][PointIndex])]))
-
-                else:
-                    self.MultiprocessingQueue_Rx.put(dict([("CurveName", CurveNameString), ("x", XdataList[CurveIndex]), ("y", YdataList[CurveIndex])]))
-                '''
+            '''
         ###########################################
 
     ##########################################################################################################
@@ -1271,7 +1269,7 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
 
     ##########################################################################################################
     ##########################################################################################################
-    def DrawLineBetween2pointListsInMathCoordinates(self, PointListXY0_MathCoord, PointListXY1_MathCoord, Color="Black", LineWidth=1):
+    def DrawLineBetween2pointListsInMathCoordinates(self, PointListXY0_MathCoord, PointListXY1_MathCoord, Color="Black", LineWidth=3):
 
         if LineWidth > 0:
             PointListXY0_CanvasCoord = self.ConvertMathPointToCanvasCoordinates(PointListXY0_MathCoord)
@@ -1425,10 +1423,10 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
             if MarkerSize > 0:
                 PointToDraw_CanvasCoord = self.ConvertMathPointToCanvasCoordinates(PointToDraw_MathCoord)
 
-                self.CanvasForDrawingGraph.create_oval(PointToDraw_CanvasCoord[0] - self.MarkerSize,
-                                                       PointToDraw_CanvasCoord[1] - self.MarkerSize,
-                                                       PointToDraw_CanvasCoord[0] + self.MarkerSize,
-                                                       PointToDraw_CanvasCoord[1] + self.MarkerSize,
+                self.CanvasForDrawingGraph.create_oval(PointToDraw_CanvasCoord[0] - MarkerSize,
+                                                       PointToDraw_CanvasCoord[1] - MarkerSize,
+                                                       PointToDraw_CanvasCoord[0] + MarkerSize,
+                                                       PointToDraw_CanvasCoord[1] + MarkerSize,
                                                        fill=Color,
                                                        outline=Color)
 
@@ -1447,15 +1445,17 @@ class MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(Frame): #Subc
 
             TempListOfPointToDraw = temp_CurvesToPlotDictOfDicts[CurveName]["PointToDrawList"]
             TempColor = temp_CurvesToPlotDictOfDicts[CurveName]["Color"]
+            TempMarkerSize = temp_CurvesToPlotDictOfDicts[CurveName]["MarkerSize"]
+            TempLineWidth = temp_CurvesToPlotDictOfDicts[CurveName]["LineWidth"]
 
             if len(TempListOfPointToDraw) > 0:
                 PointToDraw_MathCoord_LAST = []
                 ########################
                 for Index, PointToDraw_MathCoord in enumerate(TempListOfPointToDraw):
-                    self.DrawOnePoint_MathCoord(PointToDraw_MathCoord, TempColor, MarkerSize=self.MarkerSize)
+                    self.DrawOnePoint_MathCoord(PointToDraw_MathCoord, TempColor, MarkerSize=TempMarkerSize)
 
                     if Index >= 1:
-                        self.DrawLineBetween2pointListsInMathCoordinates(PointToDraw_MathCoord, PointToDraw_MathCoord_LAST, TempColor, LineWidth=self.LineWidth)
+                        self.DrawLineBetween2pointListsInMathCoordinates(PointToDraw_MathCoord, PointToDraw_MathCoord_LAST, TempColor, LineWidth=TempLineWidth)
 
                     PointToDraw_MathCoord_LAST = PointToDraw_MathCoord
                 ########################
