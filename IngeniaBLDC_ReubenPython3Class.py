@@ -6,9 +6,9 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision K, 05/21/2025
+Software Revision L, 06/16/2025
 
-Verified working on: Python 3.12 for Windows 10, 11 64-bit.
+Verified working on: Python 3.11/3.12 for Windows 10, 11 64-bit.
 '''
 
 __author__ = 'reuben.brewer'
@@ -4947,6 +4947,8 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                                     ####################################################
 
                                     ####################################################
+                                    #print("ListOfVariableNameStringsToGetViaSDO: " + str(self.IngeniaMotionController_MainDict[SlaveID_Int]["ListOfVariableNameStringsToGetViaSDO"]))
+
                                     if "STO_Status" in self.IngeniaMotionController_MainDict[SlaveID_Int]["ListOfVariableNameStringsToGetViaSDO"]:
                                         self.IngeniaMotionController_MainDict[SlaveID_Int]["STO_Status"] = self.IngeniaMotionControllerObject.configuration.get_STO_Status(servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
                                         if self.SDOcommands_Rx_PrintDebuggingStatementsFlag == 1:
@@ -5754,13 +5756,13 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                                             ("Current_Quadrature_Actual", self.IngeniaMotionController_MainDict[SlaveID_Int]["Current_Quadrature_Actual"]),
                                             ("MaxProfileVelocity_Actual", self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxProfileVelocity_Actual"]),
                                             ("MaxProfileAcceleration_Actual", self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxProfileAcceleration_Actual"]),
-                                            ("PositionMin_AllUnitsDict", self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionMin_AllUnitsDict"]),
-                                            ("PositionMax_AllUnitsDict", self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionMax_AllUnitsDict"]),
                                             ("PositionMin_EncoderTicks_Actual", self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionMin_EncoderTicks_Actual"]),
                                             ("PositionMax_EncoderTicks_Actual", self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionMax_EncoderTicks_Actual"]),
                                             ("AllowEncoderToBeZeroedFlag", self.IngeniaMotionController_MainDict[SlaveID_Int]["AllowEncoderToBeZeroedFlag"])])
 
                         '''
+                        ("PositionMin_AllUnitsDict", self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionMin_AllUnitsDict"]),
+                        ("PositionMax_AllUnitsDict", self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionMax_AllUnitsDict"]),
                         ("PositionMinRange_EncoderTicks_Actual", self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionMinRange_EncoderTicks_Actual"]),
                         ("PositionMaxRange_EncoderTicks_Actual", self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionMaxRange_EncoderTicks_Actual"]),
                         ("PositionFollowingErrorWindow_Actual", self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionFollowingErrorWindow_Actual"]),

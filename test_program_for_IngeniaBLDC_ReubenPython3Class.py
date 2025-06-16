@@ -6,9 +6,9 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision K, 05/21/2025
+Software Revision L, 06/16/2025
 
-Verified working on: Python 3.12 for Windows 10, 11 64-bit.
+Verified working on: Python 3.11/3.12 for Windows 10, 11 64-bit.
 '''
 
 __author__ = 'reuben.brewer'
@@ -428,7 +428,7 @@ def GUI_Thread():
         Tab_CSVdataLogger = ttk.Frame(TabControlObject)
         TabControlObject.add(Tab_CSVdataLogger, text='   CSVdataLogger   ')
 
-        TabControlObject.pack(expand=1, fill="both")  # CANNOT MIX PACK AND GRID IN THE SAME FRAME/TAB, SO ALL .GRID'S MUST BE CONTAINED WITHIN THEIR OWN FRAME/TAB.
+        TabControlObject.grid(row=0, column=0, sticky='nsew')
 
         ############# #Set the tab header font
         TabStyle = ttk.Style()
@@ -829,6 +829,9 @@ if __name__ == '__main__':
                                                 ("EncoderTicksPerRevolution_ToBeSet", 1.0),
                                                 ("ZeroEncoder_FireEventOnStartupFlag", 1),
 
+                                                ("GetSDOvariablesEveryNloopsCycles", 1),
+                                                ("ListOfVariableNameStringsToGetViaSDO", ["HallEffectValue_Actual_Int"]),
+
                                                 ("Position_Max_Rev", 0.0),
                                                 ("Position_Min_Rev", 0.0),
 
@@ -987,7 +990,7 @@ if __name__ == '__main__':
     global IngeniaBLDC_setup_dict
     IngeniaBLDC_setup_dict = dict([("GUIparametersDict", IngeniaBLDC_GUIparametersDict),
                                     ("NameToDisplay_UserSet", "IngeniaBLDC"),
-                                    ("DesiredInterfaceName", "Realtek USB GbE Family Controller"), #likely "Intel(R) Ethernet Connection (2) I219-LM" or "Realtek USB GbE Family Controller"
+                                    ("DesiredInterfaceName", "Realtek USB GbE Family Controller #2"), #likely "Intel(R) Ethernet Connection (2) I219-LM" or "Realtek USB GbE Family Controller"
                                     ("DesiredInterfaceName_MustItBeExactMatchFlag", 1), #IMPORTANT
                                     ("DesiredSlaves_DictOfDicts", DesiredSlaves_DictOfDicts),
                                     ("LaunchFlag_MotionLab3_IngEcatGateway_EoEservice", 0),
@@ -996,8 +999,6 @@ if __name__ == '__main__':
                                     ("PDO_UpdateDeltaTinSeconds", 0.020),
                                     ("EnableMotorAutomaticallyAfterEstopRestorationFlag", 1),
                                     ("EnableMotorAtStartOfProgramFlag", 1),
-                                    ("GetSDOvariablesEveryNloopsCycles", 1),
-                                    ("ListOfVariableNameStringsToGetViaSDO", []),
                                     ("CheckDetectedVsDesiredSlaveListFlag", 0)])
     #################################################
 
@@ -1177,6 +1178,12 @@ if __name__ == '__main__':
     global MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_NameList
     MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_NameList = ["Direct", "Quad", "FOCcombbinedFOC", "Channel3", "Channel4", "Channel5"]
 
+    global MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_MarkerSizeList
+    MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_MarkerSizeList = [0, 0, 0, 0, 0, 0]
+
+    global MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_LineWidthList
+    MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_LineWidthList = [3, 3, 3, 3, 3, 3]
+
     global MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_ColorList
     MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_ColorList = ["Red", "Green", "Blue", "Black", "Purple", "Orange"]
 
@@ -1194,9 +1201,10 @@ if __name__ == '__main__':
     MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_setup_dict = dict([("GUIparametersDict", MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_GUIparametersDict),
                                                                                         ("ParentPID", os.getpid()),
                                                                                         ("WatchdogTimerExpirationDurationSeconds_StandAlonePlottingProcess", 5.0),
-                                                                                        ("MarkerSize", 3),
                                                                                         ("CurvesToPlotNamesAndColorsDictOfLists",
                                                                                             dict([("NameList", MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_NameList),
+                                                                                                  ("MarkerSizeList", MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_MarkerSizeList),
+                                                                                                  ("LineWidthList", MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_LineWidthList),
                                                                                                   ("ColorList", MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_ColorList)])),
                                                                                         ("NumberOfDataPointToPlot", 50),
                                                                                         ("XaxisNumberOfTickMarks", 10),
@@ -1399,10 +1407,7 @@ if __name__ == '__main__':
 
             for SlaveID_Int in IngeniaBLDC_MostRecentDict_DetectedSlaveID_List:
                 ListToWrite.append(IngeniaBLDC_MostRecentDict["IngeniaMotionController_MainDict"][SlaveID_Int]["Position_Actual_AllUnitsDict"]["Deg"])
-
-                ListToWrite.append(IngeniaBLDC_MostRecentDict["IngeniaMotionController_MainDict"][SlaveID_Int]["Current_Direct_Actual"])
                 ListToWrite.append(IngeniaBLDC_MostRecentDict["IngeniaMotionController_MainDict"][SlaveID_Int]["Current_Quadrature_Actual"])
-                ListToWrite.append(IngeniaBLDC_MostRecentDict["IngeniaMotionController_MainDict"][SlaveID_Int]["Current_FOCcombinedDQ_Actual"])
 
             #print("ListToWrite: " + str(ListToWrite))
             ####################################################
@@ -1431,10 +1436,8 @@ if __name__ == '__main__':
                             ####################################################
                             ListOfValuesToPlot = []
                             for SlaveID_Int in IngeniaBLDC_MostRecentDict_DetectedSlaveID_List:
-                                #ListOfValuesToPlot.append(IngeniaBLDC_MostRecentDict["IngeniaMotionController_MainDict"][SlaveID_Int]["Position_Actual_AllUnitsDict"]["Deg"])
-                                ListOfValuesToPlot.append(IngeniaBLDC_MostRecentDict["IngeniaMotionController_MainDict"][SlaveID_Int]["Current_Direct_Actual"])
+                                ListOfValuesToPlot.append(IngeniaBLDC_MostRecentDict["IngeniaMotionController_MainDict"][SlaveID_Int]["Position_Actual_AllUnitsDict"]["Deg"])
                                 ListOfValuesToPlot.append(IngeniaBLDC_MostRecentDict["IngeniaMotionController_MainDict"][SlaveID_Int]["Current_Quadrature_Actual"])
-                                ListOfValuesToPlot.append(IngeniaBLDC_MostRecentDict["IngeniaMotionController_MainDict"][SlaveID_Int]["Current_FOCcombinedDQ_Actual"])
                             ####################################################
 
                             ####################################################

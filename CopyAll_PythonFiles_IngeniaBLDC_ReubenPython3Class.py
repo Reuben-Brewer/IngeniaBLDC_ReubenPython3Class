@@ -6,9 +6,9 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision I, 03/28/2025
+Software Revision L, 06/16/2025
 
-Verified working on: Python 3.12 for Windows 10, 11 64-bit.
+Verified working on: Python 3.11/3.12 for Windows 10, 11 64-bit.
 '''
 
 __author__ = 'reuben.brewer'
@@ -63,7 +63,7 @@ def IsTheTimeCurrentlyAM():
         return 0
 #######################################################################################################################
 
-FileWorkingDirectory = "E:\\" #Use "E:\\" if the filepath length is too long
+FileWorkingDirectory = "D:\\" #Use "E:\\" if the filepath length is too long
 #FileWorkingDirectory = os.getcwd() #Use "E:\\" if the filepath length is too long
 
 AMflag = IsTheTimeCurrentlyAM()
@@ -78,45 +78,45 @@ CreateNewDirectory(FileDirectoryToCreate)
 try:
 
     ###
-    CopyEntireDirectoryWithContents("G:\\My Drive\\CodeReuben\\IngeniaBLDC_ReubenPython3Class\\InstallFiles_and_SupportDocuments", FileDirectoryToCreate + "\\InstallFiles_and_SupportDocuments")  # Copies the entire directory
+    CopyEntireDirectoryWithContents("D:\\Laza\\Robotics - Documents\\Software\\Code_ReubenGithub\\IngeniaBLDC_ReubenPython3Class\\InstallFiles_and_SupportDocuments", FileDirectoryToCreate + "\\InstallFiles_and_SupportDocuments")  # Copies the entire directory
 
-    shutil.copy("G:\\My Drive\\CodeReuben\\IngeniaBLDC_ReubenPython3Class\\IngeniaBLDC_ReubenPython3Class.py", FileDirectoryToCreate)
-    shutil.copy("G:\\My Drive\\CodeReuben\\IngeniaBLDC_ReubenPython3Class\\test_program_for_IngeniaBLDC_ReubenPython3Class.py", FileDirectoryToCreate)
+    shutil.copy("D:\\Laza\\Robotics - Documents\\Software\\Code_ReubenGithub\\IngeniaBLDC_ReubenPython3Class\\IngeniaBLDC_ReubenPython3Class.py", FileDirectoryToCreate)
+    shutil.copy("D:\\Laza\\Robotics - Documents\\Software\\Code_ReubenGithub\\IngeniaBLDC_ReubenPython3Class\\test_program_for_IngeniaBLDC_ReubenPython3Class.py", FileDirectoryToCreate)
 
-    shutil.copy("G:\\My Drive\\CodeReuben\\IngeniaBLDC_ReubenPython3Class\\Batch_Admin.bat", FileDirectoryToCreate)
+    shutil.copy("D:\\Laza\\Robotics - Documents\\Software\\Code_ReubenGithub\\IngeniaBLDC_ReubenPython3Class\\Batch_Admin.bat", FileDirectoryToCreate)
 
-    shutil.copy("G:\\My Drive\\CodeReuben\\IngeniaBLDC_ReubenPython3Class\\SimplestTest_SingleSlave_SDOnoPDO_IngeniaBLDC_ReubenPython3Class.py", FileDirectoryToCreate)
-    shutil.copy("G:\\My Drive\\CodeReuben\\IngeniaBLDC_ReubenPython3Class\\SimplestTest_SingleSlave_SDOnoPDO_IngeniaBLDC_ReubenPython3Class_NonAdmin.bat", FileDirectoryToCreate)
+    shutil.copy("D:\\Laza\\Robotics - Documents\\Software\\Code_ReubenGithub\\IngeniaBLDC_ReubenPython3Class\\SimplestTest_SingleSlave_SDOnoPDO_IngeniaBLDC_ReubenPython3Class.py", FileDirectoryToCreate)
+    shutil.copy("D:\\Laza\\Robotics - Documents\\Software\\Code_ReubenGithub\\IngeniaBLDC_ReubenPython3Class\\SimplestTest_SingleSlave_SDOnoPDO_IngeniaBLDC_ReubenPython3Class_NonAdmin.bat", FileDirectoryToCreate)
 
-    shutil.copy("G:\\My Drive\\CodeReuben\\IngeniaBLDC_ReubenPython3Class\\FindAllSlaves_IngeniaBLDC_ReubenPython3Class.py", FileDirectoryToCreate)
-    shutil.copy("G:\\My Drive\\CodeReuben\\IngeniaBLDC_ReubenPython3Class\\FindAllSlaves_IngeniaBLDC_ReubenPython3Class_NonAdmin.bat", FileDirectoryToCreate)
+    shutil.copy("D:\\Laza\\Robotics - Documents\\Software\\Code_ReubenGithub\\IngeniaBLDC_ReubenPython3Class\\FindAllSlaves_IngeniaBLDC_ReubenPython3Class.py", FileDirectoryToCreate)
+    shutil.copy("D:\\Laza\\Robotics - Documents\\Software\\Code_ReubenGithub\\IngeniaBLDC_ReubenPython3Class\\FindAllSlaves_IngeniaBLDC_ReubenPython3Class_NonAdmin.bat", FileDirectoryToCreate)
 
-    shutil.copy("G:\\My Drive\\CodeReuben\\IngeniaBLDC_ReubenPython3Class\\ConvertIngeniaXDFerrorsToDict.py", FileDirectoryToCreate)
+    shutil.copy("D:\\Laza\\Robotics - Documents\\Software\\Code_ReubenGithub\\IngeniaBLDC_ReubenPython3Class\\ConvertIngeniaXDFerrorsToDict.py", FileDirectoryToCreate)
 
-    shutil.copy("G:\\My Drive\\CodeReuben\\IngeniaBLDC_ReubenPython3Class\\ExcelPlot_CSVdataLogger_ReubenPython3Code_IngeniaBLDC.py", FileDirectoryToCreate)
+    shutil.copy("D:\\Laza\\Robotics - Documents\\Software\\Code_ReubenGithub\\IngeniaBLDC_ReubenPython3Class\\ExcelPlot_CSVdataLogger_ReubenPython3Code_IngeniaBLDC.py", FileDirectoryToCreate)
     ###
 
     ###
-    shutil.copy("G:\\My Drive\\CodeReuben\\CSVdataLogger_ReubenPython3Class\\CSVdataLogger_ReubenPython3Class.py", FileDirectoryToCreate)
-    #shutil.copy("G:\\My Drive\\CodeReuben\\CSVdataLogger_ReubenPython3Class\\test_program_for_CSVdataLogger_ReubenPython3Class.py", FileDirectoryToCreate)
+    shutil.copy("D:\\Laza\\Robotics - Documents\\Software\\Code_ReubenGithub\\CSVdataLogger_ReubenPython3Class\\CSVdataLogger_ReubenPython3Class.py", FileDirectoryToCreate)
+    #shutil.copy("D:\\Laza\\Robotics - Documents\\Software\\Code_ReubenGithub\\CSVdataLogger_ReubenPython3Class\\test_program_for_CSVdataLogger_ReubenPython3Class.py", FileDirectoryToCreate)
 
-    shutil.copy("G:\\My Drive\\CodeReuben\\ElevatePythonPermission_ReubenPython3Class\\ElevatePythonPermission_ReubenPython3Class.py", FileDirectoryToCreate)
-    #shutil.copy("G:\\My Drive\\CodeReuben\\ElevatePythonPermission_ReubenPython3Class\\test_program_for_ElevatePythonPermission_ReubenPython3Class.py", FileDirectoryToCreate)
+    shutil.copy("D:\\Laza\\Robotics - Documents\\Software\\Code_ReubenGithub\\ElevatePythonPermission_ReubenPython3Class\\ElevatePythonPermission_ReubenPython3Class.py", FileDirectoryToCreate)
+    #shutil.copy("D:\\Laza\\Robotics - Documents\\Software\\Code_ReubenGithub\\ElevatePythonPermission_ReubenPython3Class\\test_program_for_ElevatePythonPermission_ReubenPython3Class.py", FileDirectoryToCreate)
 
-    shutil.copy("G:\\My Drive\\CodeReuben\\EntryListWithBlinking_ReubenPython2and3Class\\EntryListWithBlinking_ReubenPython2and3Class.py", FileDirectoryToCreate)
-    #shutil.copy("G:\\My Drive\\CodeReuben\\EntryListWithBlinking_ReubenPython2and3Class\\test_program_for_EntryListWithBlinking_ReubenPython2and3Class.py", FileDirectoryToCreate)
+    shutil.copy("D:\\Laza\\Robotics - Documents\\Software\\Code_ReubenGithub\\EntryListWithBlinking_ReubenPython2and3Class\\EntryListWithBlinking_ReubenPython2and3Class.py", FileDirectoryToCreate)
+    #shutil.copy("D:\\Laza\\Robotics - Documents\\Software\\Code_ReubenGithub\\EntryListWithBlinking_ReubenPython2and3Class\\test_program_for_EntryListWithBlinking_ReubenPython2and3Class.py", FileDirectoryToCreate)
 
-    shutil.copy("G:\\My Drive\\CodeReuben\\LowPassFilter_ReubenPython2and3Class\\LowPassFilter_ReubenPython2and3Class.py", FileDirectoryToCreate)
-    #shutil.copy("G:\\My Drive\\CodeReuben\\LowPassFilter_ReubenPython2and3Class\\test_program_for_LowPassFilter_ReubenPython2and3Class.py", FileDirectoryToCreate)
+    shutil.copy("D:\\Laza\\Robotics - Documents\\Software\\Code_ReubenGithub\\LowPassFilter_ReubenPython2and3Class\\LowPassFilter_ReubenPython2and3Class.py", FileDirectoryToCreate)
+    #shutil.copy("D:\\Laza\\Robotics - Documents\\Software\\Code_ReubenGithub\\LowPassFilter_ReubenPython2and3Class\\test_program_for_LowPassFilter_ReubenPython2and3Class.py", FileDirectoryToCreate)
 
-    shutil.copy("G:\\My Drive\\CodeReuben\\LowPassFilterForDictsOfLists_ReubenPython2and3Class\\LowPassFilterForDictsOfLists_ReubenPython2and3Class.py", FileDirectoryToCreate)
-    #shutil.copy("G:\\My Drive\\CodeReuben\\LowPassFilterForDictsOfLists_ReubenPython2and3Class\\test_program_for_LowPassFilterForDictsOfLists_ReubenPython2and3Class.py", FileDirectoryToCreate)
+    shutil.copy("D:\\Laza\\Robotics - Documents\\Software\\Code_ReubenGithub\\LowPassFilterForDictsOfLists_ReubenPython2and3Class\\LowPassFilterForDictsOfLists_ReubenPython2and3Class.py", FileDirectoryToCreate)
+    #shutil.copy("D:\\Laza\\Robotics - Documents\\Software\\Code_ReubenGithub\\LowPassFilterForDictsOfLists_ReubenPython2and3Class\\test_program_for_LowPassFilterForDictsOfLists_ReubenPython2and3Class.py", FileDirectoryToCreate)
 
-    shutil.copy("G:\\My Drive\\CodeReuben\\MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class\\MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class.py", FileDirectoryToCreate)
-    #shutil.copy("G:\\My Drive\\CodeReuben\\MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class\\test_program_for_MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class.py", FileDirectoryToCreate)
+    shutil.copy("D:\\Laza\\Robotics - Documents\\Software\\Code_ReubenGithub\\MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class\\MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class.py", FileDirectoryToCreate)
+    #shutil.copy("D:\\Laza\\Robotics - Documents\\Software\\Code_ReubenGithub\\MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class\\test_program_for_MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class.py", FileDirectoryToCreate)
 
-    shutil.copy("G:\\My Drive\\CodeReuben\\MyPrint_ReubenPython2and3Class\\MyPrint_ReubenPython2and3Class.py", FileDirectoryToCreate)
-    #shutil.copy("G:\\My Drive\\CodeReuben\\MyPrint_ReubenPython2and3Class\\test_program_for_MyPrint_ReubenPython2and3Class.py", FileDirectoryToCreate)
+    shutil.copy("D:\\Laza\\Robotics - Documents\\Software\\Code_ReubenGithub\\MyPrint_ReubenPython2and3Class\\MyPrint_ReubenPython2and3Class.py", FileDirectoryToCreate)
+    #shutil.copy("D:\\Laza\\Robotics - Documents\\Software\\Code_ReubenGithub\\MyPrint_ReubenPython2and3Class\\test_program_for_MyPrint_ReubenPython2and3Class.py", FileDirectoryToCreate)
     ###
     
     shutil.make_archive(FileDirectoryToCreate, 'zip', FileDirectoryToCreate)
