@@ -6,7 +6,7 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision L, 06/16/2025
+Software Revision M, 08/08/2025
 
 Verified working on: Python 3.11/3.12 for Windows 10, 11 64-bit.
 '''
@@ -15,11 +15,12 @@ __author__ = 'reuben.brewer'
 
 ##########################################
 from CSVdataLogger_ReubenPython3Class import *
-from ElevatePythonPermission_ReubenPython3Class import *
 from EntryListWithBlinking_ReubenPython2and3Class import *
 from IngeniaBLDC_ReubenPython3Class import *
 from MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class import *
 from MyPrint_ReubenPython2and3Class import *
+
+from ResetWinPCAPdriver import *
 ##########################################
 
 ##########################################
@@ -30,6 +31,7 @@ import time
 import datetime
 import threading
 import collections
+import signal #for CTRLc_HandlerFunction
 import keyboard
 ##########################################
 
@@ -53,6 +55,152 @@ def getPreciseSecondsTimeStampString():
     ts = time.time()
 
     return ts
+##########################################################################################################
+##########################################################################################################
+
+#######################################################################################################################
+#######################################################################################################################
+#######################################################################################################################
+#######################################################################################################################
+def CTRLc_RegisterHandlerFunction():
+
+    CurrentHandlerRegisteredForSIGINT = signal.getsignal(signal.SIGINT)
+    #print("CurrentHandlerRegisteredForSIGINT: " + str(CurrentHandlerRegisteredForSIGINT))
+
+    defaultish = (signal.SIG_DFL, signal.SIG_IGN, None, getattr(signal, "default_int_handler", None)) #Treat Python's built-in default handler as "unregistered"
+
+    if CurrentHandlerRegisteredForSIGINT in defaultish: # Only install if it's default/ignored (i.e., nobody set it yet)
+        signal.signal(signal.SIGINT, CTRLc_HandlerFunction)
+        print("test_program_for_IngeniaBLDC_ReubenPython3Class.py, CTRLc_RegisterHandlerFunction event fired!")
+
+    else:
+        print("test_program_for_IngeniaBLDC_ReubenPython3Class.py, could not register CTRLc_RegisterHandlerFunction (already registered previously)")
+#######################################################################################################################
+#######################################################################################################################
+#######################################################################################################################
+#######################################################################################################################
+
+#######################################################################################################################
+#######################################################################################################################
+#######################################################################################################################
+#######################################################################################################################
+def CTRLc_HandlerFunction(signum, frame):
+
+    print("test_program_for_IngeniaBLDC_ReubenPython3Class.py, CTRLc_HandlerFunction event firing!")
+
+    ExitProgram_Callback()
+
+#######################################################################################################################
+#######################################################################################################################
+#######################################################################################################################
+#######################################################################################################################
+
+##########################################################################################################
+##########################################################################################################
+##########################################################################################################
+##########################################################################################################
+def GetLatestWaveformValue(CurrentTime, MinValue, MaxValue, Period, WaveformTypeString="Sine"):
+
+        ##########################################################################################################
+        ##########################################################################################################
+        ##########################################################################################################
+        try:
+
+            ##########################################################################################################
+            ##########################################################################################################
+            OutputValue = 0.0
+            ##########################################################################################################
+            ##########################################################################################################
+
+            ##########################################################################################################
+            ##########################################################################################################
+            WaveformTypeString_ListOfAcceptableValues = ["Sine", "Cosine", "Triangular", "Square"]
+
+            if WaveformTypeString not in WaveformTypeString_ListOfAcceptableValues:
+                print("GetLatestWaveformValue: Error, WaveformTypeString must be in " + str(WaveformTypeString_ListOfAcceptableValues))
+                return -11111.0
+            ##########################################################################################################
+            ##########################################################################################################
+
+            ##########################################################################################################
+            ##########################################################################################################
+            if WaveformTypeString == "Sine":
+
+                TimeGain = math.pi/Period
+                OutputValue = (MaxValue + MinValue)/2.0 + 0.5*abs(MaxValue - MinValue)*math.sin(TimeGain*CurrentTime)
+            ##########################################################################################################
+            ##########################################################################################################
+
+            ##########################################################################################################
+            ##########################################################################################################
+            elif WaveformTypeString == "Cosine":
+
+                TimeGain = math.pi/Period
+                OutputValue = (MaxValue + MinValue)/2.0 + 0.5*abs(MaxValue - MinValue)*math.cos(TimeGain*CurrentTime)
+            ##########################################################################################################
+            ##########################################################################################################
+
+            ##########################################################################################################
+            ##########################################################################################################
+            elif WaveformTypeString == "Triangular":
+                TriangularInput_TimeGain = 1.0
+                TriangularInput_MinValue = -5
+                TriangularInput_MaxValue = 5.0
+                TriangularInput_PeriodInSeconds = 2.0
+
+                #TriangularInput_Height0toPeak = abs(TriangularInput_MaxValue - TriangularInput_MinValue)
+                #TriangularInput_CalculatedValue_1 = abs((TriangularInput_TimeGain*CurrentTime_CalculatedFromMainThread % PeriodicInput_PeriodInSeconds) - TriangularInput_Height0toPeak) + TriangularInput_MinValue
+
+                A = abs(MaxValue - MinValue)
+                P = Period
+
+                #https://stackoverflow.com/questions/1073606/is-there-a-one-line-function-that-generates-a-triangle-wave
+                OutputValue = (A / (P / 2)) * ((P / 2) - abs(CurrentTime % (2 * (P / 2)) - P / 2)) + MinValue
+            ##########################################################################################################
+            ##########################################################################################################
+
+            ##########################################################################################################
+            ##########################################################################################################
+            elif WaveformTypeString == "Square":
+
+                TimeGain = math.pi/Period
+                MeanValue = (MaxValue + MinValue)/2.0
+                SinusoidalValue =  MeanValue + 0.5*abs(MaxValue - MinValue)*math.sin(TimeGain*CurrentTime)
+
+                if SinusoidalValue >= MeanValue:
+                    OutputValue = MaxValue
+                else:
+                    OutputValue = MinValue
+            ##########################################################################################################
+            ##########################################################################################################
+
+            ##########################################################################################################
+            ##########################################################################################################
+            else:
+                OutputValue = 0.0
+            ##########################################################################################################
+            ##########################################################################################################
+
+            return OutputValue
+
+        ##########################################################################################################
+        ##########################################################################################################
+        ##########################################################################################################
+
+        ##########################################################################################################
+        ##########################################################################################################
+        ##########################################################################################################
+        except:
+            exceptions = sys.exc_info()[0]
+            print("GetLatestWaveformValue: Exceptions: %s" % exceptions)
+            return -11111.0
+            traceback.print_exc()
+        ##########################################################################################################
+        ##########################################################################################################
+        ##########################################################################################################
+
+##########################################################################################################
+##########################################################################################################
 ##########################################################################################################
 ##########################################################################################################
 
@@ -276,14 +424,14 @@ def GUI_update_clock():
     global IngeniaBLDC_MostRecentDict
     global IngeniaBLDC_MostRecentDict_Label
 
-    global EntryListWithBlinking_ReubenPython2and3ClassObject
+    global EntryListWithBlinking_Object
     global EntryListWithBlinking_OPEN_FLAG
 
     global CSVdataLogger_ReubenPython3ClassObject
     global CSVdataLogger_OPEN_FLAG
     global SHOW_IN_GUI_CSVdataLogger_FLAG
 
-    global MyPrint_ReubenPython2and3ClassObject
+    global MyPrint_Object
     global MyPrint_OPEN_FLAG
     global SHOW_IN_GUI_MyPrint_FLAG
 
@@ -314,7 +462,7 @@ def GUI_update_clock():
 
                 #########################################################
                 if EntryListWithBlinking_OPEN_FLAG == 1:
-                    EntryListWithBlinking_ReubenPython2and3ClassObject.GUI_update_clock()
+                    EntryListWithBlinking_Object.GUI_update_clock()
                 #########################################################
 
                 #########################################################
@@ -324,7 +472,7 @@ def GUI_update_clock():
 
                 #########################################################
                 if MyPrint_OPEN_FLAG == 1 and SHOW_IN_GUI_MyPrint_FLAG == 1:
-                    MyPrint_ReubenPython2and3ClassObject.GUI_update_clock()
+                    MyPrint_Object.GUI_update_clock()
                 #########################################################
 
                 #########################################################
@@ -464,7 +612,7 @@ def GUI_Thread():
     #################################################
     #################################################
     global ZeroEncoderOffsetOnAllMotors_Button
-    ZeroEncoderOffsetOnAllMotors_Button = Button(ButtonsFrame, text="Toggle Enable", state="normal", width=20, command=lambda: ZeroEncoderOffsetOnAllMotors_Button_Response())
+    ZeroEncoderOffsetOnAllMotors_Button = Button(ButtonsFrame, text="ZeroEncoderOffsetOnAllMotors", state="normal", width=40, command=lambda: ZeroEncoderOffsetOnAllMotors_Button_Response())
     ZeroEncoderOffsetOnAllMotors_Button.grid(row=0, column=0, padx=10, pady=10, columnspan=1, rowspan=1)
     #################################################
     #################################################
@@ -499,10 +647,29 @@ def ZeroEncoderOffsetOnAllMotors_Button_Response():
 
 ##########################################################################################################
 ##########################################################################################################
+##########################################################################################################
+##########################################################################################################
 if __name__ == '__main__':
 
-    #################################################
-    #################################################
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
+    CTRLc_RegisterHandlerFunction()
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
+    #ResetWinPCAPdriver() #unicorn, turn off when debugging
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
     global my_platform
 
     if platform.system() == "Linux":
@@ -522,15 +689,13 @@ if __name__ == '__main__':
         my_platform = "other"
 
     print("The OS platform is: " + my_platform)
-    #################################################
-    #################################################
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
 
-    #################################################
-    #################################################
-    #ElevatePythonPermission_ReubenPython3Class.RunPythonAsAdmin()
-    #time.sleep(5.0)
-    #################################################
-    #################################################
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
 
     #################################################
     #################################################
@@ -544,13 +709,13 @@ if __name__ == '__main__':
     USE_IngeniaBLDC_FLAG = 1
 
     global USE_EntryListWithBlinking_FLAG
-    USE_EntryListWithBlinking_FLAG = 0
+    USE_EntryListWithBlinking_FLAG = 1
 
     global USE_MyPrint_FLAG
     USE_MyPrint_FLAG = 0
 
     global USE_MyPlotterPureTkinterStandAloneProcess_FLAG
-    USE_MyPlotterPureTkinterStandAloneProcess_FLAG = 1 #unicorn
+    USE_MyPlotterPureTkinterStandAloneProcess_FLAG = 1
 
     global USE_CSVdataLogger_FLAG
     USE_CSVdataLogger_FLAG = 1
@@ -558,8 +723,8 @@ if __name__ == '__main__':
     global USE_KEYBOARD_FLAG
     USE_KEYBOARD_FLAG = 1
 
-    global USE_SINUSOIDAL_INPUT_FLAG
-    USE_SINUSOIDAL_INPUT_FLAG = 0
+    global USE_PeriodicInput_FLAG
+    USE_PeriodicInput_FLAG = 1
     #################################################
     #################################################
 
@@ -641,15 +806,14 @@ if __name__ == '__main__':
     global EXIT_PROGRAM_FLAG
     EXIT_PROGRAM_FLAG = 0
 
-    #################################################
-    global CurrentTime_MainLoopThread
-    CurrentTime_MainLoopThread = -11111.0
+    global CurrentTime_CalculatedFromMainThread
+    CurrentTime_CalculatedFromMainThread = -11111.0
 
-    global StartingTime_MainLoopThread
-    StartingTime_MainLoopThread = -11111.0
-    #################################################
+    global StartingTime_CalculatedFromMainThread
+    StartingTime_CalculatedFromMainThread = -11111.0
 
-    #################################################
+
+
     global LoopCounter_CalculatedFromGUIthread
     LoopCounter_CalculatedFromGUIthread = 0
 
@@ -667,7 +831,8 @@ if __name__ == '__main__':
 
     global DataStreamingDeltaT_CalculatedFromGUIthread
     DataStreamingDeltaT_CalculatedFromGUIthread = -1
-    #################################################
+
+
 
     global root
 
@@ -694,40 +859,92 @@ if __name__ == '__main__':
     global ZeroEncoderOffsetOnAllMotors_EventNeedsToBeFiredFlag
     ZeroEncoderOffsetOnAllMotors_EventNeedsToBeFiredFlag = 0
 
-    #''' #CyclicPosition
-    global SinusoidalMotionInput_MinValue
-    SinusoidalMotionInput_MinValue = -360.0 #degrees
+    global PeriodicInput_AcceptableValues
+    PeriodicInput_AcceptableValues = ["Sine", "Cosine", "Triangular", "Square"]
 
-    global SinusoidalMotionInput_MaxValue
-    SinusoidalMotionInput_MaxValue = 360.0 #degrees
-    #''' #CyclicPosition
+    global PeriodicInput_Type_1
+    PeriodicInput_Type_1 = "Triangular"
+
+    global PeriodicInput_Period_1
+    PeriodicInput_Period_1 = 3.0
+
+    global PeriodicInput_CalculatedValue_1
+    PeriodicInput_CalculatedValue_1 = 0.0
+
+    # ''' #CyclicPosition
+    global PeriodicInput_MinValue_1
+    PeriodicInput_MinValue_1 = -360.0 #degrees
+
+    global PeriodicInput_MaxValue_1
+    PeriodicInput_MaxValue_1 = 360.0 #degrees
+    # ''' #CyclicPosition
 
     ''' #CyclicCurrent
-    global SinusoidalMotionInput_MinValue
-    SinusoidalMotionInput_MinValue = -0.9
+    global PeriodicInput_MinValue_1
+    PeriodicInput_MinValue_1 = -0.9
 
-    global SinusoidalMotionInput_MaxValue
-    SinusoidalMotionInput_MaxValue = 0.9
+    global PeriodicInput_MaxValue_1
+    PeriodicInput_MaxValue_1 = 0.9
     ''' #CyclicCurrent
 
     ''' #CyclicVoltage
-    global SinusoidalMotionInput_MinValue
-    SinusoidalMotionInput_MinValue = -0.5
+    global PeriodicInput_MinValue_1
+    PeriodicInput_MinValue_1 = -0.5
 
-    global SinusoidalMotionInput_MaxValue
-    SinusoidalMotionInput_MaxValue = 0.5
+    global PeriodicInput_MaxValue_1
+    PeriodicInput_MaxValue_1 = 0.5
     ''' #CyclicVoltage
 
-    global SinusoidalMotionInput_ROMtestTimeToPeakAngle
-    SinusoidalMotionInput_ROMtestTimeToPeakAngle = 2.0
 
-    global SinusoidalMotionInput_TimeGain
-    SinusoidalMotionInput_TimeGain = math.pi / (2.0 * SinusoidalMotionInput_ROMtestTimeToPeakAngle)
 
-    global SinusoidalMotionInput_CommandedValue
-    SinusoidalMotionInput_CommandedValue = 0.0
+    global DesiredSlaves_DictOfDicts #unicorn
 
-    global DesiredSlaves_DictOfDicts
+    DesiredSlaves_DictOfDicts = dict([(2, dict([("JointEnglishName", "Motor_2"),
+                                                ("SlaveID_Int", 2),
+                                                ("AllowWritingOfControllerConfigurationFlag", 1),
+                                                ("XDFfileDictionaryPath", os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "cap-xcr-e_eoe_2.4.1.xdf"),
+                                                ("OperationMode", "CyclicPosition"),
+                                                ("EncoderTicksPerRevolution_ToBeSet", 8192),
+                                                ("Position_Max_Rev", 0.0),
+                                                ("Position_Min_Rev", 0.0),
+                                                ("MaxVelocity_ToBeSet", 100.0),
+                                                ("MaxProfileVelocity_ToBeSet", 100.0),
+                                                ("MaxProfileAcceleration_ToBeSet", 1000.0),
+                                                ("PositionPIDgains_Kp_ToBeSet", 0.01),
+                                                ("PositionPIDgains_Ki_ToBeSet", 0.0),
+                                                ("PositionPIDgains_Kd_ToBeSet", 0.1),
+                                                ("PositionFollowingErrorWindow_ToBeSet", 1000000),
+                                                ("PositionFollowingErrorTimeoutMilliseconds_ToBeSet", 2),
+                                                ("PositionFollowingErrorFaultModeInt_ToBeSet", 0),
+                                                ("MaxCurrentHardLimit_ToBeSet", 4.24),
+                                                ("MaxContinuousCurrent_ToBeSet", 4.24),
+                                                ("PeakCurrentValue_ToBeSet", 4.24),
+                                                ("PeakCurrentTimeMilliseconds_ToBeSet", 250),
+                                                ("PeakCurrentFaultModeInt_ToBeSet", 0)])),
+
+                                    (3, dict([("JointEnglishName", "Motor_3"),
+                                                ("SlaveID_Int", 3),
+                                                ("AllowWritingOfControllerConfigurationFlag", 1),
+                                                ("XDFfileDictionaryPath", os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "cap-xcr-e_eoe_2.4.1.xdf"),
+                                                ("OperationMode", "CyclicPosition"),
+                                                ("EncoderTicksPerRevolution_ToBeSet", 8192),
+                                                ("Position_Max_Rev", 0.0),
+                                                ("Position_Min_Rev", 0.0),
+                                                ("MaxVelocity_ToBeSet", 100.0),
+                                                ("MaxProfileVelocity_ToBeSet", 100.0),
+                                                ("MaxProfileAcceleration_ToBeSet", 1000.0),
+                                                ("PositionPIDgains_Kp_ToBeSet", 0.01),
+                                                ("PositionPIDgains_Ki_ToBeSet", 0.0),
+                                                ("PositionPIDgains_Kd_ToBeSet", 0.1),
+                                                ("PositionFollowingErrorWindow_ToBeSet", 1000000),
+                                                ("PositionFollowingErrorTimeoutMilliseconds_ToBeSet", 2),
+                                                ("PositionFollowingErrorFaultModeInt_ToBeSet", 0),
+                                                ("MaxCurrentHardLimit_ToBeSet", 4.24),
+                                                ("MaxContinuousCurrent_ToBeSet", 4.24),
+                                                ("PeakCurrentValue_ToBeSet", 4.24),
+                                                ("PeakCurrentTimeMilliseconds_ToBeSet", 250),
+                                                ("PeakCurrentFaultModeInt_ToBeSet", 0)]))])
+
     '''
     DesiredSlaves_DictOfDicts = dict([(3, dict([("JointEnglishName", "Motor_3"),
                                                 ("SlaveID_Int", 3),
@@ -757,7 +974,7 @@ if __name__ == '__main__':
                                                 ("MaxProfileVelocity_ToBeSet", 3.0),
                                                 ("MaxProfileAcceleration_ToBeSet", 30.0),
 
-                                                ("EncoderTicksPerRevolution_ToBeSet", 5000.0), #unicorn
+                                                ("EncoderTicksPerRevolution_ToBeSet", 5000.0),
 
                                                 ("PositionPIDgains_Kp_ToBeSet", 0.1),
                                                 ("PositionPIDgains_Ki_ToBeSet", 0.0),
@@ -815,6 +1032,7 @@ if __name__ == '__main__':
                                                 ("CurrentQuadraturePIgains_Ki_ToBeSet", 50.0)]))])
     '''
 
+    '''
     DesiredSlaves_DictOfDicts = dict([(1, dict([("JointEnglishName", "Motor_1"),
                                                 ("SlaveID_Int", 1),
 
@@ -858,7 +1076,7 @@ if __name__ == '__main__':
 
                                                 ("CurrentQuadraturePIgains_Kp_ToBeSet", 1.0),
                                                 ("CurrentQuadraturePIgains_Ki_ToBeSet", 50.0)]))])
-
+    '''
     #################################################
     #################################################
 
@@ -882,7 +1100,7 @@ if __name__ == '__main__':
 
     #################################################
     #################################################
-    global MyPrint_ReubenPython2and3ClassObject
+    global MyPrint_Object
 
     global MyPrint_OPEN_FLAG
     MyPrint_OPEN_FLAG = -1
@@ -902,14 +1120,14 @@ if __name__ == '__main__':
     global CSVdataLogger_MostRecentDict_Time
     CSVdataLogger_MostRecentDict_Time = -11111.0
 
-    global CSVdataLogger_ReubenPython3ClassObject_setup_dict_VariableNamesForHeaderList
-    CSVdataLogger_ReubenPython3ClassObject_setup_dict_VariableNamesForHeaderList = []
+    global CSVdataLogger_ReubenPython3ClassObject_SetupDict_VariableNamesForHeaderList
+    CSVdataLogger_ReubenPython3ClassObject_SetupDict_VariableNamesForHeaderList = []
     #################################################
     #################################################
 
     #################################################
     #################################################
-    global EntryListWithBlinking_ReubenPython2and3ClassObject
+    global EntryListWithBlinking_Object
 
     global EntryListWithBlinking_OPEN_FLAG
     EntryListWithBlinking_OPEN_FLAG = -1
@@ -931,7 +1149,7 @@ if __name__ == '__main__':
 
     #################################################
     #################################################
-    global MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject
+    global MyPlotterPureTkinterStandAloneProcess_Object
 
     global MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG
     MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG = -1
@@ -939,16 +1157,21 @@ if __name__ == '__main__':
     global MyPlotterPureTkinter_MostRecentDict
     MyPlotterPureTkinter_MostRecentDict = dict()
 
-    global MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_MostRecentDict_StandAlonePlottingProcess_ReadyForWritingFlag
-    MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_MostRecentDict_StandAlonePlottingProcess_ReadyForWritingFlag = -1
+    global MyPlotterPureTkinterStandAloneProcess_MostRecentDict_StandAlonePlottingProcess_ReadyForWritingFlag
+    MyPlotterPureTkinterStandAloneProcess_MostRecentDict_StandAlonePlottingProcess_ReadyForWritingFlag = -1
 
-    global LastTime_MainLoopThread_MyPlotterPureTkinterStandAloneProcess
-    LastTime_MainLoopThread_MyPlotterPureTkinterStandAloneProcess = -11111.0
+    global LastTime_CalculatedFromMainThread_MyPlotterPureTkinterStandAloneProcess
+    LastTime_CalculatedFromMainThread_MyPlotterPureTkinterStandAloneProcess = -11111.0
     #################################################
     #################################################
 
-    #################################################  KEY GUI LINE
-    #################################################
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ##########################################################################################################  KEY GUI LINE
+    ##########################################################################################################
+    ##########################################################################################################
     if USE_GUI_FLAG == 1:
         print("Starting GUI thread...")
         GUI_Thread_ThreadingObject = threading.Thread(target=GUI_Thread)
@@ -960,16 +1183,15 @@ if __name__ == '__main__':
         Tab_MainControls = None
         Tab_IngeniaBLDC = None
         Tab_MyPrint = None
-    #################################################
-    #################################################
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
 
     #################################################
-    #################################################
-    #################################################
-
-    #################################################
-    #################################################
-
     #################################################
     global IngeniaBLDC_GUIparametersDict
     IngeniaBLDC_GUIparametersDict = dict([("USE_GUI_FLAG", USE_GUI_FLAG and SHOW_IN_GUI_IngeniaBLDC_FLAG),
@@ -984,13 +1206,14 @@ if __name__ == '__main__':
                                     ("GUI_ROWSPAN", GUI_ROWSPAN_IngeniaBLDC),
                                     ("GUI_COLUMNSPAN", GUI_COLUMNSPAN_IngeniaBLDC)])
     #################################################
-
+    #################################################
 
     #################################################
-    global IngeniaBLDC_setup_dict
-    IngeniaBLDC_setup_dict = dict([("GUIparametersDict", IngeniaBLDC_GUIparametersDict),
+    #################################################
+    global IngeniaBLDC_SetupDict
+    IngeniaBLDC_SetupDict = dict([("GUIparametersDict", IngeniaBLDC_GUIparametersDict),
                                     ("NameToDisplay_UserSet", "IngeniaBLDC"),
-                                    ("DesiredInterfaceName", "Realtek USB GbE Family Controller #2"), #likely "Intel(R) Ethernet Connection (2) I219-LM" or "Realtek USB GbE Family Controller"
+                                    ("DesiredInterfaceName", "Realtek USB GbE Family Controller #2"),
                                     ("DesiredInterfaceName_MustItBeExactMatchFlag", 1), #IMPORTANT
                                     ("DesiredSlaves_DictOfDicts", DesiredSlaves_DictOfDicts),
                                     ("LaunchFlag_MotionLab3_IngEcatGateway_EoEservice", 0),
@@ -1001,23 +1224,19 @@ if __name__ == '__main__':
                                     ("EnableMotorAtStartOfProgramFlag", 1),
                                     ("CheckDetectedVsDesiredSlaveListFlag", 0)])
     #################################################
+    #################################################
 
+    #################################################
     #################################################
     if USE_IngeniaBLDC_FLAG == 1 and EXIT_PROGRAM_FLAG == 0:
         try:
-            IngeniaBLDC_Object = IngeniaBLDC_ReubenPython3Class(IngeniaBLDC_setup_dict)
+            IngeniaBLDC_Object = IngeniaBLDC_ReubenPython3Class(IngeniaBLDC_SetupDict)
             IngeniaBLDC_OPEN_FLAG = IngeniaBLDC_Object.OBJECT_CREATED_SUCCESSFULLY_FLAG
 
         except:
             exceptions = sys.exc_info()[0]
             print("IngeniaBLDC_ReubenPython3ClassObject __init__, exceptions: %s" % exceptions)
             traceback.print_exc()
-    #################################################
-
-    #################################################
-    #################################################
-
-    #################################################
     #################################################
     #################################################
 
@@ -1031,7 +1250,14 @@ if __name__ == '__main__':
     #################################################
     #################################################
 
-    #################################################
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
+    
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
+
     #################################################
     #################################################
     global CSVdataLogger_ReubenPython3ClassObject_GUIparametersDict
@@ -1046,35 +1272,35 @@ if __name__ == '__main__':
                                     ("GUI_PADY", GUI_PADY_CSVdataLogger),
                                     ("GUI_ROWSPAN", GUI_ROWSPAN_CSVdataLogger),
                                     ("GUI_COLUMNSPAN", GUI_COLUMNSPAN_CSVdataLogger)])
-
     #################################################
     #################################################
 
     #################################################
-    CSVdataLogger_ReubenPython3ClassObject_setup_dict_VariableNamesForHeaderList = ["Time (S)"]
+    #################################################
+    CSVdataLogger_ReubenPython3ClassObject_SetupDict_VariableNamesForHeaderList = ["Time (S)"]
+    #################################################
     #################################################
 
     #################################################
     #################################################
-    global CSVdataLogger_ReubenPython3ClassObject_setup_dict
-    CSVdataLogger_ReubenPython3ClassObject_setup_dict = dict([("GUIparametersDict", CSVdataLogger_ReubenPython3ClassObject_GUIparametersDict),
+    global CSVdataLogger_ReubenPython3ClassObject_SetupDict
+    CSVdataLogger_ReubenPython3ClassObject_SetupDict = dict([("GUIparametersDict", CSVdataLogger_ReubenPython3ClassObject_GUIparametersDict),
                                                                                 ("NameToDisplay_UserSet", "CSVdataLogger"),
                                                                                 ("CSVfile_DirectoryPath", "C:\\CSVfiles"),
                                                                                 ("FileNamePrefix", "CSV_file_"),
-                                                                                ("VariableNamesForHeaderList", CSVdataLogger_ReubenPython3ClassObject_setup_dict_VariableNamesForHeaderList),
+                                                                                ("VariableNamesForHeaderList", CSVdataLogger_ReubenPython3ClassObject_SetupDict_VariableNamesForHeaderList),
                                                                                 ("MainThread_TimeToSleepEachLoop", 0.002),
                                                                                 ("SaveOnStartupFlag", 0)])
 
     if USE_CSVdataLogger_FLAG == 1 and EXIT_PROGRAM_FLAG == 0:
         try:
-            CSVdataLogger_ReubenPython3ClassObject = CSVdataLogger_ReubenPython3Class(CSVdataLogger_ReubenPython3ClassObject_setup_dict)
+            CSVdataLogger_ReubenPython3ClassObject = CSVdataLogger_ReubenPython3Class(CSVdataLogger_ReubenPython3ClassObject_SetupDict)
             CSVdataLogger_OPEN_FLAG = CSVdataLogger_ReubenPython3ClassObject.OBJECT_CREATED_SUCCESSFULLY_FLAG
 
         except:
             exceptions = sys.exc_info()[0]
             print("CSVdataLogger_ReubenPython3ClassObject __init__: Exceptions: %s" % exceptions)
             traceback.print_exc()
-    #################################################
     #################################################
     #################################################
 
@@ -1088,36 +1314,57 @@ if __name__ == '__main__':
     #################################################
     #################################################
 
-    #################################################
-    #################################################
-    global EntryListWithBlinking_ReubenPython2and3ClassObject_GUIparametersDict
-    EntryListWithBlinking_ReubenPython2and3ClassObject_GUIparametersDict = dict([("root", Tab_IngeniaBLDC), #Tab_MainControls
-                                    ("UseBorderAroundThisGuiObjectFlag", 0),
-                                    ("GUI_ROW", GUI_ROW_EntryListWithBlinking),
-                                    ("GUI_COLUMN", GUI_COLUMN_EntryListWithBlinking),
-                                    ("GUI_PADX", GUI_PADX_EntryListWithBlinking),
-                                    ("GUI_PADY", GUI_PADY_EntryListWithBlinking),
-                                    ("GUI_ROWSPAN", GUI_ROWSPAN_EntryListWithBlinking),
-                                    ("GUI_COLUMNSPAN", GUI_COLUMNSPAN_EntryListWithBlinking)])
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
+    
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
 
+    #################################################
+    #################################################
+    global EntryListWithBlinking_Object_GUIparametersDict
+    EntryListWithBlinking_Object_GUIparametersDict = dict([("root", Tab_IngeniaBLDC), #Tab_MainControls
+                                                        ("UseBorderAroundThisGuiObjectFlag", 0),
+                                                        ("GUI_ROW", GUI_ROW_EntryListWithBlinking),
+                                                        ("GUI_COLUMN", GUI_COLUMN_EntryListWithBlinking),
+                                                        ("GUI_PADX", GUI_PADX_EntryListWithBlinking),
+                                                        ("GUI_PADY", GUI_PADY_EntryListWithBlinking),
+                                                        ("GUI_ROWSPAN", GUI_ROWSPAN_EntryListWithBlinking),
+                                                        ("GUI_COLUMNSPAN", GUI_COLUMNSPAN_EntryListWithBlinking)])
+    #################################################
+    #################################################
+
+    #################################################
+    #################################################
     global EntryListWithBlinking_Variables_ListOfDicts
-    EntryListWithBlinking_Variables_ListOfDicts = [dict([("Name", "USE_SINUSOIDAL_INPUT_FLAG"),("Type", "float"),("StartingVal", USE_SINUSOIDAL_INPUT_FLAG),("MinVal", 0.0),("MaxVal", 1.0),("EntryBlinkEnabled", 0),("EntryWidth", EntryWidth),("LabelWidth", LabelWidth),("FontSize", FontSize)]),
-                                                   dict([("Name", "SinusoidalMotionInput_MaxValue"),("Type", "float"),("StartingVal", SinusoidalMotionInput_MaxValue),("MinVal", 0.0),("MaxVal", 3600000.0),("EntryBlinkEnabled", 0),("EntryWidth", EntryWidth),("LabelWidth", LabelWidth),("FontSize", FontSize)]),
-                                                   dict([("Name", "SinusoidalMotionInput_ROMtestTimeToPeakAngle"),("Type", "float"),("StartingVal", SinusoidalMotionInput_ROMtestTimeToPeakAngle),("MinVal", 0.0),("MaxVal", 3600000.0),("EntryBlinkEnabled", 0),("EntryWidth", EntryWidth),("LabelWidth", LabelWidth),("FontSize", FontSize)])]
+    EntryListWithBlinking_Variables_ListOfDicts = [dict([("Name", "USE_PeriodicInput_FLAG"),("Type", "float"),("StartingVal", USE_PeriodicInput_FLAG),("MinVal", 0.0),("MaxVal", 1.0),("EntryBlinkEnabled", 0),("EntryWidth", EntryWidth),("LabelWidth", LabelWidth),("FontSize", FontSize)]),
+                                                   dict([("Name", "PeriodicInput_MaxValue_1"),("Type", "float"),("StartingVal", PeriodicInput_MaxValue_1),("MinVal", 0.0),("MaxVal", 3600000.0),("EntryBlinkEnabled", 0),("EntryWidth", EntryWidth),("LabelWidth", LabelWidth),("FontSize", FontSize)]),
+                                                   dict([("Name", "PeriodicInput_Period_1"),("Type", "float"),("StartingVal", PeriodicInput_Period_1),("MinVal", 0.0),("MaxVal", 3600000.0),("EntryBlinkEnabled", 0),("EntryWidth", EntryWidth),("LabelWidth", LabelWidth),("FontSize", FontSize)])]
+    #################################################
+    #################################################
 
-    global EntryListWithBlinking_ReubenPython2and3ClassObject_setup_dict
-    EntryListWithBlinking_ReubenPython2and3ClassObject_setup_dict = dict([("GUIparametersDict", EntryListWithBlinking_ReubenPython2and3ClassObject_GUIparametersDict),
-                                                                          ("EntryListWithBlinking_Variables_ListOfDicts", EntryListWithBlinking_Variables_ListOfDicts),
-                                                                          ("DebugByPrintingVariablesFlag", 0),
-                                                                          ("LoseFocusIfMouseLeavesEntryFlag", 0)])
+    #################################################
+    #################################################
+    global EntryListWithBlinking_Object_SetupDict
+    EntryListWithBlinking_Object_SetupDict = dict([("GUIparametersDict", EntryListWithBlinking_Object_GUIparametersDict),
+                                                  ("EntryListWithBlinking_Variables_ListOfDicts", EntryListWithBlinking_Variables_ListOfDicts),
+                                                  ("DebugByPrintingVariablesFlag", 0),
+                                                  ("LoseFocusIfMouseLeavesEntryFlag", 0)])
+    #################################################
+    #################################################
+
+    #################################################
+    #################################################
     if USE_EntryListWithBlinking_FLAG == 1 and EXIT_PROGRAM_FLAG == 0:
         try:
-            EntryListWithBlinking_ReubenPython2and3ClassObject = EntryListWithBlinking_ReubenPython2and3Class(EntryListWithBlinking_ReubenPython2and3ClassObject_setup_dict)
-            EntryListWithBlinking_OPEN_FLAG = EntryListWithBlinking_ReubenPython2and3ClassObject.OBJECT_CREATED_SUCCESSFULLY_FLAG
+            EntryListWithBlinking_Object = EntryListWithBlinking_ReubenPython2and3Class(EntryListWithBlinking_Object_SetupDict)
+            EntryListWithBlinking_OPEN_FLAG = EntryListWithBlinking_Object.OBJECT_CREATED_SUCCESSFULLY_FLAG
 
         except:
             exceptions = sys.exc_info()[0]
-            print("EntryListWithBlinking_ReubenPython2and3ClassObject __init__: Exceptions: %s" % exceptions)
+            print("EntryListWithBlinking_Object __init__: Exceptions: %s" % exceptions)
             traceback.print_exc()
     #################################################
     #################################################
@@ -1132,33 +1379,42 @@ if __name__ == '__main__':
     #################################################
     #################################################
 
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
+    
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
+
     #################################################
     #################################################
+    global MyPrint_Object_GUIparametersDict
+    MyPrint_Object_GUIparametersDict = dict([("USE_GUI_FLAG", USE_GUI_FLAG and SHOW_IN_GUI_MyPrint_FLAG),
+                                                                    ("root", Tab_MyPrint),
+                                                                    ("UseBorderAroundThisGuiObjectFlag", 0),
+                                                                    ("GUI_ROW", GUI_ROW_MyPrint),
+                                                                    ("GUI_COLUMN", GUI_COLUMN_MyPrint),
+                                                                    ("GUI_PADX", GUI_PADX_MyPrint),
+                                                                    ("GUI_PADY", GUI_PADY_MyPrint),
+                                                                    ("GUI_ROWSPAN", GUI_ROWSPAN_MyPrint),
+                                                                    ("GUI_COLUMNSPAN", GUI_COLUMNSPAN_MyPrint)])
+
+    global MyPrint_Object_SetupDict
+    MyPrint_Object_SetupDict = dict([("NumberOfPrintLines", 10),
+                                                            ("WidthOfPrintingLabel", 200),
+                                                            ("PrintToConsoleFlag", 1),
+                                                            ("LogFileNameFullPath", os.getcwd() + "//TestLog.txt"),
+                                                            ("GUIparametersDict", MyPrint_Object_GUIparametersDict)])
+
     if USE_MyPrint_FLAG == 1 and EXIT_PROGRAM_FLAG == 0:
-
-        MyPrint_ReubenPython2and3ClassObject_GUIparametersDict = dict([("USE_GUI_FLAG", USE_GUI_FLAG and SHOW_IN_GUI_MyPrint_FLAG),
-                                                                        ("root", Tab_MyPrint),
-                                                                        ("UseBorderAroundThisGuiObjectFlag", 0),
-                                                                        ("GUI_ROW", GUI_ROW_MyPrint),
-                                                                        ("GUI_COLUMN", GUI_COLUMN_MyPrint),
-                                                                        ("GUI_PADX", GUI_PADX_MyPrint),
-                                                                        ("GUI_PADY", GUI_PADY_MyPrint),
-                                                                        ("GUI_ROWSPAN", GUI_ROWSPAN_MyPrint),
-                                                                        ("GUI_COLUMNSPAN", GUI_COLUMNSPAN_MyPrint)])
-
-        MyPrint_ReubenPython2and3ClassObject_setup_dict = dict([("NumberOfPrintLines", 10),
-                                                                ("WidthOfPrintingLabel", 200),
-                                                                ("PrintToConsoleFlag", 1),
-                                                                ("LogFileNameFullPath", os.getcwd() + "//TestLog.txt"),
-                                                                ("GUIparametersDict", MyPrint_ReubenPython2and3ClassObject_GUIparametersDict)])
-
         try:
-            MyPrint_ReubenPython2and3ClassObject = MyPrint_ReubenPython2and3Class(MyPrint_ReubenPython2and3ClassObject_setup_dict)
-            MyPrint_OPEN_FLAG = MyPrint_ReubenPython2and3ClassObject.OBJECT_CREATED_SUCCESSFULLY_FLAG
+            MyPrint_Object = MyPrint_ReubenPython2and3Class(MyPrint_Object_SetupDict)
+            MyPrint_OPEN_FLAG = MyPrint_Object.OBJECT_CREATED_SUCCESSFULLY_FLAG
 
         except:
             exceptions = sys.exc_info()[0]
-            print("MyPrint_ReubenPython2and3ClassObject __init__: Exceptions: %s" % exceptions)
+            print("MyPrint_Object __init__: Exceptions: %s" % exceptions)
             traceback.print_exc()
     #################################################
     #################################################
@@ -1168,44 +1424,62 @@ if __name__ == '__main__':
     if USE_MyPrint_FLAG == 1:
         if EXIT_PROGRAM_FLAG == 0:
             if MyPrint_OPEN_FLAG != 1:
-                print("Failed to open MyPrint_ReubenPython2and3ClassObject.")
+                print("Failed to open MyPrint_Object.")
                 ExitProgram_Callback()
     #################################################
     #################################################
 
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
+    
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
+
     #################################################
     #################################################
-    global MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_NameList
-    MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_NameList = ["Direct", "Quad", "FOCcombbinedFOC", "Channel3", "Channel4", "Channel5"]
+    global MyPlotterPureTkinterStandAloneProcess_NameList
+    MyPlotterPureTkinterStandAloneProcess_NameList = ["Position_ToBeSet", "Position_Actual", "Current_Direct", "Current_Quad", "Current_FOCcombbinedFOC"]
 
-    global MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_MarkerSizeList
-    MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_MarkerSizeList = [0, 0, 0, 0, 0, 0]
+    global MyPlotterPureTkinterStandAloneProcess_MarkerSizeList
+    MyPlotterPureTkinterStandAloneProcess_MarkerSizeList = [0]*len(MyPlotterPureTkinterStandAloneProcess_NameList)
 
-    global MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_LineWidthList
-    MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_LineWidthList = [3, 3, 3, 3, 3, 3]
+    global MyPlotterPureTkinterStandAloneProcess_LineWidthList
+    MyPlotterPureTkinterStandAloneProcess_LineWidthList = [3]*len(MyPlotterPureTkinterStandAloneProcess_NameList)
 
-    global MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_ColorList
-    MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_ColorList = ["Red", "Green", "Blue", "Black", "Purple", "Orange"]
+    global MyPlotterPureTkinterStandAloneProcess_ColorList
+    MyPlotterPureTkinterStandAloneProcess_ColorList = ["Red", "Green", "Blue", "Black", "Orange"]
 
-    global MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_GUIparametersDict
-    MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_GUIparametersDict = dict([("EnableInternal_MyPrint_Flag", 1),
+    global MyPlotterPureTkinterStandAloneProcess_IncludeInXaxisAutoscaleCalculationList
+    MyPlotterPureTkinterStandAloneProcess_IncludeInXaxisAutoscaleCalculationList = [1]*len(MyPlotterPureTkinterStandAloneProcess_NameList)
+
+    global MyPlotterPureTkinterStandAloneProcess_IncludeInYaxisAutoscaleCalculationList
+    MyPlotterPureTkinterStandAloneProcess_IncludeInYaxisAutoscaleCalculationList = [1]*len(MyPlotterPureTkinterStandAloneProcess_NameList)
+
+    global MyPlotterPureTkinterStandAloneProcess_GUIparametersDict
+    MyPlotterPureTkinterStandAloneProcess_GUIparametersDict = dict([("EnableInternal_MyPrint_Flag", 1),
                                                                                                 ("NumberOfPrintLines", 10),
                                                                                                 ("UseBorderAroundThisGuiObjectFlag", 0),
                                                                                                 ("GraphCanvasWidth", 890),
                                                                                                 ("GraphCanvasHeight", 700),
                                                                                                 ("GraphCanvasWindowStartingX", 0),
                                                                                                 ("GraphCanvasWindowStartingY", 0),
-                                                                                                ("GUI_RootAfterCallbackInterval_Milliseconds_IndependentOfParentRootGUIloopEvents", 20)])
+                                                                                                ("GUI_RootAfterCallbackInterval_Milliseconds_IndependentOfParentRootGUIloopEvents", 30)])
 
-    global MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_setup_dict
-    MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_setup_dict = dict([("GUIparametersDict", MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_GUIparametersDict),
+    global MyPlotterPureTkinterStandAloneProcess_SetupDict
+    MyPlotterPureTkinterStandAloneProcess_SetupDict = dict([("GUIparametersDict", MyPlotterPureTkinterStandAloneProcess_GUIparametersDict),
                                                                                         ("ParentPID", os.getpid()),
                                                                                         ("WatchdogTimerExpirationDurationSeconds_StandAlonePlottingProcess", 5.0),
                                                                                         ("CurvesToPlotNamesAndColorsDictOfLists",
-                                                                                            dict([("NameList", MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_NameList),
-                                                                                                  ("MarkerSizeList", MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_MarkerSizeList),
-                                                                                                  ("LineWidthList", MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_LineWidthList),
-                                                                                                  ("ColorList", MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_ColorList)])),
+                                                                                            dict([("NameList", MyPlotterPureTkinterStandAloneProcess_NameList),
+                                                                                                  ("MarkerSizeList", MyPlotterPureTkinterStandAloneProcess_MarkerSizeList),
+                                                                                                  ("LineWidthList", MyPlotterPureTkinterStandAloneProcess_LineWidthList),
+                                                                                                  ("ColorList", MyPlotterPureTkinterStandAloneProcess_ColorList),
+                                                                                                  ("IncludeInXaxisAutoscaleCalculationList", MyPlotterPureTkinterStandAloneProcess_IncludeInXaxisAutoscaleCalculationList),
+                                                                                                  ("IncludeInYaxisAutoscaleCalculationList", MyPlotterPureTkinterStandAloneProcess_IncludeInYaxisAutoscaleCalculationList)])),
+                                                                                        ("SmallTextSize", 7),
+                                                                                        ("LargeTextSize", 12),
                                                                                         ("NumberOfDataPointToPlot", 50),
                                                                                         ("XaxisNumberOfTickMarks", 10),
                                                                                         ("YaxisNumberOfTickMarks", 10),
@@ -1220,16 +1494,22 @@ if __name__ == '__main__':
                                                                                         ("XaxisDrawnAtBottomOfGraph", 0),
                                                                                         ("XaxisLabelString", "Time (sec)"),
                                                                                         ("YaxisLabelString", "Y-units (units)"),
-                                                                                        ("ShowLegendFlag", 1)])
+                                                                                        ("ShowLegendFlag", 1),
+                                                                                        ("GraphNumberOfLeadingZeros", 0),
+                                                                                        ("GraphNumberOfDecimalPlaces", 3),
+                                                                                        ("SavePlot_DirectoryPath", os.path.join(os.getcwd(), "SavedImagesFolder")),
+                                                                                        ("KeepPlotterWindowAlwaysOnTopFlag", 0),
+                                                                                        ("RemoveTitleBorderCloseButtonAndDisallowWindowMoveFlag", 0),
+                                                                                        ("AllowResizingOfWindowFlag", 1)])
 
     if USE_MyPlotterPureTkinterStandAloneProcess_FLAG == 1 and EXIT_PROGRAM_FLAG == 0:
         try:
-            MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject = MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_setup_dict)
-            MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG = MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.OBJECT_CREATED_SUCCESSFULLY_FLAG
+            MyPlotterPureTkinterStandAloneProcess_Object = MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class(MyPlotterPureTkinterStandAloneProcess_SetupDict)
+            MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG = MyPlotterPureTkinterStandAloneProcess_Object.OBJECT_CREATED_SUCCESSFULLY_FLAG
 
         except:
             exceptions = sys.exc_info()[0]
-            print("MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject, exceptions: %s" % exceptions)
+            print("MyPlotterPureTkinterStandAloneProcess_Object, exceptions: %s" % exceptions)
             traceback.print_exc()
     #################################################
     #################################################
@@ -1244,12 +1524,22 @@ if __name__ == '__main__':
     #################################################
     #################################################
 
-    #################################################
-    #################################################
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
     if USE_KEYBOARD_FLAG == 1 and EXIT_PROGRAM_FLAG == 0:
         keyboard.on_press_key("esc", ExitProgram_Callback)
-    #################################################
-    #################################################
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
 
     #################################################
     #################################################
@@ -1279,69 +1569,89 @@ if __name__ == '__main__':
 
         #################################################
         for SlaveID_Int in IngeniaBLDC_MostRecentDict_DetectedSlaveID_List:
-            CSVdataLogger_ReubenPython3ClassObject_setup_dict_VariableNamesForHeaderList.append("Position (Deg) Slave " + str(SlaveID_Int))
-            CSVdataLogger_ReubenPython3ClassObject_setup_dict_VariableNamesForHeaderList.append("Current Quadrature (A) Slave " + str(SlaveID_Int))
+            CSVdataLogger_ReubenPython3ClassObject_SetupDict_VariableNamesForHeaderList.append("Position (Deg) Slave " + str(SlaveID_Int))
+            CSVdataLogger_ReubenPython3ClassObject_SetupDict_VariableNamesForHeaderList.append("Current Quadrature (A) Slave " + str(SlaveID_Int))
         #################################################
 
         #################################################
-        print("CSVdataLogger_ReubenPython3ClassObject_setup_dict_VariableNamesForHeaderList: " + str(CSVdataLogger_ReubenPython3ClassObject_setup_dict_VariableNamesForHeaderList))
-        CSVdataLogger_ReubenPython3ClassObject_setup_dict["VariableNamesForHeaderList"] = CSVdataLogger_ReubenPython3ClassObject_setup_dict_VariableNamesForHeaderList
-        CSVdataLogger_ReubenPython3ClassObject.UpdateSetupDictParameters(CSVdataLogger_ReubenPython3ClassObject_setup_dict)
+        print("CSVdataLogger_ReubenPython3ClassObject_SetupDict_VariableNamesForHeaderList: " + str(CSVdataLogger_ReubenPython3ClassObject_SetupDict_VariableNamesForHeaderList))
+        CSVdataLogger_ReubenPython3ClassObject_SetupDict["VariableNamesForHeaderList"] = CSVdataLogger_ReubenPython3ClassObject_SetupDict_VariableNamesForHeaderList
+        CSVdataLogger_ReubenPython3ClassObject.UpdateSetupDictParameters(CSVdataLogger_ReubenPython3ClassObject_SetupDict)
         #################################################
 
     #################################################
     #################################################
 
-    #################################################
-    #################################################
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
     if EXIT_PROGRAM_FLAG == 0:
         print("Starting main loop 'test_program_for_IngeniaBLDC_ReubenPython3Class.")
-        StartingTime_MainLoopThread = getPreciseSecondsTimeStampString()
-    #################################################
-    #################################################
+        StartingTime_CalculatedFromMainThread = getPreciseSecondsTimeStampString()
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
 
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
     while(EXIT_PROGRAM_FLAG == 0):
 
         ###################################################
         ###################################################
-        CurrentTime_MainLoopThread = getPreciseSecondsTimeStampString() - StartingTime_MainLoopThread
+        ###################################################
+        CurrentTime_CalculatedFromMainThread = getPreciseSecondsTimeStampString() - StartingTime_CalculatedFromMainThread
+        ###################################################
         ###################################################
         ###################################################
 
-        ####################################################
-        ####################################################
+        ###################################################
+        ###################################################
+        ###################################################
 
         ################################################### GET's
+        ###################################################
         if EntryListWithBlinking_OPEN_FLAG == 1:
 
-            EntryListWithBlinking_MostRecentDict = EntryListWithBlinking_ReubenPython2and3ClassObject.GetMostRecentDataDict()
+            EntryListWithBlinking_MostRecentDict = EntryListWithBlinking_Object.GetMostRecentDataDict()
 
             if "DataUpdateNumber" in EntryListWithBlinking_MostRecentDict and EntryListWithBlinking_MostRecentDict["DataUpdateNumber"] != EntryListWithBlinking_MostRecentDict_DataUpdateNumber_last:
                 EntryListWithBlinking_MostRecentDict_DataUpdateNumber = EntryListWithBlinking_MostRecentDict["DataUpdateNumber"]
                 #print("DataUpdateNumber = " + str(EntryListWithBlinking_MostRecentDict_DataUpdateNumber) + ", EntryListWithBlinking_MostRecentDict: " + str(EntryListWithBlinking_MostRecentDict))
 
                 if EntryListWithBlinking_MostRecentDict_DataUpdateNumber > 1:
-                    USE_SINUSOIDAL_INPUT_FLAG = int(EntryListWithBlinking_MostRecentDict["USE_SINUSOIDAL_INPUT_FLAG"])
-                    SinusoidalMotionInput_MaxValue = EntryListWithBlinking_MostRecentDict["SinusoidalMotionInput_MaxValue"]
-                    SinusoidalMotionInput_ROMtestTimeToPeakAngle = EntryListWithBlinking_MostRecentDict["SinusoidalMotionInput_ROMtestTimeToPeakAngle"]
+                    USE_PeriodicInput_FLAG = int(EntryListWithBlinking_MostRecentDict["USE_PeriodicInput_FLAG"])
+                    PeriodicInput_MaxValue_1 = EntryListWithBlinking_MostRecentDict["PeriodicInput_MaxValue_1"]
+                    PeriodicInput_Period_1 = EntryListWithBlinking_MostRecentDict["PeriodicInput_Period_1"]
+        ###################################################
         ###################################################
 
+        ###################################################
         ###################################################
         EntryListWithBlinking_MostRecentDict_DataUpdateNumber_last = EntryListWithBlinking_MostRecentDict_DataUpdateNumber
         ###################################################
+        ###################################################
 
-        ####################################################
-        ####################################################
+        ###################################################
+        ###################################################
+        ###################################################
 
         ################################################### GET's
+        ###################################################
         ###################################################
         if IngeniaBLDC_OPEN_FLAG == 1:
             if IngeniaBLDC_Object.IsDedicatedPDOthreadStillRunning() == 0:
                 IngeniaBLDC_Object.StartPDOdedicatedThread()
         ###################################################
         ###################################################
+        ###################################################
 
         ################################################### GET's
+        ###################################################
         ###################################################
         if IngeniaBLDC_OPEN_FLAG == 1:
 
@@ -1353,8 +1663,10 @@ if __name__ == '__main__':
 
         ###################################################
         ###################################################
+        ###################################################
 
         ################################################### SET's
+        ###################################################
         ###################################################
         if IngeniaBLDC_OPEN_FLAG == 1:
 
@@ -1367,31 +1679,31 @@ if __name__ == '__main__':
             ###################################################
 
             ###################################################
-            if USE_SINUSOIDAL_INPUT_FLAG == 1:
+            if USE_PeriodicInput_FLAG == 1:
 
-                SinusoidalMotionInput_TimeGain = math.pi / (2.0 * SinusoidalMotionInput_ROMtestTimeToPeakAngle)
-                
-                SinusoidalMotionInput_CommandedValue = (SinusoidalMotionInput_MaxValue + SinusoidalMotionInput_MinValue)/2.0 + \
-                                                       0.5*abs(SinusoidalMotionInput_MaxValue - SinusoidalMotionInput_MinValue)*math.sin(SinusoidalMotionInput_TimeGain*CurrentTime_MainLoopThread)
-
-                SinusoidalMotionInput_CommandedValue = SinusoidalMotionInput_CommandedValue
+                PeriodicInput_CalculatedValue_1 = GetLatestWaveformValue(CurrentTime_CalculatedFromMainThread,
+                                                                         PeriodicInput_MinValue_1,
+                                                                         PeriodicInput_MaxValue_1,
+                                                                         PeriodicInput_Period_1,
+                                                                         PeriodicInput_Type_1)
 
                 for SlaveID_Int in DesiredSlaves_DictOfDicts:
-                    #SinusoidalMotionInput_CommandedValue_TEMP = SlaveID_Int*SinusoidalMotionInput_CommandedValue
-                    SinusoidalMotionInput_CommandedValue_TEMP = SinusoidalMotionInput_CommandedValue
+                    #PeriodicInput_CalculatedValue_1_TEMP = SlaveID_Int*PeriodicInput_CalculatedValue_1
+                    PeriodicInput_CalculatedValue_1_TEMP = PeriodicInput_CalculatedValue_1
 
                     if DesiredSlaves_DictOfDicts[SlaveID_Int]["OperationMode"] == "CyclicPosition":
-                        IngeniaBLDC_Object.SetPosition_ExternalProgram(SlaveID_Int, SinusoidalMotionInput_CommandedValue_TEMP, "Deg")
+                        IngeniaBLDC_Object.SetPosition_ExternalProgram(SlaveID_Int, PeriodicInput_CalculatedValue_1_TEMP, "Deg")
 
                     if DesiredSlaves_DictOfDicts[SlaveID_Int]["OperationMode"] == "CyclicCurrent":
-                        IngeniaBLDC_Object.SetCurrent_Quadrature_ExternalProgram(SlaveID_Int, SinusoidalMotionInput_CommandedValue_TEMP)
+                        IngeniaBLDC_Object.SetCurrent_Quadrature_ExternalProgram(SlaveID_Int, PeriodicInput_CalculatedValue_1_TEMP)
 
                     if DesiredSlaves_DictOfDicts[SlaveID_Int]["OperationMode"] == "CyclicVoltage":
-                        IngeniaBLDC_Object.SetVoltage_Quadrature_ExternalProgram(SlaveID_Int, SinusoidalMotionInput_CommandedValue_TEMP)
+                        IngeniaBLDC_Object.SetVoltage_Quadrature_ExternalProgram(SlaveID_Int, PeriodicInput_CalculatedValue_1_TEMP)
 
 
             ###################################################
 
+        ###################################################
         ###################################################
         ###################################################
 
@@ -1403,7 +1715,7 @@ if __name__ == '__main__':
             ####################################################
             ####################################################
             ListToWrite = []
-            ListToWrite.append(CurrentTime_MainLoopThread)
+            ListToWrite.append(CurrentTime_CalculatedFromMainThread)
 
             for SlaveID_Int in IngeniaBLDC_MostRecentDict_DetectedSlaveID_List:
                 ListToWrite.append(IngeniaBLDC_MostRecentDict["IngeniaMotionController_MainDict"][SlaveID_Int]["Position_Actual_AllUnitsDict"]["Deg"])
@@ -1425,29 +1737,32 @@ if __name__ == '__main__':
             try:
                 ####################################################
                 ####################################################
-                MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_MostRecentDict = MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.GetMostRecentDataDict()
+                MyPlotterPureTkinterStandAloneProcess_MostRecentDict = MyPlotterPureTkinterStandAloneProcess_Object.GetMostRecentDataDict()
 
-                if "StandAlonePlottingProcess_ReadyForWritingFlag" in MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_MostRecentDict:
-                    MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_MostRecentDict_StandAlonePlottingProcess_ReadyForWritingFlag = MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_MostRecentDict["StandAlonePlottingProcess_ReadyForWritingFlag"]
+                if "StandAlonePlottingProcess_ReadyForWritingFlag" in MyPlotterPureTkinterStandAloneProcess_MostRecentDict:
+                    MyPlotterPureTkinterStandAloneProcess_MostRecentDict_StandAlonePlottingProcess_ReadyForWritingFlag = MyPlotterPureTkinterStandAloneProcess_MostRecentDict["StandAlonePlottingProcess_ReadyForWritingFlag"]
 
-                    if MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_MostRecentDict_StandAlonePlottingProcess_ReadyForWritingFlag == 1:
-                        if CurrentTime_MainLoopThread - LastTime_MainLoopThread_MyPlotterPureTkinterStandAloneProcess >= 0.030:
+                    if MyPlotterPureTkinterStandAloneProcess_MostRecentDict_StandAlonePlottingProcess_ReadyForWritingFlag == 1:
+                        if CurrentTime_CalculatedFromMainThread - LastTime_CalculatedFromMainThread_MyPlotterPureTkinterStandAloneProcess >= 0.030:
 
                             ####################################################
+                            SlaveID_Int_ToPlot = 3
+
                             ListOfValuesToPlot = []
-                            for SlaveID_Int in IngeniaBLDC_MostRecentDict_DetectedSlaveID_List:
-                                ListOfValuesToPlot.append(IngeniaBLDC_MostRecentDict["IngeniaMotionController_MainDict"][SlaveID_Int]["Position_Actual_AllUnitsDict"]["Deg"])
-                                ListOfValuesToPlot.append(IngeniaBLDC_MostRecentDict["IngeniaMotionController_MainDict"][SlaveID_Int]["Current_Quadrature_Actual"])
+
+                            ListOfValuesToPlot.append(IngeniaBLDC_MostRecentDict["IngeniaMotionController_MainDict"][SlaveID_Int_ToPlot]["Position_ToBeSet_AllUnitsDict"]["Deg"])
+                            ListOfValuesToPlot.append(IngeniaBLDC_MostRecentDict["IngeniaMotionController_MainDict"][SlaveID_Int_ToPlot]["Position_Actual_AllUnitsDict"]["Deg"])
+                            #ListOfValuesToPlot.append(IngeniaBLDC_MostRecentDict["IngeniaMotionController_MainDict"][SlaveID_Int_ToPlot]["Current_Quadrature_Actual"])
                             ####################################################
 
                             ####################################################
-                            MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.ExternalAddPointOrListOfPointsToPlot(MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject_NameList[0:len(ListOfValuesToPlot)],
-                                                                                                                                    [CurrentTime_MainLoopThread]*len(ListOfValuesToPlot),
-                                                                                                                                    ListOfValuesToPlot)
+                            MyPlotterPureTkinterStandAloneProcess_Object.ExternalAddPointOrListOfPointsToPlot(MyPlotterPureTkinterStandAloneProcess_NameList[0:len(ListOfValuesToPlot)],
+                                                                                                            [CurrentTime_CalculatedFromMainThread]*len(ListOfValuesToPlot),
+                                                                                                            ListOfValuesToPlot)
                             ####################################################
 
                             ####################################################
-                            LastTime_MainLoopThread_MyPlotterPureTkinterStandAloneProcess = CurrentTime_MainLoopThread
+                            LastTime_CalculatedFromMainThread_MyPlotterPureTkinterStandAloneProcess = CurrentTime_CalculatedFromMainThread
                             ####################################################
 
                 ####################################################
@@ -1461,12 +1776,21 @@ if __name__ == '__main__':
         ####################################################
         ####################################################
 
+        ####################################################
+        ####################################################
+        ####################################################
         time.sleep(0.002)
-    #################################################
-    #################################################
+        ####################################################
+        ####################################################
+        ####################################################
 
-    ################################################# THIS IS THE EXIT ROUTINE!
-    #################################################
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ########################################################################################################## THIS IS THE EXIT ROUTINE!
+    ##########################################################################################################
+    ##########################################################################################################
     print("Exiting main program 'test_program_for_IngeniaBLDC_ReubenPython3Class.")
 
     #################################################
@@ -1476,7 +1800,7 @@ if __name__ == '__main__':
 
     #################################################
     if MyPrint_OPEN_FLAG == 1:
-        MyPrint_ReubenPython2and3ClassObject.ExitProgram_Callback()
+        MyPrint_Object.ExitProgram_Callback()
     #################################################
 
     #################################################
@@ -1486,16 +1810,19 @@ if __name__ == '__main__':
 
     #################################################
     if EntryListWithBlinking_OPEN_FLAG == 1:
-        EntryListWithBlinking_ReubenPython2and3ClassObject.ExitProgram_Callback()
+        EntryListWithBlinking_Object.ExitProgram_Callback()
     #################################################
 
     #################################################
     if MyPlotterPureTkinterStandAloneProcess_OPEN_FLAG == 1:
-        MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3ClassObject.ExitProgram_Callback()
+        MyPlotterPureTkinterStandAloneProcess_Object.ExitProgram_Callback()
     #################################################
 
-    #################################################
-    #################################################
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
 
+##########################################################################################################
+##########################################################################################################
 ##########################################################################################################
 ##########################################################################################################

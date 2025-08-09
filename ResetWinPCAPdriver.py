@@ -6,7 +6,7 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision L, 06/16/2025
+Software Revision M, 08/08/2025
 
 Verified working on: Python 3.11/3.12 for Windows 10/11 64-bit and Raspberry Pi Bookworm.
 '''
@@ -57,8 +57,9 @@ def ResetWinPCAPdriver():
     except:
         exceptions = sys.exc_info()[0]
         print("@@@@@@@@@@@@@@@@@@@ Failure for ResetWinPCAPdriver @@@@@@@@@@@@@@@@@@@, Exceptions: %s" % exceptions)
-        return 0
-        #traceback.print_exc()
+        #return 0
+        traceback.print_exc()
+        time.sleep(5.0)
 
 ##########################################################################################################
 ##########################################################################################################

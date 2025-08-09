@@ -6,7 +6,7 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision L, 06/16/2025
+Software Revision M, 08/08/2025
 
 Verified working on: Python 3.11/3.12 for Windows 10, 11 64-bit.
 '''
@@ -14,8 +14,8 @@ Verified working on: Python 3.11/3.12 for Windows 10, 11 64-bit.
 __author__ = 'reuben.brewer'
 
 ##########################################
-from GetPIDsByProcessEnglishNameAndOptionallyKill_ReubenPython2and3 import *
 from EntryListWithBlinking_ReubenPython2and3Class import *
+from GetPIDsByProcessEnglishNameAndOptionallyKill_ReubenPython2and3 import *
 from LowPassFilterForDictsOfLists_ReubenPython2and3Class import *
 ##########################################
 
@@ -30,6 +30,7 @@ import queue as Queue
 import collections
 from copy import * #for deepcopy
 import inspect #To enable 'TellWhichFileWereIn'
+import signal #for CTRLc_HandlerFunction
 import threading
 import traceback
 import subprocess
@@ -208,7 +209,7 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                                                         (0x00007372, "Feedback runaway error"),
                                                         (0x00002289, "Over current without current control"),
                                                         (0x00007391, "Profiler parameters not valid. They should all have positive values."),
-                                                        (0x00000000, "No error"),
+                                                        (0x00000000, "NoError"),
                                                         (0x00007381, "BiSS-C warning bit active"),
                                                         (0x00001001, "Communications watchdog error"),
                                                         (0x00007388, "Velocity following error"),
@@ -653,7 +654,7 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
         self.IngeniaMotionController_MainDict = dict()
         for SlaveID_Int in self.DesiredSlaveID_List:
 
-            #########################################################
+            ######################################################### unicorn
             #########################################################
             #########################################################
             self.IngeniaMotionController_MainDict[SlaveID_Int] = dict([("SlaveID_Int", SlaveID_Int),
@@ -901,37 +902,12 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
             #########################################################
             #########################################################
 
-        self.IngeniaMotionController_MainDict[1]["AliasOrServoName_String"] = "default" #This is a requirement of the "ingeniamotion" module. Can use any alias after "default" has been set for one controller.
         #########################################################
         #########################################################
         #########################################################
         #########################################################
 
         #########################################################
-        #########################################################
-        #########################################################
-
-        #########################################################
-        #########################################################
-        if "LaunchFlag_MotionLab3_IngEcatGateway_EoEservice" in setup_dict:
-            self.LaunchFlag_MotionLab3_IngEcatGateway_EoEservice = self.PassThrough0and1values_ExitProgramOtherwise("LaunchFlag_MotionLab3_IngEcatGateway_EoEservice", setup_dict["LaunchFlag_MotionLab3_IngEcatGateway_EoEservice"])
-
-        else:
-            self.LaunchFlag_MotionLab3_IngEcatGateway_EoEservice = 0
-
-        print("IngeniaBLDC_ReubenPython3Class __init__: LaunchFlag_MotionLab3_IngEcatGateway_EoEservice: " + str(self.LaunchFlag_MotionLab3_IngEcatGateway_EoEservice))
-        #########################################################
-        #########################################################
-
-        #########################################################
-        #########################################################
-        if "MotionLab3_IngEcatGateway_EoEservice_EXEfullFilePath" in setup_dict:
-            self.MotionLab3_IngEcatGateway_EoEservice_EXEfullFilePath = str(setup_dict["MotionLab3_IngEcatGateway_EoEservice_EXEfullFilePath"])
-
-        else:
-            self.MotionLab3_IngEcatGateway_EoEservice_EXEfullFilePath = ""
-
-        print("IngeniaBLDC_ReubenPython3Class __init__: MotionLab3_IngEcatGateway_EoEservice_EXEfullFilePath: " + str(self.MotionLab3_IngEcatGateway_EoEservice_EXEfullFilePath))
         #########################################################
         #########################################################
 
@@ -1044,27 +1020,6 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
 
         #########################################################
         #########################################################
-
-        #########################################################
-        if self.LaunchFlag_MotionLab3_IngEcatGateway_EoEservice == 1:
-            self.EoEserviceIsRunningFlag = self.StartEoEservice()
-        else:
-            self.EoEserviceIsRunningFlag = 1
-
-        print("self.EoEserviceIsRunningFlag: " + str(self.EoEserviceIsRunningFlag))
-        #########################################################
-
-        #########################################################
-        if self.EoEserviceIsRunningFlag == 0:
-            print("IngeniaBLDC_ReubenPython3Class __init__: Error, EoEservice isn't running, exiting now.")
-            return
-        #########################################################
-
-        #########################################################
-        #########################################################
-
-        #########################################################
-        #########################################################
         try:
 
             SuccessFlag = self.InitializeMotors()
@@ -1115,7 +1070,7 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
 
         #########################################################
         #########################################################
-        time.sleep(0.25)
+        self.CTRLc_RegisterHandlerFunction()
         #########################################################
         #########################################################
 
@@ -1130,10 +1085,38 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
     ##########################################################################################################
     ##########################################################################################################
 
+    ###########################################################################################################
     ##########################################################################################################
     ##########################################################################################################
-    def __del__(self):
-        pass
+    ##########################################################################################################
+    def CTRLc_RegisterHandlerFunction(self):
+
+        CurrentHandlerRegisteredForSIGINT = signal.getsignal(signal.SIGINT)
+        defaultish = (signal.SIG_DFL, signal.SIG_IGN, None, getattr(signal, "default_int_handler", None)) #Treat Python's built-in default handler as "unregistered"
+
+        if CurrentHandlerRegisteredForSIGINT in defaultish:  # Only install if it's default/ignored (i.e., nobody set it yet)
+            signal.signal(signal.SIGINT, self.CTRLc_HandlerFunction)
+            print("IngeniaBLDC_ReubenPython3Class, CTRLc_RegisterHandlerFunction event fired!")
+
+        else:
+            print("IngeniaBLDC_ReubenPython3Class, could not register CTRLc_RegisterHandlerFunction (already registered previously)")
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ########################################################################################################## MUST ISSUE CTRLc_RegisterHandlerFunction() AT START OF PROGRAM
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
+    def CTRLc_HandlerFunction(self, signum, frame):
+
+        print("IngeniaBLDC_ReubenPython3Class, CTRLc_HandlerFunction event firing!")
+
+        self.ExitProgram_Callback()
+
+    ##########################################################################################################
+    ##########################################################################################################
     ##########################################################################################################
     ##########################################################################################################
 
@@ -1519,61 +1502,6 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
     ##########################################################################################################
     ##########################################################################################################
     ##########################################################################################################
-    def StartEoEservice(self):
-
-        try:
-
-            ##########################################################################################################
-            ##########################################################################################################
-            [PID_DictWithPIDasKey, PID_DictWithEXEenglishNameAsKey] = GetPIDsByProcessEnglishName("IngEcatGateway")
-            print("$$$$$$$$$$$$ PID_DictWithPIDasKey: " + str(PID_DictWithPIDasKey) + ", PID_DictWithEXEenglishNameAsKey: " + str(PID_DictWithEXEenglishNameAsKey) + " $$$$$$$$$$$$")
-
-            if len(PID_DictWithPIDasKey) == 0: #IngEcatGateway.exe isn't running
-
-                ##########################################################################################################
-                try:
-                    print("@@@@@@@@@@@@@@@@@@@ StartEoEservice: launching IngEcatGateway.exe @@@@@@@@@@@@@@@@@@@")
-
-                    #shell_command_to_issue = "\"" + os.getcwd() + "\\InstallFiles_and_SupportDocuments\\EoE_start.bat\" " + "\"" + self.MotionLab3_IngEcatGateway_EoEservice_EXEfullFilePath + "\""
-                    #shell_command_to_issue = "\"" + self.MotionLab3_IngEcatGateway_EoEservice_EXEfullFilePath + "\""
-                    shell_command_to_issue = "python \"G:\\My Drive\\CodeReuben\\ElevatePythonPermission_ReubenPython3Class\\test_program_for_ElevatePythonPermission_ReubenPython3Class.py\""
-
-                    print("shell_command_to_issue: " + shell_command_to_issue)
-
-                    #process = subprocess.Popen([shell_command_to_issue], shell=True)  # subprocess.Popen doesn't wait for process to terminate
-                    time.sleep(2.0)
-
-                    return 1
-
-                except:
-                    exceptions = sys.exc_info()[0]
-                    print("StartEoEservice, subprocess.Popen failed to launch IngEcatGateway.exe, Exceptions: %s" % exceptions)
-                    #return 0
-                    traceback.print_exc()
-                ##########################################################################################################
-
-            else:
-                ##########################################################################################################
-                print("StartEoEservice: IngEcatGateway.exe is already running, no further action necessary.")
-                return 1
-                ##########################################################################################################
-
-            ##########################################################################################################
-            ##########################################################################################################
-
-        except:
-            exceptions = sys.exc_info()[0]
-            print("StartEoEservice, exceptions: %s" % exceptions)
-            return 0
-            #traceback.print_exc()
-
-    ##########################################################################################################
-    ##########################################################################################################
-    ##########################################################################################################
-
-    ##########################################################################################################
-    ##########################################################################################################
-    ##########################################################################################################
     ##########################################################################################################
     def InitializeMotors(self):
 
@@ -1671,6 +1599,22 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
             self.IngeniaMotionController_MainDict[SlaveID_Int]["MotorConnectedFlag"] = 0
             #traceback.print_exc()
             return 0
+        ##########################################################################################################
+        ##########################################################################################################
+        ##########################################################################################################
+
+        ##########################################################################################################
+        ##########################################################################################################
+        ##########################################################################################################
+        SlaveID_Int_List = []
+        for SlaveID_Int in self.DetectedSlaveID_List:
+            SlaveID_Int_List.append(SlaveID_Int)
+
+        #print("SlaveID_Int_List: " + str(SlaveID_Int_List))
+        self.SlaveID_Int_Min = min(SlaveID_Int_List)
+        print("IngeniaBLDC_ReubenPython3Class InitializeMotors: self.SlaveID_Int_Min = " + str(self.SlaveID_Int_Min))
+
+        self.IngeniaMotionController_MainDict[self.SlaveID_Int_Min]["AliasOrServoName_String"] = "default" #This is a requirement of the "ingeniamotion" module. Can use any alias after "default" has been set for one controller.
         ##########################################################################################################
         ##########################################################################################################
         ##########################################################################################################
@@ -4584,6 +4528,8 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
     ##########################################################################################################
     def DedicatedTxThread(self):
 
+        #########################################################
+        #########################################################
         self.MyPrint_WithoutLogFile("Started DedicatedTxThread for IngeniaBLDC_ReubenPython3Class object.")
         self.DedicatedTxThread_StillRunningFlag = 1
 
@@ -4591,6 +4537,8 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
         #    self.SetEnabledState_ExternalProgram(SlaveID_Int, self.EnableMotorAtStartOfProgramFlag, PrintDebugFlag=0) Taken care of in Initializtion routine
 
         self.StartingTime_CalculatedFromDedicatedTxThread = self.getPreciseSecondsTimeStampString()
+        #########################################################
+        #########################################################
 
         ##########################################################################################################
         ##########################################################################################################
@@ -5268,8 +5216,9 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
         #################################################
         #################################################
         #################################################
+        self.TKinter_LightRedColor = '#%02x%02x%02x' % (255, 150, 150)  # RGB
         self.TKinter_LightGreenColor = '#%02x%02x%02x' % (150, 255, 150) #RGB
-        self.TKinter_LightRedColor = '#%02x%02x%02x' % (255, 150, 150) #RGB
+        self.TKinter_LightBlueColor = '#%02x%02x%02x' % (150, 150, 255)  # RGB
         self.TKinter_LightYellowColor = '#%02x%02x%02x' % (255, 255, 150)  # RGB
         self.TKinter_DefaultGrayColor = '#%02x%02x%02x' % (240, 240, 240)  # RGB
         self.TkinterScaleLabelWidth = 30
@@ -5456,6 +5405,7 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
 
                 GUIscale_ScaleObject_FROM = self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionMin_AllUnitsDict"]["EncoderTicks"]
                 GUIscale_ScaleObject_TO = self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionMax_AllUnitsDict"]["EncoderTicks"]
+                GUIscale_ScaleObject_RESOLUTION = 1
 
                 if GUIscale_ScaleObject_FROM == 0.0 and GUIscale_ScaleObject_TO == 0.0:
                     GUIscale_ScaleObject_FROM = -1.0*self.IngeniaMotionController_MainDict[SlaveID_Int]["EncoderTicksPerRevolution_Actual"] #Still want to be able to use sliders even with infinite rotation enabled
@@ -5464,16 +5414,17 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
             elif self.IngeniaMotionController_MainDict[SlaveID_Int]["OperationMode"] == "CyclicCurrent":
                 GUIscale_ScaleObject_FROM = -1.0*self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxCurrentHardLimit_ToBeSet"]
                 GUIscale_ScaleObject_TO = self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxCurrentHardLimit_ToBeSet"]
+                GUIscale_ScaleObject_RESOLUTION = 0.01
 
             elif self.IngeniaMotionController_MainDict[SlaveID_Int]["OperationMode"] == "CyclicVoltage":
                 GUIscale_ScaleObject_FROM = -24.0 #-1.0*self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxVoltage_ToBeSet"] #WHERE SHOULD THESE NUMBERS COME FROM?
                 GUIscale_ScaleObject_TO = 24.0 #self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxVoltage_ToBeSet"] #WHERE SHOULD THESE NUMBERS COME FROM?
+                GUIscale_ScaleObject_RESOLUTION = 0.01
 
             else:
                 GUIscale_ScaleObject_FROM = -11111.0
                 GUIscale_ScaleObject_TO = 11111.0
-
-            GUIscale_ScaleObject_RESOLUTION = 1#abs(GUIscale_ScaleObject_TO - GUIscale_ScaleObject_FROM)/100.0 #100 tick marks
+                GUIscale_ScaleObject_RESOLUTION = 1
 
             self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorMotionSetpoint_GUIscale_ScaleObject"] = Scale(self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorMotionSetpoint_GUIscale_Frame"],
                                                                                                                                        from_=GUIscale_ScaleObject_FROM,
@@ -5717,6 +5668,16 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
 
                         else:
                             self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EnabledState_Button"]["bg"] = self.TKinter_LightYellowColor
+                        #######################################################
+                        #######################################################
+
+                        #######################################################
+                        #######################################################
+                        if self.IngeniaMotionController_MainDict[SlaveID_Int]["Error_Last_EnglishName"] != "NoError":
+                            self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["FaultReset_Button"]["bg"] = self.TKinter_LightBlueColor
+
+                        else:
+                            self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["FaultReset_Button"]["bg"] = self.TKinter_DefaultGrayColor
                         #######################################################
                         #######################################################
 

@@ -6,9 +6,9 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision G, 08/31/2024
+Software Revision I, 07/14/2025
 
-Verified working on: Python 2.7, 3.8 for Windows 8.1, 10 64-bit and Raspberry Pi Buster (no Mac testing yet).
+Verified working on: Python 3.11/3.12 for Windows 10/11 64-bit and Raspberry Pi Bookworm.
 '''
 
 __author__ = 'reuben.brewer'
@@ -190,6 +190,28 @@ class EntryListWithBlinking_ReubenPython2and3Class(Frame): #Subclass the Tkinter
                 self.GUI_COLUMNSPAN = 1
 
             print("EntryListWithBlinking_ReubenPython2and3Class __init__: GUI_COLUMNSPAN: " + str(self.GUI_COLUMNSPAN))
+            #########################################################
+            #########################################################
+
+            #########################################################
+            #########################################################
+            if "GUI_WIDTH" in self.GUIparametersDict:
+                self.GUI_WIDTH = int(self.PassThroughFloatValuesInRange_ExitProgramOtherwise("GUI_WIDTH", self.GUIparametersDict["GUI_WIDTH"], -1.0, 1000.0))
+            else:
+                self.GUI_WIDTH = -1
+
+            print("EntryListWithBlinking_ReubenPython2and3Class __init__: GUI_WIDTH: " + str(self.GUI_WIDTH))
+            #########################################################
+            #########################################################
+
+            #########################################################
+            #########################################################
+            if "GUI_HEIGHT" in self.GUIparametersDict:
+                self.GUI_HEIGHT = int(self.PassThroughFloatValuesInRange_ExitProgramOtherwise("GUI_HEIGHT", self.GUIparametersDict["GUI_HEIGHT"], -1.0, 1000.0))
+            else:
+                self.GUI_HEIGHT = -1
+
+            print("EntryListWithBlinking_ReubenPython2and3Class __init__: GUI_HEIGHT: " + str(self.GUI_HEIGHT))
             #########################################################
             #########################################################
 
@@ -665,10 +687,6 @@ class EntryListWithBlinking_ReubenPython2and3Class(Frame): #Subclass the Tkinter
     ##########################################################################################################
     def StartGUI(self, GuiParent):
 
-        #self.GUI_Thread_ThreadingObject = threading.Thread(target=self.GUI_Thread, args=(GuiParent,))
-        #self.GUI_Thread_ThreadingObject.setDaemon(True) #Should mean that the GUI thread is destroyed automatically when the main thread is destroyed.
-        #self.GUI_Thread_ThreadingObject.start()
-
         self.GUI_Thread(GuiParent)
     ##########################################################################################################
     ##########################################################################################################
@@ -683,8 +701,11 @@ class EntryListWithBlinking_ReubenPython2and3Class(Frame): #Subclass the Tkinter
         #################################################
 
         #################################################
-        self.myFrame = Frame(self.root)
-
+        if self.GUI_WIDTH != -1 and self.GUI_HEIGHT != -1:
+            self.myFrame = Frame(self.root, height = self.GUI_HEIGHT, width = self.GUI_WIDTH) #MUST SPECIFY BOTH HEIGHT AND WIDTH FOR PROPER RESULTS
+        else:
+            self.myFrame = Frame(self.root)
+            
         if self.UseBorderAroundThisGuiObjectFlag == 1:
             self.myFrame["borderwidth"] = 2
             self.myFrame["relief"] = "ridge"
@@ -694,8 +715,11 @@ class EntryListWithBlinking_ReubenPython2and3Class(Frame): #Subclass the Tkinter
                           padx = self.GUI_PADX,
                           pady = self.GUI_PADY,
                           rowspan = self.GUI_ROWSPAN,
-                          columnspan= self.GUI_COLUMNSPAN,
+                          columnspan = self.GUI_COLUMNSPAN,
                           sticky = self.GUI_STICKY)
+               
+        if self.GUI_WIDTH != -1 and self.GUI_HEIGHT != -1:
+            self.myFrame.grid_propagate(False)  # Prevent auto-resize, perform first in GUI_Thread() before everything else has been grid()'ed
         #################################################
 
         #################################################
@@ -704,12 +728,12 @@ class EntryListWithBlinking_ReubenPython2and3Class(Frame): #Subclass the Tkinter
         #################################################
 
         #################################################
-        self.DebugByPrintingVariables_Label = Label(self.myFrame, text="DebugByPrintingVariables_Label", width=50)
         if self.DebugByPrintingVariablesFlag == 1:
+            self.DebugByPrintingVariables_Label = Label(self.myFrame, text="DebugByPrintingVariables_Label", width=50)
             self.DebugByPrintingVariables_Label.grid(row=0, column=1, padx=1, pady=1, columnspan=1, rowspan=1)
         #################################################
 
-        ####################################################
+        #################################################
         EntryRow = 0
         for Variable_name in self.EntryListWithBlinking_Variables_DictOfDicts:
 
@@ -734,8 +758,8 @@ class EntryListWithBlinking_ReubenPython2and3Class(Frame): #Subclass the Tkinter
                 self.EntryListWithBlinking_Variables_DictOfDicts[Variable_name]["Entry"].bind('<Leave>', lambda event, Variable_name=Variable_name: self.EntryEventResponse(event, Variable_name))
 
             EntryRow = EntryRow + 1
-        ###################################################
-
+        #################################################
+                
         #################################################
         self.GUI_ready_to_be_updated_flag = 1
         #################################################
@@ -743,7 +767,55 @@ class EntryListWithBlinking_ReubenPython2and3Class(Frame): #Subclass the Tkinter
     ##########################################################################################################
     ##########################################################################################################
 
-    ###########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
+    def grid(self):
+        
+        ##########################################################################################################
+        try:
+            #print("grid() event fired for EntryListWithBlinking_ReubenPython3Class")
+            
+            self.myFrame.grid()
+            
+            self.GUI_update_clock()
+            
+        ##########################################################################################################
+        
+        ##########################################################################################################
+        except:
+            exceptions = sys.exc_info()[0]
+            print("grid() EntryListWithBlinking_ReubenPython3Class, Exceptions: %s" % exceptions)
+            traceback.print_exc()
+        ##########################################################################################################
+                
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
+    def grid_remove(self):
+        
+        ##########################################################################################################
+        try:
+            #print("grid_remove() event fired for EntryListWithBlinking_ReubenPython3Class")
+            
+            self.myFrame.grid_remove()
+            
+            self.GUI_update_clock()
+            
+        ##########################################################################################################
+        
+        ##########################################################################################################
+        except:
+            exceptions = sys.exc_info()[0]
+            print("grid_remove() EntryListWithBlinking_ReubenPython3Class, Exceptions: %s" % exceptions)
+            traceback.print_exc()
+        ##########################################################################################################
+                
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ##########################################################################################################
     ##########################################################################################################
     def EntryEventResponse(self, event, Variable_name):
 
@@ -864,7 +936,8 @@ class EntryListWithBlinking_ReubenPython2and3Class(Frame): #Subclass the Tkinter
 
                     ########################################################
                     ########################################################
-                    self.DebugByPrintingVariables_Label["text"] = TextToDisplay
+                    if self.DebugByPrintingVariablesFlag == 1:
+                        self.DebugByPrintingVariables_Label["text"] = TextToDisplay
                     ########################################################
                     ########################################################
 

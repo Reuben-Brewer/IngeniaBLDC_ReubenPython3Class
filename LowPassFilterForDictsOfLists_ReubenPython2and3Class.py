@@ -6,7 +6,7 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision G, 05/27/2025
+Software Revision H, 7/18/2025
 
 Verified working on: Python 3.11/3.12 for Windows 10/11 64-bit, Ubuntu 20.04, and Raspberry Pi Bookworm (no Mac testing yet).
 '''
@@ -300,7 +300,7 @@ class LowPassFilterForDictsOfLists_ReubenPython2and3Class():
     ##########################################################################################################
     ##########################################################################################################
     ##########################################################################################################
-    def AddDataDictFromExternalProgram(self, DataDictOfNewPointsForMultipleVariables):
+    def AddDataDictFromExternalProgram(self, DataDictOfNewPointsForMultipleVariables, PrintInfoForDebuggingFlag = 0):
 
         try:
             #print("AddDataDictFromExternalProgram: self.DataDictOfNewPointsForMultipleVariables = " + str(DataDictOfNewPointsForMultipleVariables))
@@ -344,7 +344,7 @@ class LowPassFilterForDictsOfLists_ReubenPython2and3Class():
                     else:
                         ###############################################
                         for Index, Value in enumerate(UpdatedValuesList):
-                            self.UpdateOneVariableWithNewValue(VariableNameString, Index, Value)
+                            self.UpdateOneVariableWithNewValue(VariableNameString, Index, Value, PrintInfoForDebuggingFlag)
                         ###############################################
 
                     ###############################################
@@ -379,71 +379,93 @@ class LowPassFilterForDictsOfLists_ReubenPython2and3Class():
 
     ##########################################################################################################
     ##########################################################################################################
-    def UpdateOneVariableWithNewValue(self, VariableNameStr, ListIndex, NewValue):
+    ##########################################################################################################
+    ##########################################################################################################
+    def UpdateOneVariableWithNewValue(self, VariableNameStr, ListIndex, NewValue, PrintInfoForDebuggingFlag = 0):
 
+        ##########################################################################################################
+        ##########################################################################################################
+        ##########################################################################################################
         try:
 
-            #print("UpdateOneVariableWithNewValue: " + str(VariableNameStr) + ", ListIndex = " + ", NewValue = " + str(NewValue))
-
-            ###############################################
-            ###############################################
-            ###############################################
+            ##########################################################################################################
+            ##########################################################################################################
             NewValue = float(NewValue)
+            ##########################################################################################################
+            ##########################################################################################################
 
-            ###############################################
-            ###############################################
+            ##########################################################################################################
+            ##########################################################################################################
+            if PrintInfoForDebuggingFlag == 1:
+                print("UpdateOneVariableWithNewValue: " + str(VariableNameStr) + ", ListIndex = " + ", NewValue = " + str(NewValue))
+            ##########################################################################################################
+            ##########################################################################################################
+
+            ##########################################################################################################
+            ##########################################################################################################
             self.VariablesDict[VariableNameStr]["__SignalInRawHistoryList"][ListIndex] = list(numpy.roll(self.VariablesDict[VariableNameStr]["__SignalInRawHistoryList"][ListIndex], 1)) #MUST EXPLICITLY MAKE NEW LIST() FOR THIS TO WORK PROPERLY
             self.VariablesDict[VariableNameStr]["__SignalInRawHistoryList"][ListIndex][0] = NewValue  #Add the incoming data point
-            ###############################################
-            ###############################################
+            ##########################################################################################################
+            ##########################################################################################################
 
-            ###############################################
-            ###############################################
-
-            ###############################################
+            ##########################################################################################################
+            ##########################################################################################################
             self.VariablesDict[VariableNameStr]["__SignalOutFilteredHistoryList"][ListIndex] = list(numpy.roll(self.VariablesDict[VariableNameStr]["__SignalOutFilteredHistoryList"][ListIndex], 1)) #MUST EXPLICITLY MAKE NEW LIST() FOR THIS TO WORK PROPERLY
-            ###############################################
+            ##########################################################################################################
+            ##########################################################################################################
 
-            ###############################################
+            ##########################################################################################################
+            ##########################################################################################################
             # fmedian = median5(fval_prev4, fval_prev3, fval_prev2, fval_prev1, fval_new);
             MedianValue_BoseNelson = self.ComputeMedian5point_BoseNelson(self.VariablesDict[VariableNameStr]["__SignalInRawHistoryList"][ListIndex][4],
                                                                          self.VariablesDict[VariableNameStr]["__SignalInRawHistoryList"][ListIndex][3],
                                                                          self.VariablesDict[VariableNameStr]["__SignalInRawHistoryList"][ListIndex][2],
                                                                          self.VariablesDict[VariableNameStr]["__SignalInRawHistoryList"][ListIndex][1],
                                                                          self.VariablesDict[VariableNameStr]["__SignalInRawHistoryList"][ListIndex][0])
-            #MedianValue_Numpy = numpy.median(self.__SignalInRawHistoryList) MedianValue_Numpy is much slower than MedianValue_BoseNelson
+
+            #MedianValue_Numpy = numpy.median(self.__SignalInRawHistoryList) #MedianValue_Numpy is much slower than MedianValue_BoseNelson, so don't use this.
             #print str(MedianValue_BoseNelson - MedianValue_Numpy)
 
             if self.VariablesDict[VariableNameStr]["UseMedianFilterFlag"] == 1:
                 self.VariablesDict[VariableNameStr]["__SignalOutFilteredHistoryList"][ListIndex][0] = MedianValue_BoseNelson
             else:
                 self.VariablesDict[VariableNameStr]["__SignalOutFilteredHistoryList"][ListIndex][0] = NewValue
-            ###############################################
+            ##########################################################################################################
+            ##########################################################################################################
 
-            ###############################################
-            if self.VariablesDict[VariableNameStr]["UseExponentialSmoothingFilterFlag"] == 1: #FORMER ERROR: THIS USED TO WORK ON __SignalInRawHistoryList INSTEAD OF __SignalOutFilteredHistoryList, SO IT ERASED MEDIAN FILTER
-                #new_filtered_value = k * raw_sensor_value + (1 - k) * old_filtered_value
+            ##########################################################################################################
+            ##########################################################################################################
+            if self.VariablesDict[VariableNameStr]["UseExponentialSmoothingFilterFlag"] == 1:  #new_filtered_value = k * raw_sensor_value + (1 - k) * old_filtered_value
                 self.VariablesDict[VariableNameStr]["__SignalOutFilteredHistoryList"][ListIndex][0] = self.VariablesDict[VariableNameStr]["ExponentialSmoothingFilterLambda"] * self.VariablesDict[VariableNameStr]["__SignalOutFilteredHistoryList"][ListIndex][0] + (1.0 - self.VariablesDict[VariableNameStr]["ExponentialSmoothingFilterLambda"]) * self.VariablesDict[VariableNameStr]["__SignalOutFilteredHistoryList"][ListIndex][1]
-            ###############################################
+            ##########################################################################################################
+            ##########################################################################################################
 
-            ###############################################
+            ##########################################################################################################
+            ##########################################################################################################
             self.VariablesDict[VariableNameStr]["Raw_MostRecentValuesList"][ListIndex] = self.VariablesDict[VariableNameStr]["__SignalInRawHistoryList"][ListIndex][0]
             self.VariablesDict[VariableNameStr]["Filtered_MostRecentValuesList"][ListIndex] = self.VariablesDict[VariableNameStr]["__SignalOutFilteredHistoryList"][ListIndex][0]
-            ###############################################
-
-            ###############################################
-            ###############################################
+            ##########################################################################################################
+            ##########################################################################################################
 
             #print("VariableNameStr Lambda: " + VariableNameStr + " = " + str(self.VariablesDict[VariableNameStr]["ExponentialSmoothingFilterLambda"]))
 
-            ###############################################
-            ###############################################
-            ###############################################
+        ##########################################################################################################
+        ##########################################################################################################
+        ##########################################################################################################
 
+        ##########################################################################################################
+        ##########################################################################################################
+        ##########################################################################################################
         except:
             exceptions = sys.exc_info()[0]
             print("UpdateOneVariableWithNewValue, exceptions: %s" % exceptions)
             traceback.print_exc()
+        ##########################################################################################################
+        ##########################################################################################################
+        ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
     ##########################################################################################################
     ##########################################################################################################
 
