@@ -6,12 +6,20 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision M, 08/08/2025
+Software Revision N, 12/26/2025
 
-Verified working on: Python 3.11/3.12 for Windows 10, 11 64-bit.
+Python 3.11/12 but NOT 3.13 (ingenialink requires scipy==1.12.0 compatible, which is NOT compatible with Python 3.13)
 '''
 
 __author__ = 'reuben.brewer'
+
+##########################################################################################################
+##########################################################################################################
+
+##########################################
+import ReubenGithubCodeModulePaths #Replaces the need to have "ReubenGithubCodeModulePaths.pth" within "C:\Anaconda3\Lib\site-packages".
+ReubenGithubCodeModulePaths.Enable()
+##########################################
 
 ##########################################
 from EntryListWithBlinking_ReubenPython2and3Class import *
@@ -53,6 +61,9 @@ if platform.system() == "Windows":
     winmm = ctypes.WinDLL('winmm')
     winmm.timeBeginPeriod(1) #Set minimum timer resolution to 1ms so that time.sleep(0.001) behaves properly.
 ##########################################
+
+##########################################################################################################
+##########################################################################################################
 
 class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
 
@@ -428,16 +439,6 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                 self.USE_GUI_FLAG = 0
 
             print("IngeniaBLDC_ReubenPython3Class __init__: USE_GUI_FLAG: " + str(self.USE_GUI_FLAG))
-            #########################################################
-            #########################################################
-
-            #########################################################
-            #########################################################
-            if "root" in self.GUIparametersDict:
-                self.root = self.GUIparametersDict["root"]
-            else:
-                print("IngeniaBLDC_ReubenPython3Class __init__: ERROR, must pass in 'root'")
-                return
             #########################################################
             #########################################################
 
@@ -988,12 +989,12 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
 
         #########################################################
         #new_filtered_value = k * raw_sensor_value + (1 - k) * old_filtered_value
-        self.LowPassFilterForDictsOfLists_ReubenPython2and3ClassObject_DictOfVariableFilterSettings = dict([("DataStreamingFrequency_CalculatedFromDedicatedPDOThread", dict([("UseMedianFilterFlag", 1), ("UseExponentialSmoothingFilterFlag", 1),("ExponentialSmoothingFilterLambda", 0.05)])),
-                                                                                                             ("DataStreamingFrequency_CalculatedFromDedicatedTxThread", dict([("UseMedianFilterFlag", 1), ("UseExponentialSmoothingFilterFlag", 1),("ExponentialSmoothingFilterLambda", 0.05)])),
-                                                                                                             ("DataStreamingFrequency_CalculatedFromDedicatedRxThread", dict([("UseMedianFilterFlag", 1), ("UseExponentialSmoothingFilterFlag", 1),("ExponentialSmoothingFilterLambda", 0.05)])),
-                                                                                                            ("DataStreamingFrequency_CalculatedFromGUIthread", dict([("UseMedianFilterFlag", 1), ("UseExponentialSmoothingFilterFlag", 1), ("ExponentialSmoothingFilterLambda", 0.05)])),
-                                                                                                            ("DataStreamingFrequency_CalculatedFromTPDOcallback", dict([("UseMedianFilterFlag", 1), ("UseExponentialSmoothingFilterFlag", 1),("ExponentialSmoothingFilterLambda", 0.05)])),
-                                                                                                            ("DataStreamingFrequency_CalculatedFromRPDOcallback", dict([("UseMedianFilterFlag", 1), ("UseExponentialSmoothingFilterFlag", 1),("ExponentialSmoothingFilterLambda", 0.05)]))])
+        self.LowPassFilterForDictsOfLists_ReubenPython2and3ClassObject_DictOfVariableFilterSettings = dict([("DataStreamingFrequency_CalculatedFromDedicatedPDOThread", dict([("UseMedianFilterFlag", 0), ("UseExponentialSmoothingFilterFlag", 1),("ExponentialSmoothingFilterLambda", 0.05)])),
+                                                                                                             ("DataStreamingFrequency_CalculatedFromDedicatedTxThread", dict([("UseMedianFilterFlag", 0), ("UseExponentialSmoothingFilterFlag", 1),("ExponentialSmoothingFilterLambda", 0.05)])),
+                                                                                                             ("DataStreamingFrequency_CalculatedFromDedicatedRxThread", dict([("UseMedianFilterFlag", 0), ("UseExponentialSmoothingFilterFlag", 1),("ExponentialSmoothingFilterLambda", 0.05)])),
+                                                                                                            ("DataStreamingFrequency_CalculatedFromGUIthread", dict([("UseMedianFilterFlag", 0), ("UseExponentialSmoothingFilterFlag", 1), ("ExponentialSmoothingFilterLambda", 0.05)])),
+                                                                                                            ("DataStreamingFrequency_CalculatedFromTPDOcallback", dict([("UseMedianFilterFlag", 0), ("UseExponentialSmoothingFilterFlag", 1),("ExponentialSmoothingFilterLambda", 0.05)])),
+                                                                                                            ("DataStreamingFrequency_CalculatedFromRPDOcallback", dict([("UseMedianFilterFlag", 0), ("UseExponentialSmoothingFilterFlag", 1),("ExponentialSmoothingFilterLambda", 0.05)]))])
 
         self.LowPassFilterForDictsOfLists_ReubenPython2and3ClassObject_setup_dict = dict([("DictOfVariableFilterSettings", self.LowPassFilterForDictsOfLists_ReubenPython2and3ClassObject_DictOfVariableFilterSettings)])
 
@@ -1058,13 +1059,6 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
         #########################################################
         self.DedicatedTxThread_ThreadingObject = threading.Thread(target=self.DedicatedTxThread, args=())
         self.DedicatedTxThread_ThreadingObject.start()
-        #########################################################
-        #########################################################
-
-        #########################################################
-        #########################################################
-        if self.USE_GUI_FLAG == 1:
-            self.StartGUI(self.root)
         #########################################################
         #########################################################
 
@@ -4334,6 +4328,17 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                 ##########################################################################################################
                 ##########################################################################################################
 
+                ##########################################################################################################
+                ##########################################################################################################
+                #self.IngeniaMotionControllerObject.communication.sdo_write(0x1010, 0x01, (0x65766173).to_bytes(4, byteorder="little"))
+                #self.IngeniaMotionControllerObject.communication.set_register("CL_POS_REF_MAX", int(PositionMax_EncoderTicks), servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"]) #User maximum allowed position.
+
+                self.IngeniaMotionControllerObject.configuration.store_configuration(servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+                #self.IngeniaMotionControllerObject.configuration.save_configuration(os.path.join(os.getcwd(), "foo.xcf"), servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+                print("InitializeAndStartPDOdataExchange: PDO mapping stored to NVM via 0x1010:01 and save XCF file locally.")
+                ##########################################################################################################
+                ##########################################################################################################
+
             ##########################################################################################################
             ##########################################################################################################
             ##########################################################################################################
@@ -5172,23 +5177,15 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
 
     ##########################################################################################################
     ##########################################################################################################
-    def StartGUI(self, GuiParent):
+    def CreateGUIobjects(self, TkinterParent):
 
-        self.GUI_Thread(GuiParent)
-    ##########################################################################################################
-    ##########################################################################################################
-
-    ##########################################################################################################
-    ##########################################################################################################
-    def GUI_Thread(self, parent):
-
-        print("Starting the GUI_Thread for IngeniaBLDC_ReubenPython3Class object.")
+        print("IngeniaBLDC_ReubenPython3Class, CreateGUIobjects event fired.")
 
         #################################################
         #################################################
         #################################################
-        self.root = parent
-        self.parent = parent
+        self.root = TkinterParent
+        self.parent = TkinterParent
         #################################################
         #################################################
         #################################################
@@ -5339,8 +5336,7 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
 
             #################################################
             #################################################
-            self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_ReubenPython2and3ClassObject_GUIparametersDict"] = dict([("root", self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfoCanvas"]),
-                                                                                                                                                    ("UseBorderAroundThisGuiObjectFlag", 0),
+            self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_ReubenPython2and3ClassObject_GUIparametersDict"] = dict([("UseBorderAroundThisGuiObjectFlag", 0),
                                                                                                                                                     ("GUI_ROW", 3),
                                                                                                                                                     ("GUI_COLUMN", 0),
                                                                                                                                                     ("GUI_PADX", 1),
@@ -5375,6 +5371,8 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                 self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_MostRecentDict_DataUpdateNumber"] = 0
                 self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_MostRecentDict_DataUpdateNumber_last"] = -1
                 self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_ReubenPython2and3ClassObject_NeedsToBeUpdatedFromExternalSourceFlag"] = 0
+
+                self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_ReubenPython2and3ClassObject"].CreateGUIobjects(TkinterParent=self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfoCanvas"]) #unicorn
 
             except:
                 exceptions = sys.exc_info()[0]
