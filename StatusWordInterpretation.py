@@ -6,9 +6,9 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision M, 08/08/2025
+Software Revision N, 12/26/2025
 
-Verified working on: Python 3.12 for Windows 11 64-bit.
+Verified working on: Python 3.11/12/13 for Windows 10, 11 64-bit.
 '''
 
 __author__ = 'reuben.brewer'
@@ -123,8 +123,8 @@ def StatusWordInterpretation(StatusWordToIntrepret):
 ##########################################################################################################
 if __name__ == '__main__':
 
-    StatusWord = 17975 #0x4637
-    StatusWord = 17971 #0x4633
+    StatusWord = 563 #0x4637
+    #StatusWord = 1587 #0x4633
 
     print("StatusWord: " + str(StatusWord) + "\n" + pformat(StatusWordInterpretation(StatusWord)))
 
