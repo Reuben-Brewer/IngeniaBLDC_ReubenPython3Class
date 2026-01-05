@@ -14,11 +14,11 @@ www.reubotics.com
 
 Apache 2 License
 
-Software Revision M, 08/08/2025
+Software Revision N, 12/26/2025
 
 Verified working on:
 
-Python 3.12.
+Python 3.11/12 but NOT 3.13 (ingenialink requires scipy==1.12.0 compatible, which is NOT compatible with Python 3.13)
 
 Windows 10, 11 64-bit
 
@@ -59,6 +59,12 @@ IngeniaBLDC_ReubenPython3Class, ListOfModuleDependencies_NestedLayers: ['future.
 
 IngeniaBLDC_ReubenPython3Class, ListOfModuleDependencies_All:['CSVdataLogger_ReubenPython3Class', 'ElevatePythonPermission_ReubenPython3Class', 'EntryListWithBlinking_ReubenPython2and3Class', 'future.builtins', 'GetPIDsByProcessEnglishNameAndOptionallyKill_ReubenPython2and3', 'ingeniamotion', 'ingeniamotion.enums', 'keyboard', 'LowPassFilter_ReubenPython2and3Class', 'LowPassFilterForDictsOfLists_ReubenPython2and3Class', 'MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class', 'MyPrint_ReubenPython2and3Class', 'numpy', 'pexpect', 'psutil']
 
+pip install ingenialink==7.3.5
+
+pip install ingeniamotion==0.8.5
+
+pip install pysoem==1.1.8
+
 ############
 
 ############
@@ -73,13 +79,13 @@ ExcelPlot_CSVdataLogger_ReubenPython3Code_IngeniaBLDC.py, ListOfModuleDependenci
 
 ExcelPlot_CSVdataLogger_ReubenPython3Code_IngeniaBLDC.py, ListOfModuleDependencies_All:['pandas', 'win32com.client', 'xlsxwriter', 'xlutils.copy', 'xlwt']
 
-pip install pywin32         #version 305.1 as of 10/17/24
+pip install pywin32=311
 
-pip install xlsxwriter      #version 3.2.0 as of 10/17/24. Might have to manually delete older version from /lib/site-packages if it was distutils-managed. Works overall, but the function ".set_size" doesn't do anything.
+pip install xlsxwriter==3.2.9 #Might have to manually delete older version from /lib/site-packages if it was distutils-managed. Works overall, but the function ".set_size" doesn't do anything.
 
-pip install xlutils         #version 2.0.0 as of 10/17/24
+pip install xlutils==2.0.0
 
-pip install xlwt            #version 1.3.0 as of 10/17/24
+pip install xlwt==1.3.0
 
 ############
 
