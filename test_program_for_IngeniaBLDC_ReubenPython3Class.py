@@ -6,7 +6,7 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision N, 12/26/2025
+Software Revision O, 1/22/2026
 
 Python 3.11/12 but NOT 3.13 (ingenialink requires scipy==1.12.0 compatible, which is NOT compatible with Python 3.13)
 '''
@@ -955,12 +955,36 @@ if __name__ == '__main__':
 
     global DesiredSlaves_DictOfDicts #unicorn
 
-    DesiredSlaves_DictOfDicts = dict([(1, dict([("JointEnglishName", "Motor_2"),
+    DesiredSlaves_DictOfDicts = dict([(1, dict([("JointEnglishName", "Motor_1"),
                                                 ("SlaveID_Int", 1),
-                                                ("AllowWritingOfControllerConfigurationFlag", 0),
-                                                ("XDFfileDictionaryPath", os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "cap-xcr-e_eoe_2.4.1.xdf"),
+                                                ("AllowWritingOfControllerConfigurationFlag", 1),
+                                                ("XDFfileDictionaryPath", os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "cap-xcr-e_eoe_2.9.0_v2.xdf"),
                                                 ("OperationMode", "CyclicPosition"),
                                                 ("EncoderTicksPerRevolution_ToBeSet", 8192),
+                                                ("DynamicBrakingEnabledState_ToBeSet", 0),
+                                                ("Position_Max_Rev", 0.0),
+                                                ("Position_Min_Rev", 0.0),
+                                                ("MaxVelocity_ToBeSet", 100.0),
+                                                ("MaxProfileVelocity_ToBeSet", 100.0),
+                                                ("MaxProfileAcceleration_ToBeSet", 1000.0),
+                                                ("PositionPIDgains_Kp_ToBeSet", 0.01),
+                                                ("PositionPIDgains_Ki_ToBeSet", 0.0),
+                                                ("PositionPIDgains_Kd_ToBeSet", 0.1),
+                                                ("PositionFollowingErrorWindow_ToBeSet", 1000000),
+                                                ("PositionFollowingErrorTimeoutMilliseconds_ToBeSet", 2),
+                                                ("PositionFollowingErrorFaultModeInt_ToBeSet", 0),
+                                                ("MaxCurrentHardLimit_ToBeSet", 4.24),
+                                                ("MaxContinuousCurrent_ToBeSet", 4.24),
+                                                ("PeakCurrentValue_ToBeSet", 4.24),
+                                                ("PeakCurrentTimeMilliseconds_ToBeSet", 250),
+                                                ("PeakCurrentFaultModeInt_ToBeSet", 0)])),
+                                       (2, dict([("JointEnglishName", "Motor_2"),
+                                                ("SlaveID_Int", 2),
+                                                ("AllowWritingOfControllerConfigurationFlag", 1),
+                                                ("XDFfileDictionaryPath", os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "den-xcr-e_eoe_2.4.1.xdf"),  #den-xcr-e_eoe_2.4.1.xdf cap-xcr-e_eoe_2.4.1.xdf
+                                                ("OperationMode", "CyclicPosition"),
+                                                ("EncoderTicksPerRevolution_ToBeSet", 8192),
+                                                ("DynamicBrakingEnabledState_ToBeSet", 0),
                                                 ("Position_Max_Rev", 0.0),
                                                 ("Position_Min_Rev", 0.0),
                                                 ("MaxVelocity_ToBeSet", 100.0),
@@ -1227,7 +1251,7 @@ if __name__ == '__main__':
     global IngeniaBLDC_SetupDict
     IngeniaBLDC_SetupDict = dict([("GUIparametersDict", IngeniaBLDC_GUIparametersDict),
                                     ("NameToDisplay_UserSet", "IngeniaBLDC"),
-                                    ("DesiredInterfaceName", "Realtek USB GbE Family Controller"),
+                                    ("DesiredInterfaceName", "Realtek USB GbE Family Controller #4"),
                                     ("DesiredInterfaceName_MustItBeExactMatchFlag", 1), #IMPORTANT
                                     ("DesiredSlaves_DictOfDicts", DesiredSlaves_DictOfDicts),
                                     ("LaunchFlag_MotionLab3_IngEcatGateway_EoEservice", 0),

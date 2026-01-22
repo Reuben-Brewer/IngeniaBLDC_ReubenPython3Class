@@ -6,7 +6,7 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision N, 12/26/2025
+Software Revision O, 1/22/2026
 
 Python 3.11/12 but NOT 3.13 (ingenialink requires scipy==1.12.0 compatible, which is NOT compatible with Python 3.13)
 '''
@@ -690,6 +690,10 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                                                                         ("EnabledState_ToBeSet", 0),
                                                                         ("EnabledState_NeedsToBeSetFlag", 0),
                                                                         ("EnabledState_Actual", -1),
+
+                                                                        ("DynamicBrakingEnabledState_ToBeSet", -1),
+                                                                        ("DynamicBrakingEnabledState_NeedsToBeSetFlag", 0),
+                                                                        ("DynamicBrakingEnabledState_Actual", -1),
 
                                                                         ("EncoderTicksPerRevolution_ToBeSet", 1),
                                                                         ("EncoderTicksPerRevolution_Actual", -11111),
@@ -1661,6 +1665,11 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                 self.IngeniaMotionController_MainDict[SlaveID_Int]["VendorID_Actual"] = self.IngeniaMotionControllerObject.configuration.get_vendor_id()
                 self.IngeniaMotionController_MainDict[SlaveID_Int]["ProductCode_Actual"] = self.IngeniaMotionControllerObject.configuration.get_product_code()
                 self.IngeniaMotionController_MainDict[SlaveID_Int]["FWversion_Actual"] = self.IngeniaMotionControllerObject.configuration.get_fw_version()
+
+                print("For SlaveID_Int = " + str(SlaveID_Int) + ", SerialNumber_Actual: " + str(self.IngeniaMotionController_MainDict[SlaveID_Int]["SerialNumber_Actual"]))
+                print("For SlaveID_Int = " + str(SlaveID_Int) + ", VendorID_Actual: " + str(self.IngeniaMotionController_MainDict[SlaveID_Int]["VendorID_Actual"]))
+                print("For SlaveID_Int = " + str(SlaveID_Int) + ", ProductCode_Actual: " + str(self.IngeniaMotionController_MainDict[SlaveID_Int]["ProductCode_Actual"]))
+                print("For SlaveID_Int = " + str(SlaveID_Int) + ", FWversion_Actual: " + str(self.IngeniaMotionController_MainDict[SlaveID_Int]["FWversion_Actual"]))
                 ##########################################################################################################
                 ##########################################################################################################
 
@@ -1668,6 +1677,13 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                 ##########################################################################################################
                 if self.IngeniaMotionController_MainDict[SlaveID_Int]["EncoderTicksPerRevolution_ToBeSet"] != -11111.0 and self.IngeniaMotionController_MainDict[SlaveID_Int]["EncoderTicksPerRevolution_ToBeSet"] != 1:
                     self.__SetEncoderTicksPerRevolution(SlaveID_Int, self.IngeniaMotionController_MainDict[SlaveID_Int]["EncoderTicksPerRevolution_ToBeSet"], PrintDebugFlag=1)
+                ##########################################################################################################
+                ##########################################################################################################
+
+                ########################################################################################################## THESE SET'S HAVE TO TAKE PLACE AFTER THE MOTOR IS CONNECTED
+                ##########################################################################################################
+                if self.IngeniaMotionController_MainDict[SlaveID_Int]["DynamicBrakingEnabledState_ToBeSet"] != -1:
+                    self.__SetDynamicBrakingEnabledState(SlaveID_Int, self.IngeniaMotionController_MainDict[SlaveID_Int]["DynamicBrakingEnabledState_ToBeSet"], PrintDebugFlag=1)
                 ##########################################################################################################
                 ##########################################################################################################
 
@@ -2305,6 +2321,118 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
         except:
             exceptions = sys.exc_info()[0]
             print("__ResetFaults, exceptions: %s" % exceptions)
+            traceback.print_exc()
+
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
+    def __GetDynamicBrakingEnabledState(self, SlaveID_Int, PrintDebugFlag = 0):
+
+        try:
+            if self.IngeniaMotionController_MainDict[SlaveID_Int]["MotorConnectedFlag"] == 1:
+
+                self.IngeniaMotionController_MainDict[SlaveID_Int]["DynamicBrakingEnabledState_Actual"] = self.IngeniaMotionControllerObject.communication.get_register("PS_DISABLE_OPTION", #"0x262E"
+                                                                                                                                                               servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+                ##########################################################################################################
+                if PrintDebugFlag == 1:
+                    print("__GetDynamicBrakingEnabledState event fired for SlaveID_Int = " + str(SlaveID_Int) + ", DynamicBrakingEnabledState_Actual: "  + str(self.IngeniaMotionController_MainDict[SlaveID_Int]["DynamicBrakingEnabledState_Actual"]))
+                ##########################################################################################################
+
+        except:
+            exceptions = sys.exc_info()[0]
+            print("__GetDynamicBrakingEnabledState, exceptions: %s" % exceptions)
+            traceback.print_exc()
+
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
+    def __SetDynamicBrakingEnabledState(self, SlaveID_Int, DynamicBrakingEnabledState, PrintDebugFlag = 0):
+
+        ##########################################################################################################
+        ##########################################################################################################
+        ##########################################################################################################
+        try:
+
+            if self.IngeniaMotionController_MainDict[SlaveID_Int]["MotorConnectedFlag"] == 1:
+
+                ##########################################################################################################
+                ##########################################################################################################
+                if DynamicBrakingEnabledState in [0, 1]:
+                    N = 1
+
+                    ##########################################################################################################
+                    for Counter in range(0, N):
+                        self.IngeniaMotionControllerObject.communication.set_register("PS_DISABLE_OPTION", DynamicBrakingEnabledState, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"]) #"0x262E"
+                        time.sleep(0.001)
+                    ##########################################################################################################
+
+                    ##########################################################################################################
+                    self.__GetDynamicBrakingEnabledState(SlaveID_Int, PrintDebugFlag)
+                    ##########################################################################################################
+
+                    ##########################################################################################################
+                    if PrintDebugFlag == 1:
+                        print("__SetDynamicBrakingEnabledState event fired for SlaveID_Int = " + str(SlaveID_Int) + ", DynamicBrakingEnabledState = " + str(DynamicBrakingEnabledState))
+                    ##########################################################################################################
+
+                ##########################################################################################################
+                ##########################################################################################################
+
+                ##########################################################################################################
+                ##########################################################################################################
+                else:
+                    print("__SetDynamicBrakingEnabledState: Error, DynamicBrakingEnabledState must be 0 or 1 for SlaveID_Int = " + str(SlaveID_Int))
+                ##########################################################################################################
+                ##########################################################################################################
+
+            else:
+                print("__SetDynamicBrakingEnabledState error: MotorConnectedFlag != 0 for SlaveID_Int = " + str(SlaveID_Int))
+
+        ##########################################################################################################
+        ##########################################################################################################
+        ##########################################################################################################
+
+        ##########################################################################################################
+        ##########################################################################################################
+        ##########################################################################################################
+        except:
+            exceptions = sys.exc_info()[0]
+            print("__SetDynamicBrakingEnabledState, exceptions: %s" % exceptions)
+            #traceback.print_exc()
+        ##########################################################################################################
+        ##########################################################################################################
+        ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
+    def SetDynamicBrakingEnabledState_ExternalProgram(self, SlaveID_Int, DynamicBrakingEnabledStateTarget, PrintDebugFlag = 0):
+        try:
+
+            DynamicBrakingEnabledStateTarget = int(DynamicBrakingEnabledStateTarget)
+            if DynamicBrakingEnabledStateTarget not in [0, 1]:
+                print("SetDynamicBrakingEnabledState_ExternalProgram error for SlaveID_Int = " + str(SlaveID_Int) + ", DynamicBrakingEnabledStateTarget must be in [0, 1].")
+                return
+
+            self.IngeniaMotionController_MainDict[SlaveID_Int]["DynamicBrakingEnabledState_ToBeSet"] = DynamicBrakingEnabledStateTarget
+            self.IngeniaMotionController_MainDict[SlaveID_Int]["DynamicBrakingEnabledState_NeedsToBeSetFlag"] = 1
+
+            if PrintDebugFlag == 1:
+                print("SetDynamicBrakingEnabledState_ExternalProgram event fired for SlaveID_Int = " + str(SlaveID_Int) + ", DynamicBrakingEnabledStateTarget = " + str(DynamicBrakingEnabledStateTarget))
+
+        except:
+            exceptions = sys.exc_info()[0]
+            print("SetDynamicBrakingEnabledState_ExternalProgram, exceptions: %s" % exceptions)
             traceback.print_exc()
 
     ##########################################################################################################
@@ -4333,7 +4461,7 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                 #self.IngeniaMotionControllerObject.communication.sdo_write(0x1010, 0x01, (0x65766173).to_bytes(4, byteorder="little"))
                 #self.IngeniaMotionControllerObject.communication.set_register("CL_POS_REF_MAX", int(PositionMax_EncoderTicks), servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"]) #User maximum allowed position.
 
-                self.IngeniaMotionControllerObject.configuration.store_configuration(servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+                #self.IngeniaMotionControllerObject.configuration.store_configuration(servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
                 #self.IngeniaMotionControllerObject.configuration.save_configuration(os.path.join(os.getcwd(), "foo.xcf"), servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
                 print("InitializeAndStartPDOdataExchange: PDO mapping stored to NVM via 0x1010:01 and save XCF file locally.")
                 ##########################################################################################################
@@ -4588,23 +4716,31 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
 
                         ##########################################################################################################
                         if self.IngeniaMotionController_MainDict[SlaveID_Int]["EnabledState_NeedsToBeSetFlag"] == 1:
-                            self.__SetEnabledState(SlaveID_Int,
-                                                   self.IngeniaMotionController_MainDict[SlaveID_Int]["EnabledState_ToBeSet"],
-                                                   PrintDebugFlag=1)
+                            
+                            self.__SetEnabledState(SlaveID_Int, self.IngeniaMotionController_MainDict[SlaveID_Int]["EnabledState_ToBeSet"], PrintDebugFlag=1)
 
                             self.IngeniaMotionController_MainDict[SlaveID_Int]["EnabledState_NeedsToBeSetFlag"] = 0
                         ##########################################################################################################
 
                         ##########################################################################################################
                         if self.IngeniaMotionController_MainDict[SlaveID_Int]["ResetFaults_EventNeedsToBeFiredFlag"] == 1:
-                            self.__ResetFaults(SlaveID_Int,
-                                               PrintDebugFlag=1)
+                            
+                            self.__ResetFaults(SlaveID_Int, PrintDebugFlag=1)
 
                             self.IngeniaMotionController_MainDict[SlaveID_Int]["ResetFaults_EventNeedsToBeFiredFlag"] = 0
                         ##########################################################################################################
 
                         ##########################################################################################################
+                        if self.IngeniaMotionController_MainDict[SlaveID_Int]["DynamicBrakingEnabledState_NeedsToBeSetFlag"] == 1:
+                            
+                            self.__SetDynamicBrakingEnabledState(SlaveID_Int, self.IngeniaMotionController_MainDict[SlaveID_Int]["DynamicBrakingEnabledState_ToBeSet"], PrintDebugFlag=1)
+
+                            self.IngeniaMotionController_MainDict[SlaveID_Int]["DynamicBrakingEnabledState_NeedsToBeSetFlag"] = 0
+                        ##########################################################################################################
+
+                        ##########################################################################################################
                         if self.IngeniaMotionController_MainDict[SlaveID_Int]["ZeroEncoder_EventNeedsToBeFiredFlag"] == 1:
+                            
                             self.SetPosition_ExternalProgram(SlaveID_Int, 0) #OTHERWISE THE MOTOR WILL JUMP BECAUSE ITS TARGET IS NO-ZERO WHEN ITS ENCODER IS RESET TO ZERO
 
                             self.IngeniaMotionController_MainDict[SlaveID_Int]["EncoderOffset_ToBeSet"] = self.IngeniaMotionController_MainDict[SlaveID_Int]["Position_Actual_EncoderTicks"]
@@ -4616,15 +4752,14 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                         ##########################################################################################################
                         if self.IngeniaMotionController_MainDict[SlaveID_Int]["EncoderOffset_NeedsToBeSetFlag"] == 1:
 
-                            self.__SetEncoderOffset(SlaveID_Int,
-                                                 0.0,
-                                                 PrintDebugFlag=1)
+                            self.__SetEncoderOffset(SlaveID_Int, 0.0, PrintDebugFlag=1)
 
                             self.IngeniaMotionController_MainDict[SlaveID_Int]["EncoderOffset_NeedsToBeSetFlag"] = 0
                         ##########################################################################################################
 
                         ##########################################################################################################
                         if self.IngeniaMotionController_MainDict[SlaveID_Int]["FaultReset_EventNeedsToBeFiredFlag"] == 1:
+                            
                             self.__ResetFaults(SlaveID_Int, PrintDebugFlag=1)
 
                             self.IngeniaMotionController_MainDict[SlaveID_Int]["FaultReset_EventNeedsToBeFiredFlag"] = 0
@@ -4668,22 +4803,15 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                         ##########################################################################################################
                         if self.IngeniaMotionController_MainDict[SlaveID_Int]["VelocityPIDgains_NeedsToBeSetFlag"] == 1:
 
-                            self.__SetVelocityPIDgains(SlaveID_Int,
-                                                       self.IngeniaMotionController_MainDict[SlaveID_Int]["VelocityPIDgains_Kp_ToBeSet"],
-                                                       self.IngeniaMotionController_MainDict[SlaveID_Int]["VelocityPIDgains_Ki_ToBeSet"],
-                                                       self.IngeniaMotionController_MainDict[SlaveID_Int]["VelocityPIDgains_Kd_ToBeSet"],
-                                                       PrintDebugFlag=1)
+                            self.__SetVelocityPIDgains(SlaveID_Int, self.IngeniaMotionController_MainDict[SlaveID_Int]["VelocityPIDgains_Kp_ToBeSet"], self.IngeniaMotionController_MainDict[SlaveID_Int]["VelocityPIDgains_Ki_ToBeSet"], self.IngeniaMotionController_MainDict[SlaveID_Int]["VelocityPIDgains_Kd_ToBeSet"], PrintDebugFlag=1)
 
                             self.IngeniaMotionController_MainDict[SlaveID_Int]["VelocityPIDgains_NeedsToBeSetFlag"] = 0
                         ##########################################################################################################
 
                         ##########################################################################################################
                         if self.IngeniaMotionController_MainDict[SlaveID_Int]["CurrentDirectPIgains_NeedsToBeSetFlag"] == 1:
-
-                            self.__SetCurrentDirectPIgains(SlaveID_Int,
-                                                       self.IngeniaMotionController_MainDict[SlaveID_Int]["CurrentDirectPIgains_Kp_ToBeSet"],
-                                                       self.IngeniaMotionController_MainDict[SlaveID_Int]["CurrentDirectPIgains_Ki_ToBeSet"],
-                                                       PrintDebugFlag=1)
+                            
+                            self.__SetCurrentDirectPIgains(SlaveID_Int, self.IngeniaMotionController_MainDict[SlaveID_Int]["CurrentDirectPIgains_Kp_ToBeSet"], self.IngeniaMotionController_MainDict[SlaveID_Int]["CurrentDirectPIgains_Ki_ToBeSet"], PrintDebugFlag=1)
 
                             self.IngeniaMotionController_MainDict[SlaveID_Int]["CurrentDirectPIgains_NeedsToBeSetFlag"] = 0
                         ##########################################################################################################
@@ -4691,10 +4819,7 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                         ##########################################################################################################
                         if self.IngeniaMotionController_MainDict[SlaveID_Int]["CurrentQuadraturePIgains_NeedsToBeSetFlag"] == 1:
 
-                            self.__SetCurrentQuadraturePIgains(SlaveID_Int,
-                                                       self.IngeniaMotionController_MainDict[SlaveID_Int]["CurrentQuadraturePIgains_Kp_ToBeSet"],
-                                                       self.IngeniaMotionController_MainDict[SlaveID_Int]["CurrentQuadraturePIgains_Ki_ToBeSet"],
-                                                       PrintDebugFlag=1)
+                            self.__SetCurrentQuadraturePIgains(SlaveID_Int, self.IngeniaMotionController_MainDict[SlaveID_Int]["CurrentQuadraturePIgains_Kp_ToBeSet"], self.IngeniaMotionController_MainDict[SlaveID_Int]["CurrentQuadraturePIgains_Ki_ToBeSet"], PrintDebugFlag=1)
 
                             self.IngeniaMotionController_MainDict[SlaveID_Int]["CurrentQuadraturePIgains_NeedsToBeSetFlag"] = 0
                         ##########################################################################################################
@@ -4702,9 +4827,7 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                         ##########################################################################################################
                         if self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxVelocity_NeedsToBeSetFlag"] == 1:
 
-                            self.__SetMaxVelocity(SlaveID_Int,
-                                                 self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxVelocity_ToBeSet"],
-                                                 PrintDebugFlag=1)
+                            self.__SetMaxVelocity(SlaveID_Int, self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxVelocity_ToBeSet"], PrintDebugFlag=1)
 
                             self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxVelocity_NeedsToBeSetFlag"] = 0
                         ##########################################################################################################
@@ -4712,9 +4835,7 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                         ##########################################################################################################
                         if self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxProfileVelocity_NeedsToBeSetFlag"] == 1:
 
-                            self.__SetMaxProfileVelocity(SlaveID_Int,
-                                                 self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxProfileVelocity_ToBeSet"],
-                                                 PrintDebugFlag=1)
+                            self.__SetMaxProfileVelocity(SlaveID_Int, self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxProfileVelocity_ToBeSet"], PrintDebugFlag=1)
 
                             self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxProfileVelocity_NeedsToBeSetFlag"] = 0
                         ##########################################################################################################
@@ -4722,9 +4843,7 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                         ##########################################################################################################
                         if self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxProfileAcceleration_NeedsToBeSetFlag"] == 1:
 
-                            self.__SetMaxProfileAcceleration(SlaveID_Int,
-                                                 self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxProfileAcceleration_ToBeSet"],
-                                                 PrintDebugFlag=1)
+                            self.__SetMaxProfileAcceleration(SlaveID_Int, self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxProfileAcceleration_ToBeSet"], PrintDebugFlag=1)
 
                             self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxProfileAcceleration_NeedsToBeSetFlag"] = 0
                         ##########################################################################################################
@@ -4732,9 +4851,7 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                         ##########################################################################################################
                         if self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxCurrentHardLimit_NeedsToBeSetFlag"] == 1:
 
-                            self.__SetMaxCurrentHardLimit(SlaveID_Int,
-                                                 self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxCurrentHardLimit_ToBeSet"],
-                                                 PrintDebugFlag=1)
+                            self.__SetMaxCurrentHardLimit(SlaveID_Int, self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxCurrentHardLimit_ToBeSet"], PrintDebugFlag=1)
 
                             self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxCurrentHardLimit_NeedsToBeSetFlag"] = 0
                         ##########################################################################################################
@@ -4742,9 +4859,7 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                         ##########################################################################################################
                         if self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxContinuousCurrent_NeedsToBeSetFlag"] == 1:
 
-                            self.__SetMaxContinuousCurrent(SlaveID_Int,
-                                                 self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxContinuousCurrent_ToBeSet"],
-                                                 PrintDebugFlag=1)
+                            self.__SetMaxContinuousCurrent(SlaveID_Int, self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxContinuousCurrent_ToBeSet"], PrintDebugFlag=1)
 
                             self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxContinuousCurrent_NeedsToBeSetFlag"] = 0
                         ##########################################################################################################
@@ -5298,8 +5413,8 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
             #################################################
             #################################################
             self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EnabledState_Button"] = Button(self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfo_ButtonsFrame"],
-                                                                                                         text="EnabledState_Button " + str(SlaveID_Int), state="normal",
-                                                                                                         width=20,
+                                                                                                         text="EnabledState" + str(SlaveID_Int), state="normal",
+                                                                                                         width=10,
                                                                                                          bg=self.TKinter_LightYellowColor,
                                                                                                          command=lambda name=SlaveID_Int: self.EnabledState_Button_Response(name))
 
@@ -5310,8 +5425,8 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
             #################################################
             #################################################
             self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["ZeroEncoder_Button"] = Button(self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfo_ButtonsFrame"],
-                                                                                                         text="ZeroEncoder_Button " + str(SlaveID_Int), state="normal",
-                                                                                                         width=20,
+                                                                                                         text="ZeroEncoder" + str(SlaveID_Int), state="normal",
+                                                                                                         width=10,
                                                                                                          bg=self.TKinter_DefaultGrayColor,
                                                                                                          command=lambda name=SlaveID_Int: self.ZeroEncoder_Button_Response(name))
 
@@ -5325,12 +5440,24 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
             #################################################
             #################################################
             self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["FaultReset_Button"] = Button(self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfo_ButtonsFrame"],
-                                                                                                         text="FaultReset_Button " + str(SlaveID_Int), state="normal",
-                                                                                                         width=20,
+                                                                                                         text="FaultReset" + str(SlaveID_Int), state="normal",
+                                                                                                         width=10,
                                                                                                          bg=self.TKinter_DefaultGrayColor,
                                                                                                          command=lambda name=SlaveID_Int: self.FaultReset_Button_Response(name))
 
             self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["FaultReset_Button"].grid(row=0, column=2, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
+            #################################################
+            #################################################
+            
+            #################################################
+            #################################################
+            self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["DynamicBrakingEnabledState_Button"] = Button(self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfo_ButtonsFrame"],
+                                                                                                         text="DynamicBraking" + str(SlaveID_Int), state="normal",
+                                                                                                         width=14,
+                                                                                                         bg=self.TKinter_DefaultGrayColor,
+                                                                                                         command=lambda name=SlaveID_Int: self.DynamicBrakingEnabledState_Button_Response(name))
+
+            self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["DynamicBrakingEnabledState_Button"].grid(row=0, column=3, padx=self.GUI_PADX, pady=self.GUI_PADY, columnspan=1, rowspan=1)
             #################################################
             #################################################
 
@@ -5542,6 +5669,28 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
 
     ##########################################################################################################
     ##########################################################################################################
+    def DynamicBrakingEnabledState_Button_Response(self, name):
+
+        SlaveID_Int = int(name)
+
+        ##########################################################################################################
+        if self.IngeniaMotionController_MainDict[SlaveID_Int]["DynamicBrakingEnabledState_Actual"] == 1:
+            self.IngeniaMotionController_MainDict[SlaveID_Int]["DynamicBrakingEnabledState_ToBeSet"] = 0
+        else:
+            self.IngeniaMotionController_MainDict[SlaveID_Int]["DynamicBrakingEnabledState_ToBeSet"] = 1
+
+        self.IngeniaMotionController_MainDict[SlaveID_Int]["DynamicBrakingEnabledState_NeedsToBeSetFlag"] = 1
+        ##########################################################################################################
+
+        ##########################################################################################################
+        print("DynamicBrakingEnabledState_Button_Response: Event fired for SlaveID_Int = " + str(SlaveID_Int))
+        ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
+
+    ##########################################################################################################
+    ##########################################################################################################
     def IndividualMotorMotionSetpoint_GUIscale_EventResponse(self, event, name):
 
         SlaveID_Int = int(name)
@@ -5668,6 +5817,19 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                             self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EnabledState_Button"]["bg"] = self.TKinter_LightYellowColor
                         #######################################################
                         #######################################################
+                        
+                        #######################################################
+                        #######################################################
+                        if self.IngeniaMotionController_MainDict[SlaveID_Int]["DynamicBrakingEnabledState_Actual"] == 1:
+                            self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["DynamicBrakingEnabledState_Button"]["bg"] = self.TKinter_LightGreenColor
+
+                        elif self.IngeniaMotionController_MainDict[SlaveID_Int]["DynamicBrakingEnabledState_Actual"] == 0:
+                            self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["DynamicBrakingEnabledState_Button"]["bg"] = self.TKinter_LightRedColor
+
+                        else:
+                            self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["DynamicBrakingEnabledState_Button"]["bg"] = self.TKinter_LightYellowColor
+                        #######################################################
+                        #######################################################
 
                         #######################################################
                         #######################################################
@@ -5691,6 +5853,7 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                                             ("OperationMode_Actual_EnglishName", self.IngeniaMotionController_MainDict[SlaveID_Int]["OperationMode_Actual_EnglishName"]),
                                             ("EncoderTicksPerRevolution_Actual", self.IngeniaMotionController_MainDict[SlaveID_Int]["EncoderTicksPerRevolution_Actual"]),
                                             ("EnabledState_Actual", self.IngeniaMotionController_MainDict[SlaveID_Int]["EnabledState_Actual"]),
+                                            ("DynamicBrakingEnabledState_Actual", self.IngeniaMotionController_MainDict[SlaveID_Int]["DynamicBrakingEnabledState_Actual"]),
                                             ("Error_Last_HexCode", self.IngeniaMotionController_MainDict[SlaveID_Int]["Error_Last_HexCode"]),
                                             ("Error_Last_EnglishName", self.IngeniaMotionController_MainDict[SlaveID_Int]["Error_Last_EnglishName"]),
                                             ("Position_ToBeSet_EncoderTicks", self.IngeniaMotionController_MainDict[SlaveID_Int]["Position_ToBeSet_EncoderTicks"]),
@@ -5758,9 +5921,9 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
 
                         #######################################################
                         self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfo_Label"]["text"] = self.ConvertDictToProperlyFormattedStringForPrinting(DictToDisplay,
-                                                                                                    NumberOfDecimalsPlaceToUse = 4,
-                                                                                                    NumberOfEntriesPerLine = 1,
-                                                                                                    NumberOfTabsBetweenItems = 1)
+                                                                                                                                                                                NumberOfDecimalsPlaceToUse = 4,
+                                                                                                                                                                                NumberOfEntriesPerLine = 1,
+                                                                                                                                                                                NumberOfTabsBetweenItems = 1)
                         #######################################################
 
                         #######################################################
