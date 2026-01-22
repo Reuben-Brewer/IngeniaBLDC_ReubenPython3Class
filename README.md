@@ -14,7 +14,7 @@ www.reubotics.com
 
 Apache 2 License
 
-Software Revision N, 12/26/2025
+Software Revision O, 01/22/2026
 
 Verified working on:
 
@@ -59,11 +59,11 @@ IngeniaBLDC_ReubenPython3Class, ListOfModuleDependencies_NestedLayers: ['future.
 
 IngeniaBLDC_ReubenPython3Class, ListOfModuleDependencies_All:['CSVdataLogger_ReubenPython3Class', 'ElevatePythonPermission_ReubenPython3Class', 'EntryListWithBlinking_ReubenPython2and3Class', 'future.builtins', 'GetPIDsByProcessEnglishNameAndOptionallyKill_ReubenPython2and3', 'ingeniamotion', 'ingeniamotion.enums', 'keyboard', 'LowPassFilter_ReubenPython2and3Class', 'LowPassFilterForDictsOfLists_ReubenPython2and3Class', 'MyPlotterPureTkinterStandAloneProcess_ReubenPython2and3Class', 'MyPrint_ReubenPython2and3Class', 'numpy', 'pexpect', 'psutil']
 
-pip install ingenialink==7.3.5
+pip install ingenialink==7.5.2
 
-pip install ingeniamotion==0.8.5
+pip install ingeniamotion==0.10.1
 
-pip install pysoem==1.1.8
+pip install pysoem==1.1.13
 
 ############
 
