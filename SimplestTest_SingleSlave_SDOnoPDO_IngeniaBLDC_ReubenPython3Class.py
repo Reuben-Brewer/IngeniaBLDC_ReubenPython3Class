@@ -6,9 +6,9 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision O, 1/22/2026
+Software Revision P, 1/29/2026
 
-Verified working on: Python 3.11/12/13 for Windows 10, 11 64-bit.
+Python 3.11/12 but NOT 3.13 (ingenialink requires scipy==1.12.0 compatible, which is NOT compatible with Python 3.13)
 '''
 
 __author__ = 'reuben.brewer'
@@ -22,6 +22,9 @@ import traceback
 import keyboard
 from ingeniamotion import MotionController
 from ingeniamotion.enums import OperationMode
+
+import ingeniamotion
+print("ingeniamotion==" + str(ingeniamotion.__version__))
 ##########################################
 
 ##########################################################################################################
@@ -151,9 +154,10 @@ if __name__ == '__main__':
     #DesiredInterfaceName = "Intel(R) Ethernet Connection (2) I219-LM"
     #DesiredInterfaceName = "Realtek USB GbE Family Controller"
     #DesiredInterfaceName = "Dell Realtek USB GbE Family Controller"
-    DesiredInterfaceName = "Realtek USB GbE Family Controller #2"
+    DesiredInterfaceName = "Realtek USB GbE Family Controller #4"
+    #DesiredInterfaceName = "Eth0"
 
-    XDFfileDictionaryPath = os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "cap-xcr-e_eoe_2.4.1.xdf"
+    XDFfileDictionaryPath = os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "cap-xcr-e_eoe_2.9.0_v2.xdf"
     #XDFfileDictionaryPath = os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "den-xcr-e_eoe_2.5.0.xdf"
 
     OperationModeSelected = "CyclicPosition"
@@ -326,6 +330,14 @@ if __name__ == '__main__':
         IngeniaMotionControllerObject.communication.connect_servo_ethercat(InterfaceSelected, DesiredSlaveID_Int, XDFfileDictionaryPath)
 
         IngeniaMotionControllerObject.motion.fault_reset()
+        ##########################################################################################################
+        ##########################################################################################################
+        ##########################################################################################################
+
+        ##########################################################################################################
+        ##########################################################################################################
+        ##########################################################################################################
+
         ##########################################################################################################
         ##########################################################################################################
         ##########################################################################################################

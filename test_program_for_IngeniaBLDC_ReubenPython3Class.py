@@ -6,7 +6,7 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision O, 1/22/2026
+Software Revision P, 1/29/2026
 
 Python 3.11/12 but NOT 3.13 (ingenialink requires scipy==1.12.0 compatible, which is NOT compatible with Python 3.13)
 '''
@@ -958,7 +958,7 @@ if __name__ == '__main__':
     DesiredSlaves_DictOfDicts = dict([(1, dict([("JointEnglishName", "Motor_1"),
                                                 ("SlaveID_Int", 1),
                                                 ("AllowWritingOfControllerConfigurationFlag", 1),
-                                                ("XDFfileDictionaryPath", os.getcwd() + "\\InstallFiles_and_SupportDocuments\\" + "cap-xcr-e_eoe_2.9.0_v2.xdf"),
+                                                ("XDFfileDictionaryPath", os.path.join(os.path.join(os.getcwd(), "InstallFiles_and_SupportDocuments"), "cap-xcr-e_eoe_2.9.0_v2.xdf")),
                                                 ("OperationMode", "CyclicPosition"),
                                                 ("EncoderTicksPerRevolution_ToBeSet", 8192),
                                                 ("DynamicBrakingEnabledState_ToBeSet", 0),
@@ -1232,6 +1232,37 @@ if __name__ == '__main__':
 
     #################################################
     #################################################
+    if my_platform == "windows":
+        IngeniaBLDC_DesiredInterfaceName = "Realtek USB GbE Family Controller #4"
+        IngeniaBLDC_PDO_UpdateDeltaTinSeconds = 0.020
+        IngeniaBLDC_PDO_WatchdogExpirationDurationinSeconds = 0.100
+        IngeniaBLDC_DedicatedRxThread_TimeToSleepEachLoop = 0.002
+        IngeniaBLDC_DedicatedTxThread_TimeToSleepEachLoop = 0.002
+        IngeniaBLDC_DictToDisplay_NumberOfEntriesPerLine = 1
+        IngeniaBLDC_IndividualMotorInfo_Label_Width = 55
+
+    elif my_platform == "linux" or my_platform == "pi":
+        IngeniaBLDC_DesiredInterfaceName = "eth0"
+        IngeniaBLDC_PDO_UpdateDeltaTinSeconds = 0.040
+        IngeniaBLDC_PDO_WatchdogExpirationDurationinSeconds = 0.200
+        IngeniaBLDC_DedicatedRxThread_TimeToSleepEachLoop = 0.003
+        IngeniaBLDC_DedicatedTxThread_TimeToSleepEachLoop = 0.003
+        IngeniaBLDC_DictToDisplay_NumberOfEntriesPerLine = 4
+        IngeniaBLDC_IndividualMotorInfo_Label_Width = 400
+
+    else:
+        IngeniaBLDC_DesiredInterfaceName = "eth0"
+        IngeniaBLDC_PDO_UpdateDeltaTinSeconds = 0.040
+        IngeniaBLDC_PDO_WatchdogExpirationDurationinSeconds = 0.200
+        IngeniaBLDC_DedicatedRxThread_TimeToSleepEachLoop = 0.003
+        IngeniaBLDC_DedicatedTxThread_TimeToSleepEachLoop = 0.003
+        IngeniaBLDC_DictToDisplay_NumberOfEntriesPerLine = 4
+        IngeniaBLDC_IndividualMotorInfo_Label_Width = 400
+    #################################################
+    #################################################
+
+    #################################################
+    #################################################
     global IngeniaBLDC_GUIparametersDict
     IngeniaBLDC_GUIparametersDict = dict([("USE_GUI_FLAG", USE_GUI_FLAG and SHOW_IN_GUI_IngeniaBLDC_FLAG),
                                         ("EnableInternal_MyPrint_Flag", 0),
@@ -1242,7 +1273,9 @@ if __name__ == '__main__':
                                         ("GUI_PADX", GUI_PADX_IngeniaBLDC),
                                         ("GUI_PADY", GUI_PADY_IngeniaBLDC),
                                         ("GUI_ROWSPAN", GUI_ROWSPAN_IngeniaBLDC),
-                                        ("GUI_COLUMNSPAN", GUI_COLUMNSPAN_IngeniaBLDC)])
+                                        ("GUI_COLUMNSPAN", GUI_COLUMNSPAN_IngeniaBLDC),
+                                        ("DictToDisplay_NumberOfEntriesPerLine", IngeniaBLDC_DictToDisplay_NumberOfEntriesPerLine),
+                                        ("IndividualMotorInfo_Label_Width", IngeniaBLDC_IndividualMotorInfo_Label_Width)])
     #################################################
     #################################################
 
@@ -1251,13 +1284,13 @@ if __name__ == '__main__':
     global IngeniaBLDC_SetupDict
     IngeniaBLDC_SetupDict = dict([("GUIparametersDict", IngeniaBLDC_GUIparametersDict),
                                     ("NameToDisplay_UserSet", "IngeniaBLDC"),
-                                    ("DesiredInterfaceName", "Realtek USB GbE Family Controller #4"),
+                                    ("DesiredInterfaceName", IngeniaBLDC_DesiredInterfaceName),
                                     ("DesiredInterfaceName_MustItBeExactMatchFlag", 1), #IMPORTANT
                                     ("DesiredSlaves_DictOfDicts", DesiredSlaves_DictOfDicts),
-                                    ("LaunchFlag_MotionLab3_IngEcatGateway_EoEservice", 0),
-                                    ("DedicatedRxThread_TimeToSleepEachLoop", 0.002),
-                                    ("DedicatedTxThread_TimeToSleepEachLoop", 0.002),
-                                    ("PDO_UpdateDeltaTinSeconds", 0.020),
+                                    ("DedicatedRxThread_TimeToSleepEachLoop", IngeniaBLDC_DedicatedRxThread_TimeToSleepEachLoop),
+                                    ("DedicatedTxThread_TimeToSleepEachLoop", IngeniaBLDC_DedicatedTxThread_TimeToSleepEachLoop),
+                                    ("PDO_UpdateDeltaTinSeconds", IngeniaBLDC_PDO_UpdateDeltaTinSeconds),
+                                    ("PDO_WatchdogExpirationDurationinSeconds", IngeniaBLDC_PDO_WatchdogExpirationDurationinSeconds),
                                     ("EnableMotorAutomaticallyAfterEstopRestorationFlag", 1),
                                     ("EnableMotorAtStartOfProgramFlag", 1),
                                     ("CheckDetectedVsDesiredSlaveListFlag", 0)])
