@@ -14,13 +14,13 @@ www.reubotics.com
 
 Apache 2 License
 
-Software Revision O, 01/22/2026
+Software Revision P, 1/29/2026
 
 Verified working on:
 
 Python 3.11/12 but NOT 3.13 (ingenialink requires scipy==1.12.0 compatible, which is NOT compatible with Python 3.13)
 
-Windows 10, 11 64-bit
+Windows 10, 11 64-bit and Ubuntu 24.04-LTS on Raspberry Pi 5.
 
 Note For test_program_for_IngeniaBLDC_ReubenPython3Class.py:
 
