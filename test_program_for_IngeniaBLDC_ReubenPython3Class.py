@@ -6,7 +6,7 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision P, 1/29/2026
+Software Revision Q, 02/02/2026
 
 Python 3.11/12 but NOT 3.13 (ingenialink requires scipy==1.12.0 compatible, which is NOT compatible with Python 3.13)
 '''
@@ -40,6 +40,7 @@ import datetime
 import threading
 import collections
 import signal #for CTRLc_HandlerFunction
+import math
 import keyboard
 ##########################################
 
@@ -110,7 +111,7 @@ def CTRLc_HandlerFunction(signum, frame):
 ##########################################################################################################
 ##########################################################################################################
 ##########################################################################################################
-def GetLatestWaveformValue(CurrentTime, MinValue, MaxValue, Period, WaveformTypeString="Sine"):
+def GetLatestWaveformValue(CurrentTime, MinValue, MaxValue, Period, WaveformTypeString="Sine", PhaseOffsetInSeconds=0.0, ExtremumTimeTolerance=0.0):
 
         ##########################################################################################################
         ##########################################################################################################
@@ -119,7 +120,10 @@ def GetLatestWaveformValue(CurrentTime, MinValue, MaxValue, Period, WaveformType
 
             ##########################################################################################################
             ##########################################################################################################
+            EffectiveTime = CurrentTime + PhaseOffsetInSeconds
+            
             OutputValue = 0.0
+            ExtremumType = None  # None, "min", "max"
             ##########################################################################################################
             ##########################################################################################################
 
@@ -129,7 +133,33 @@ def GetLatestWaveformValue(CurrentTime, MinValue, MaxValue, Period, WaveformType
 
             if WaveformTypeString not in WaveformTypeString_ListOfAcceptableValues:
                 print("GetLatestWaveformValue: Error, WaveformTypeString must be in " + str(WaveformTypeString_ListOfAcceptableValues))
-                return -11111.0
+                return -11111.0, None
+            ##########################################################################################################
+            ##########################################################################################################
+
+            ##########################################################################################################
+            ##########################################################################################################
+            if Period <= 0.0:
+                print("GetLatestWaveformValue: Error, Period must be > 0")
+                return -11111.0, None
+            ##########################################################################################################
+            ##########################################################################################################
+
+            ##########################################################################################################
+            ##########################################################################################################
+            MinValue_Local = min(MinValue, MaxValue)
+            MaxValue_Local = max(MinValue, MaxValue)
+
+            MeanValue = (MaxValue_Local + MinValue_Local) / 2.0
+            Amplitude = 0.5 * abs(MaxValue_Local - MinValue_Local)
+
+            AngularFrequency = 2.0 * math.pi / Period
+
+            Phase_0to1 = (EffectiveTime % Period) / Period
+            PhaseTolerance = 0.0
+
+            if ExtremumTimeTolerance > 0.0:
+                PhaseTolerance = ExtremumTimeTolerance / Period
             ##########################################################################################################
             ##########################################################################################################
 
@@ -137,8 +167,13 @@ def GetLatestWaveformValue(CurrentTime, MinValue, MaxValue, Period, WaveformType
             ##########################################################################################################
             if WaveformTypeString == "Sine":
 
-                TimeGain = math.pi/Period
-                OutputValue = (MaxValue + MinValue)/2.0 + 0.5*abs(MaxValue - MinValue)*math.sin(TimeGain*CurrentTime)
+                OutputValue = MeanValue + Amplitude * math.sin(AngularFrequency * EffectiveTime)
+
+                if PhaseTolerance > 0.0:
+                    if abs(Phase_0to1 - 0.75) <= PhaseTolerance or abs(Phase_0to1 - 1.75) <= PhaseTolerance:
+                        ExtremumType = "min"
+                    elif abs(Phase_0to1 - 0.25) <= PhaseTolerance:
+                        ExtremumType = "max"
             ##########################################################################################################
             ##########################################################################################################
 
@@ -146,27 +181,30 @@ def GetLatestWaveformValue(CurrentTime, MinValue, MaxValue, Period, WaveformType
             ##########################################################################################################
             elif WaveformTypeString == "Cosine":
 
-                TimeGain = math.pi/Period
-                OutputValue = (MaxValue + MinValue)/2.0 + 0.5*abs(MaxValue - MinValue)*math.cos(TimeGain*CurrentTime)
+                OutputValue = MeanValue + Amplitude * math.cos(AngularFrequency * EffectiveTime)
+
+                if PhaseTolerance > 0.0:
+                    if abs(Phase_0to1 - 0.5) <= PhaseTolerance:
+                        ExtremumType = "min"
+                    elif abs(Phase_0to1 - 0.0) <= PhaseTolerance or abs(Phase_0to1 - 1.0) <= PhaseTolerance:
+                        ExtremumType = "max"
             ##########################################################################################################
             ##########################################################################################################
 
             ##########################################################################################################
             ##########################################################################################################
             elif WaveformTypeString == "Triangular":
-                TriangularInput_TimeGain = 1.0
-                TriangularInput_MinValue = -5
-                TriangularInput_MaxValue = 5.0
-                TriangularInput_PeriodInSeconds = 2.0
 
-                #TriangularInput_Height0toPeak = abs(TriangularInput_MaxValue - TriangularInput_MinValue)
-                #TriangularInput_CalculatedValue_1 = abs((TriangularInput_TimeGain*CurrentTime_CalculatedFromMainThread % PeriodicInput_PeriodInSeconds) - TriangularInput_Height0toPeak) + TriangularInput_MinValue
-
-                A = abs(MaxValue - MinValue)
+                A = abs(MaxValue_Local - MinValue_Local)
                 P = Period
 
-                #https://stackoverflow.com/questions/1073606/is-there-a-one-line-function-that-generates-a-triangle-wave
-                OutputValue = (A / (P / 2)) * ((P / 2) - abs(CurrentTime % (2 * (P / 2)) - P / 2)) + MinValue
+                OutputValue = (A / (P / 2.0)) * ((P / 2.0) - abs((EffectiveTime % P) - (P / 2.0))) + MinValue_Local
+
+                if PhaseTolerance > 0.0:
+                    if abs(Phase_0to1 - 0.0) <= PhaseTolerance or abs(Phase_0to1 - 1.0) <= PhaseTolerance:
+                        ExtremumType = "min"
+                    elif abs(Phase_0to1 - 0.5) <= PhaseTolerance:
+                        ExtremumType = "max"
             ##########################################################################################################
             ##########################################################################################################
 
@@ -174,14 +212,12 @@ def GetLatestWaveformValue(CurrentTime, MinValue, MaxValue, Period, WaveformType
             ##########################################################################################################
             elif WaveformTypeString == "Square":
 
-                TimeGain = math.pi/Period
-                MeanValue = (MaxValue + MinValue)/2.0
-                SinusoidalValue =  MeanValue + 0.5*abs(MaxValue - MinValue)*math.sin(TimeGain*CurrentTime)
-
-                if SinusoidalValue >= MeanValue:
-                    OutputValue = MaxValue
+                if math.sin(AngularFrequency * EffectiveTime) >= 0.0:
+                    OutputValue = MaxValue_Local
                 else:
-                    OutputValue = MinValue
+                    OutputValue = MinValue_Local
+
+                # Square wave has no true local extrema (discontinuous)
             ##########################################################################################################
             ##########################################################################################################
 
@@ -192,7 +228,7 @@ def GetLatestWaveformValue(CurrentTime, MinValue, MaxValue, Period, WaveformType
             ##########################################################################################################
             ##########################################################################################################
 
-            return OutputValue
+            return OutputValue, ExtremumType
 
         ##########################################################################################################
         ##########################################################################################################
@@ -204,8 +240,8 @@ def GetLatestWaveformValue(CurrentTime, MinValue, MaxValue, Period, WaveformType
         except:
             exceptions = sys.exc_info()[0]
             print("GetLatestWaveformValue: Exceptions: %s" % exceptions)
-            return -11111.0
             traceback.print_exc()
+            return -11111.0, None
         ##########################################################################################################
         ##########################################################################################################
         ##########################################################################################################
@@ -771,7 +807,7 @@ if __name__ == '__main__':
     USE_MyPrint_FLAG = 0
 
     global USE_MyPlotterPureTkinterStandAloneProcess_FLAG
-    USE_MyPlotterPureTkinterStandAloneProcess_FLAG = 0
+    USE_MyPlotterPureTkinterStandAloneProcess_FLAG = 1
 
     global USE_CSVdataLogger_FLAG
     USE_CSVdataLogger_FLAG = 0
@@ -927,13 +963,11 @@ if __name__ == '__main__':
     global PeriodicInput_CalculatedValue_1
     PeriodicInput_CalculatedValue_1 = 0.0
 
-    # ''' #CyclicPosition
     global PeriodicInput_MinValue_1
     PeriodicInput_MinValue_1 = -360.0 #degrees
 
     global PeriodicInput_MaxValue_1
     PeriodicInput_MaxValue_1 = 360.0 #degrees
-    # ''' #CyclicPosition
 
     ''' #CyclicCurrent
     global PeriodicInput_MinValue_1
@@ -951,7 +985,20 @@ if __name__ == '__main__':
     PeriodicInput_MaxValue_1 = 0.5
     ''' #CyclicVoltage
 
+    global PeriodicInput_Type_2
+    PeriodicInput_Type_2 = "Triangular"
 
+    global PeriodicInput_Period_2
+    PeriodicInput_Period_2 = 3.0
+
+    global PeriodicInput_CalculatedValue_2
+    PeriodicInput_CalculatedValue_2 = 0.0
+
+    global PeriodicInput_MinValue_2
+    PeriodicInput_MinValue_2 = -360.0 #degrees
+
+    global PeriodicInput_MaxValue_2
+    PeriodicInput_MaxValue_2 = 360.0 #degrees
 
     global DesiredSlaves_DictOfDicts #unicorn
 
@@ -1752,6 +1799,33 @@ if __name__ == '__main__':
         ################################################### SET's
         ###################################################
         ###################################################
+        if USE_PeriodicInput_FLAG == 1:
+
+            PeriodicInput_CalculatedValue_1, ExtremumType_1 = GetLatestWaveformValue(CurrentTime=CurrentTime_CalculatedFromMainThread,
+                                                                                    MinValue=PeriodicInput_MinValue_1,
+                                                                                    MaxValue=PeriodicInput_MaxValue_1,
+                                                                                    Period=PeriodicInput_Period_1,
+                                                                                    WaveformTypeString=PeriodicInput_Type_1,
+                                                                                    PhaseOffsetInSeconds = 0.0,
+                                                                                    ExtremumTimeTolerance=0.001)
+            
+            PeriodicInput_CalculatedValue_2, ExtremumType_2 = GetLatestWaveformValue(CurrentTime=CurrentTime_CalculatedFromMainThread,
+                                                                                    MinValue=PeriodicInput_MinValue_2,
+                                                                                    MaxValue=PeriodicInput_MaxValue_2,
+                                                                                    Period=PeriodicInput_Period_2,
+                                                                                    WaveformTypeString=PeriodicInput_Type_2,
+                                                                                    PhaseOffsetInSeconds = 1.0,
+                                                                                    ExtremumTimeTolerance=0.001)
+            if ExtremumType_1 in ["min", "max"]:
+                print("ExtremumType: " + str(ExtremumType_1))
+
+        ###################################################
+        ###################################################
+        ###################################################
+
+        ################################################### SET's
+        ###################################################
+        ###################################################
         if IngeniaBLDC_OPEN_FLAG == 1:
 
             ###################################################
@@ -1764,12 +1838,6 @@ if __name__ == '__main__':
 
             ###################################################
             if USE_PeriodicInput_FLAG == 1:
-
-                PeriodicInput_CalculatedValue_1 = GetLatestWaveformValue(CurrentTime_CalculatedFromMainThread,
-                                                                         PeriodicInput_MinValue_1,
-                                                                         PeriodicInput_MaxValue_1,
-                                                                         PeriodicInput_Period_1,
-                                                                         PeriodicInput_Type_1)
 
                 for SlaveID_Int in DesiredSlaves_DictOfDicts:
                     #PeriodicInput_CalculatedValue_1_TEMP = SlaveID_Int*PeriodicInput_CalculatedValue_1
@@ -1832,9 +1900,10 @@ if __name__ == '__main__':
                             SlaveID_Int_ToPlot = 3
 
                             ListOfValuesToPlot = []
-
-                            ListOfValuesToPlot.append(IngeniaBLDC_MostRecentDict["IngeniaMotionController_MainDict"][SlaveID_Int_ToPlot]["Position_ToBeSet_AllUnitsDict"]["Deg"])
-                            ListOfValuesToPlot.append(IngeniaBLDC_MostRecentDict["IngeniaMotionController_MainDict"][SlaveID_Int_ToPlot]["Position_Actual_AllUnitsDict"]["Deg"])
+                            ListOfValuesToPlot.append(PeriodicInput_CalculatedValue_1)
+                            ListOfValuesToPlot.append(PeriodicInput_CalculatedValue_2)
+                            #ListOfValuesToPlot.append(IngeniaBLDC_MostRecentDict["IngeniaMotionController_MainDict"][SlaveID_Int_ToPlot]["Position_ToBeSet_AllUnitsDict"]["Deg"])
+                            #ListOfValuesToPlot.append(IngeniaBLDC_MostRecentDict["IngeniaMotionController_MainDict"][SlaveID_Int_ToPlot]["Position_Actual_AllUnitsDict"]["Deg"])
                             #ListOfValuesToPlot.append(IngeniaBLDC_MostRecentDict["IngeniaMotionController_MainDict"][SlaveID_Int_ToPlot]["Current_Quadrature_Actual"])
                             ####################################################
 

@@ -6,7 +6,7 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision P, 1/29/2026
+Software Revision Q, 02/02/2026
 
 Verified working on: Python 3.11/12/13 for Windows 10/11 64-bit  and Raspberry Pi Bookworm.
 '''
@@ -16,7 +16,7 @@ Verified working on: Python 3.11/12/13 for Windows 10/11 64-bit  and Raspberry P
 #######################################################################################################################
 #######################################################################################################################
 __author__ = 'reuben.brewer'
-__version__ = "Software Revision P, 1/29/2026"
+__version__ = "Software Revision Q, 02/02/2026"
 
 from .IngeniaBLDC_ReubenPython3Class import IngeniaBLDC_ReubenPython3Class
 
