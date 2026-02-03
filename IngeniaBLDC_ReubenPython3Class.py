@@ -578,7 +578,7 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
             if "IndividualMotorInfo_Label_Width" in self.GUIparametersDict:
                 self.IndividualMotorInfo_Label_Width = int(self.PassThroughFloatValuesInRange_ExitProgramOtherwise("IndividualMotorInfo_Label_Width", self.GUIparametersDict["IndividualMotorInfo_Label_Width"], 1.0, 200.0))
             else:
-                self.IndividualMotorInfo_Label_Width = 1
+                self.IndividualMotorInfo_Label_Width = 55
 
             print("IngeniaBLDC_ReubenPython3Class __init__: IndividualMotorInfo_Label_Width: " + str(self.IndividualMotorInfo_Label_Width))
             #########################################################
