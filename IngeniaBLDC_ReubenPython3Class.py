@@ -6,7 +6,7 @@ reuben.brewer@gmail.com
 www.reubotics.com
 
 Apache 2 License
-Software Revision R, 02/27/2026
+Software Revision S, 03/06/2026
 
 Python 3.11/12 but NOT 3.13 (ingenialink requires scipy==1.12.0 compatible, which is NOT compatible with Python 3.13)
 '''
@@ -100,6 +100,7 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
         #########################################################
 
         self.Position_AcceptableUnitsList = ["EncoderTicks", "Deg", "Rad", "Rev"]
+        self.Velocity_AcceptableUnitsList = ["EncoderTicksPerSec", "DegPerSec", "RadPerSec", "RevPerSec"]
 
         self.MostRecentDataDict = dict()
 
@@ -285,6 +286,9 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
         #########################################################
         #########################################################
         self.OperationMode_ListOfAcceptableValuesStrings = ["CyclicPosition",
+                                                            "ProfilePosition",
+                                                            "InterpolatedPosition",
+                                                            "Position",
                                                             "CyclicCurrent",
                                                             "CyclicVoltage"]
 
@@ -397,7 +401,7 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
         #########################################################
         #########################################################
         self.ListOfAcceptableVariableNameStringsForReading = ["Position_Actual_EncoderTicks",
-                                                                "Velocity_Actual_EncoderTicks",
+                                                                "Velocity_Actual_RevPerSec",
                                                                 "Current_Direct_Actual",
                                                                 "Current_Quadrature_Actual",
                                                                 "EnabledState_Actual"] #unicorn
@@ -767,8 +771,8 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                                                                         ("MaxProfileVelocity_NeedsToBeSetFlag", 0),
                                                                         ("MaxProfileVelocity_Actual", -11111.0),
 
-                                                                        ("Velocity_Actual_EncoderTicks", -11111.0),
-                                                                        ("Velocity_Actual_AllUnitsDict", dict([("EncoderTicks", -1.11111), ("Deg", -1.11111), ("Rad", -1.11111), ("Rev", -1.11111)])),
+                                                                        ("Velocity_Actual_RevPerSec", -11111.0),
+                                                                        ("Velocity_Actual_AllUnitsDict", dict([("EncoderTicksPerSec", -1.11111), ("DegPerSec", -1.11111), ("RadPerSec", -1.11111), ("RevPerSec", -1.11111)])),
 
                                                                         ("VelocityPIDgains_Kp_Actual", -11111.0),
                                                                         ("VelocityPIDgains_Ki_Actual", -11111.0),
@@ -1883,7 +1887,7 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                 ##########################################################################################################
                 ##########################################################################################################
                 ##########################################################################################################
-                if self.IngeniaMotionController_MainDict[SlaveID_Int]["OperationMode"] == "CyclicPosition":
+                if self.IngeniaMotionController_MainDict[SlaveID_Int]["OperationMode"].lower().find("position") != -1:
 
                     ########################################################################################################## Need to set target to zero
                     ##########################################################################################################
@@ -2061,28 +2065,28 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
             ##########################################################################################################
 
             ##########################################################################################################
-            if InputUnits.upper() == "ENCODERTICKS":
+            if InputUnits.upper() == "ENCODERTICKS" or InputUnits.upper() == "ENCODERTICKSPERSEC":
                 ConvertedValue_EncoderTicks = InputValue*(1.0)
             ##########################################################################################################
 
             ##########################################################################################################
-            elif InputUnits.upper() == "DEG":
+            elif InputUnits.upper() == "DEG" or InputUnits.upper() == "DEGPERSEC":
                 ConvertedValue_EncoderTicks = InputValue*(self.IngeniaMotionController_MainDict[SlaveID_Int]["EncoderTicksPerRevolution_ToBeSet"]/360.0) #Don't use EncoderTicksPerRevolution_Actual as some times we don't want to read it.
             ##########################################################################################################
 
             ##########################################################################################################
-            elif InputUnits.upper() == "RAD":
+            elif InputUnits.upper() == "RAD" or InputUnits.upper() == "RADPERSEC":
                 ConvertedValue_EncoderTicks = InputValue*(self.IngeniaMotionController_MainDict[SlaveID_Int]["EncoderTicksPerRevolution_ToBeSet"]/(2*math.pi)) #Don't use EncoderTicksPerRevolution_Actual as some times we don't want to read it.
             ##########################################################################################################
 
             ##########################################################################################################
-            elif InputUnits.upper() == "REV":
+            elif InputUnits.upper() == "REV" or InputUnits.upper() == "REVPERSEC":
                 ConvertedValue_EncoderTicks = InputValue*(self.IngeniaMotionController_MainDict[SlaveID_Int]["EncoderTicksPerRevolution_ToBeSet"]/1.0) #Don't use EncoderTicksPerRevolution_Actual as some times we don't want to read it.
             ##########################################################################################################
 
             ##########################################################################################################
             else:
-                print("ConvertPositionToAllUnits: InputUnits not recognized. Input value: " + str(InputValue) + ", InputUnits: " + str(InputUnits))
+                print("ConvertPositionToAllUnits: InputUnits not recognized (#1). Input value: " + str(InputValue) + ", InputUnits: " + str(InputUnits))
                 return ConvertedValuesDict
             ##########################################################################################################
 
@@ -2093,14 +2097,14 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
             ##########################################################################################################
 
             ##########################################################################################################
-            if InputUnits in self.Position_AcceptableUnitsList:
+            if InputUnits in self.Position_AcceptableUnitsList or InputUnits in self.Velocity_AcceptableUnitsList:
                 ConvertedValue_EncoderTicks = ConvertedValue_EncoderTicks/1.0
                 ConvertedValue_Deg = ConvertedValue_EncoderTicks/(self.IngeniaMotionController_MainDict[SlaveID_Int]["EncoderTicksPerRevolution_ToBeSet"]/360.0) #Don't use EncoderTicksPerRevolution_Actual as some times we don't want to read it.
                 ConvertedValue_Rad = ConvertedValue_EncoderTicks/(self.IngeniaMotionController_MainDict[SlaveID_Int]["EncoderTicksPerRevolution_ToBeSet"]/(2*math.pi)) #Don't use EncoderTicksPerRevolution_Actual as some times we don't want to read it.
                 ConvertedValue_Rev = ConvertedValue_EncoderTicks/(self.IngeniaMotionController_MainDict[SlaveID_Int]["EncoderTicksPerRevolution_ToBeSet"]/1.0) #Don't use EncoderTicksPerRevolution_Actual as some times we don't want to read it.
 
             else:
-                print("ConvertPositionToAllUnits: InputUnits not recognized. Input value: " + str(InputValue) + ", InputUnits: " + str(InputUnits))
+                print("ConvertPositionToAllUnits: InputUnits not recognized (#2). Input value: " + str(InputValue) + ", InputUnits: " + str(InputUnits))
                 return ConvertedValuesDict
             ##########################################################################################################
 
@@ -2624,8 +2628,19 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                 ##########################################################################################################
 
                 ##########################################################################################################
-                if OperationMode_ToBeSet == "CyclicPosition":
-                    self.IngeniaMotionControllerObject.motion.set_operation_mode(OperationMode.CYCLIC_POSITION, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+                if self.IngeniaMotionController_MainDict[SlaveID_Int]["OperationMode"].lower().find("position") != -1:
+
+                    if self.IngeniaMotionController_MainDict[SlaveID_Int]["OperationMode"] == "CyclicPosition":
+                        self.IngeniaMotionControllerObject.motion.set_operation_mode(OperationMode.CYCLIC_POSITION, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+
+                    elif self.IngeniaMotionController_MainDict[SlaveID_Int]["OperationMode"] == "ProfilePosition":
+                        self.IngeniaMotionControllerObject.motion.set_operation_mode(OperationMode.PROFILE_POSITION, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+
+                    elif self.IngeniaMotionController_MainDict[SlaveID_Int]["OperationMode"] == "InterpolatedPosition":
+                        self.IngeniaMotionControllerObject.motion.set_operation_mode(OperationMode.INTERPOLATED_POSITION, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+
+                    elif self.IngeniaMotionController_MainDict[SlaveID_Int]["OperationMode"] == "Position":
+                        self.IngeniaMotionControllerObject.motion.set_operation_mode(OperationMode.POSITION, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
 
                 elif OperationMode_ToBeSet == "CyclicCurrent":
                     self.IngeniaMotionControllerObject.motion.set_operation_mode(OperationMode.CYCLIC_CURRENT, servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
@@ -4281,8 +4296,8 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                 ##########################################################################################################
 
                 ##########################################################################################################
-                if self.IngeniaMotionController_RPDOandTPDOobjectsOnlyDict[SlaveID_Int]["PDO_ListOfRPDOvariableNames"][Index] == "Velocity_Actual_EncoderTicks":
-                    self.IngeniaMotionController_MainDict[SlaveID_Int]["Velocity_Actual_AllUnitsDict"] = self.ConvertPositionToAllUnits(SlaveID_Int, Element.value, "EncoderTicks", VelocityInsteadOfPositionFlag=1)
+                if self.IngeniaMotionController_RPDOandTPDOobjectsOnlyDict[SlaveID_Int]["PDO_ListOfRPDOvariableNames"][Index] == "Velocity_Actual_RevPerSec":
+                    self.IngeniaMotionController_MainDict[SlaveID_Int]["Velocity_Actual_AllUnitsDict"] = self.ConvertPositionToAllUnits(SlaveID_Int, Element.value, "RevPerSec", VelocityInsteadOfPositionFlag=1)
                 ##########################################################################################################
 
                 ##########################################################################################################
@@ -4436,7 +4451,7 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                 ##########################################################################################################
 
                 ##########################################################################################################
-                if self.IngeniaMotionController_MainDict[SlaveID_Int]["OperationMode"] == "CyclicPosition":
+                if self.IngeniaMotionController_MainDict[SlaveID_Int]["OperationMode"].lower().find("position") != -1:
 
                     ####################################################
                     InitialValue_PositionSetpoint_TEMP = self.IngeniaMotionControllerObject.motion.get_actual_position(servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
@@ -4523,7 +4538,7 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                 ##########################################################################################################
 
                 ##########################################################################################################
-                self.IngeniaMotionController_RPDOandTPDOobjectsOnlyDict[SlaveID_Int]["PDOitem_Velocity_Actual"] = self.IngeniaMotionControllerObject.capture.pdo.create_pdo_item("CL_VEL_FBK_VALUE",
+                self.IngeniaMotionController_RPDOandTPDOobjectsOnlyDict[SlaveID_Int]["PDOitem_Velocity_Actual"] = self.IngeniaMotionControllerObject.capture.pdo.create_pdo_item("CL_VEL_FBK_VALUE", #CL_VEL_FBK_VALUE, 0x2031-0x00, units of rev/s
                                                                                                                                                     servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"]) #Create a RPDO map item
                 ##########################################################################################################
 
@@ -4574,7 +4589,7 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                 ##########################################################################################################
                 self.IngeniaMotionController_RPDOandTPDOobjectsOnlyDict[SlaveID_Int]["PDO_ListOfRPDOvariableNames"].append("Position_Actual_EncoderTicks")
                 #self.IngeniaMotionController_RPDOandTPDOobjectsOnlyDict[SlaveID_Int]["PDO_ListOfRPDOvariableNames"].append("PositionSetPoint_Actual_EncoderTicks")
-                self.IngeniaMotionController_RPDOandTPDOobjectsOnlyDict[SlaveID_Int]["PDO_ListOfRPDOvariableNames"].append("Velocity_Actual_EncoderTicks")
+                self.IngeniaMotionController_RPDOandTPDOobjectsOnlyDict[SlaveID_Int]["PDO_ListOfRPDOvariableNames"].append("Velocity_Actual_RevPerSec")
                 self.IngeniaMotionController_RPDOandTPDOobjectsOnlyDict[SlaveID_Int]["PDO_ListOfRPDOvariableNames"].append("Current_Direct_Actual")
                 self.IngeniaMotionController_RPDOandTPDOobjectsOnlyDict[SlaveID_Int]["PDO_ListOfRPDOvariableNames"].append("Current_Quadrature_Actual")
                 self.IngeniaMotionController_RPDOandTPDOobjectsOnlyDict[SlaveID_Int]["PDO_ListOfRPDOvariableNames"].append("Status_Word")
@@ -4961,24 +4976,43 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                         ##########################################################################################################
                         if self.IngeniaMotionController_MainDict[SlaveID_Int]["VelocityPIDgains_NeedsToBeSetFlag"] == 1:
 
-                            self.__SetVelocityPIDgains(SlaveID_Int, self.IngeniaMotionController_MainDict[SlaveID_Int]["VelocityPIDgains_Kp_ToBeSet"], self.IngeniaMotionController_MainDict[SlaveID_Int]["VelocityPIDgains_Ki_ToBeSet"], self.IngeniaMotionController_MainDict[SlaveID_Int]["VelocityPIDgains_Kd_ToBeSet"], PrintDebugFlag=1)
+                            self.__SetVelocityPIDgains(SlaveID_Int,
+                                                       self.IngeniaMotionController_MainDict[SlaveID_Int]["VelocityPIDgains_Kp_ToBeSet"],
+                                                       self.IngeniaMotionController_MainDict[SlaveID_Int]["VelocityPIDgains_Ki_ToBeSet"],
+                                                       self.IngeniaMotionController_MainDict[SlaveID_Int]["VelocityPIDgains_Kd_ToBeSet"],
+                                                       PrintDebugFlag=1)
 
                             self.IngeniaMotionController_MainDict[SlaveID_Int]["VelocityPIDgains_NeedsToBeSetFlag"] = 0
                         ##########################################################################################################
 
-                        ##########################################################################################################
+                        ########################################################################################################## Always keep direct and quadrature current gains the same.
                         if self.IngeniaMotionController_MainDict[SlaveID_Int]["CurrentDirectPIgains_NeedsToBeSetFlag"] == 1:
                             
-                            self.__SetCurrentDirectPIgains(SlaveID_Int, self.IngeniaMotionController_MainDict[SlaveID_Int]["CurrentDirectPIgains_Kp_ToBeSet"], self.IngeniaMotionController_MainDict[SlaveID_Int]["CurrentDirectPIgains_Ki_ToBeSet"], PrintDebugFlag=1)
+                            self.__SetCurrentDirectPIgains(SlaveID_Int,
+                                                           self.IngeniaMotionController_MainDict[SlaveID_Int]["CurrentDirectPIgains_Kp_ToBeSet"],
+                                                           self.IngeniaMotionController_MainDict[SlaveID_Int]["CurrentDirectPIgains_Ki_ToBeSet"],
+                                                           PrintDebugFlag=1)
+
+                            self.__SetCurrentQuadraturePIgains(SlaveID_Int,
+                                                               self.IngeniaMotionController_MainDict[SlaveID_Int]["CurrentQuadraturePIgains_Kp_ToBeSet"],
+                                                               self.IngeniaMotionController_MainDict[SlaveID_Int]["CurrentQuadraturePIgains_Ki_ToBeSet"],
+                                                               PrintDebugFlag=1)
 
                             self.IngeniaMotionController_MainDict[SlaveID_Int]["CurrentDirectPIgains_NeedsToBeSetFlag"] = 0
                         ##########################################################################################################
 
-                        ##########################################################################################################
+                        ########################################################################################################## Always keep direct and quadrature current gains the same.
                         if self.IngeniaMotionController_MainDict[SlaveID_Int]["CurrentQuadraturePIgains_NeedsToBeSetFlag"] == 1:
 
-                            self.__SetCurrentQuadraturePIgains(SlaveID_Int, self.IngeniaMotionController_MainDict[SlaveID_Int]["CurrentQuadraturePIgains_Kp_ToBeSet"], self.IngeniaMotionController_MainDict[SlaveID_Int]["CurrentQuadraturePIgains_Ki_ToBeSet"], PrintDebugFlag=1)
-                            self.__SetCurrentDirectPIgains(SlaveID_Int, self.IngeniaMotionController_MainDict[SlaveID_Int]["CurrentQuadraturePIgains_Kp_ToBeSet"], self.IngeniaMotionController_MainDict[SlaveID_Int]["CurrentQuadraturePIgains_Ki_ToBeSet"], PrintDebugFlag=1)
+                            self.__SetCurrentQuadraturePIgains(SlaveID_Int,
+                                                               self.IngeniaMotionController_MainDict[SlaveID_Int]["CurrentQuadraturePIgains_Kp_ToBeSet"],
+                                                               self.IngeniaMotionController_MainDict[SlaveID_Int]["CurrentQuadraturePIgains_Ki_ToBeSet"],
+                                                               PrintDebugFlag=1)
+
+                            self.__SetCurrentDirectPIgains(SlaveID_Int,
+                                                           self.IngeniaMotionController_MainDict[SlaveID_Int]["CurrentQuadraturePIgains_Kp_ToBeSet"],
+                                                           self.IngeniaMotionController_MainDict[SlaveID_Int]["CurrentQuadraturePIgains_Ki_ToBeSet"],
+                                                           PrintDebugFlag=1)
 
                             self.IngeniaMotionController_MainDict[SlaveID_Int]["CurrentQuadraturePIgains_NeedsToBeSetFlag"] = 0
                         ##########################################################################################################
@@ -5192,10 +5226,10 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                                         if self.SDOcommands_Rx_PrintDebuggingStatementsFlag == 1:
                                             print("DedicatedRxThread, SDO query made for Position_Actual_EncoderTicks on SlaveID_Int = " + str(SlaveID_Int))
 
-                                    if "Velocity_Actual_EncoderTicks" in self.IngeniaMotionController_MainDict[SlaveID_Int]["ListOfVariableNameStringsToGetViaSDO"]:
-                                        self.IngeniaMotionController_MainDict[SlaveID_Int]["Velocity_Actual_EncoderTicks"] = self.IngeniaMotionControllerObject.motion.get_actual_velocity(servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
+                                    if "Velocity_Actual_RevPerSec" in self.IngeniaMotionController_MainDict[SlaveID_Int]["ListOfVariableNameStringsToGetViaSDO"]:
+                                        self.IngeniaMotionController_MainDict[SlaveID_Int]["Velocity_Actual_RevPerSec"] = self.IngeniaMotionControllerObject.motion.get_actual_velocity(servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
                                         if self.SDOcommands_Rx_PrintDebuggingStatementsFlag == 1:
-                                            print("DedicatedRxThread, SDO query made for Velocity_Actual_EncoderTicks on SlaveID_Int = " + str(SlaveID_Int))
+                                            print("DedicatedRxThread, SDO query made for Velocity_Actual_RevPerSec on SlaveID_Int = " + str(SlaveID_Int))
 
                                     if "Current_Direct_Actual" in self.IngeniaMotionController_MainDict[SlaveID_Int]["ListOfVariableNameStringsToGetViaSDO"]:
                                         self.IngeniaMotionController_MainDict[SlaveID_Int]["Current_Direct_Actual"] = self.IngeniaMotionControllerObject.motion.get_actual_current_direct(servo=self.IngeniaMotionController_MainDict[SlaveID_Int]["AliasOrServoName_String"])
@@ -5635,17 +5669,18 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
             LabelWidth = 40
             FontSize = 8
 
-            if self.IngeniaMotionController_MainDict[SlaveID_Int]["OperationMode"] == "CyclicPosition":
-                self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_Variables_ListOfDicts"] = [dict([("Name", "PositionPIDgains_Kp_ToBeSet"),("Type", "float"),("StartingVal", self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionPIDgains_Kp_ToBeSet"]),("MinVal", -1000000.0),("MaxVal", 1000000.0),("EntryBlinkEnabled", 0),("EntryWidth", EntryWidth),("LabelWidth", LabelWidth),("FontSize", FontSize)]),
-                                                                                                                               dict([("Name", "PositionPIDgains_Ki_ToBeSet"),("Type", "float"),("StartingVal", self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionPIDgains_Ki_ToBeSet"]),("MinVal", -1000000.0),("MaxVal", 1000000.0),("EntryBlinkEnabled", 0),("EntryWidth", EntryWidth),("LabelWidth", LabelWidth),("FontSize", FontSize)]),
-                                                                                                                               dict([("Name", "PositionPIDgains_Kd_ToBeSet"),("Type", "float"),("StartingVal", self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionPIDgains_Kd_ToBeSet"]),("MinVal", -1000000.0),("MaxVal", 1000000.0),("EntryBlinkEnabled", 0),("EntryWidth", EntryWidth),("LabelWidth", LabelWidth),("FontSize", FontSize)])]
 
-            if self.IngeniaMotionController_MainDict[SlaveID_Int]["OperationMode"] == "CyclicCurrent":
-                self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_Variables_ListOfDicts"] = [dict([("Name", "CurrentQuadraturePIgains_Kp_ToBeSet"),("Type", "float"),("StartingVal", self.IngeniaMotionController_MainDict[SlaveID_Int]["CurrentQuadraturePIgains_Kp_ToBeSet"]),("MinVal", -1000000.0),("MaxVal", 1000000.0),("EntryBlinkEnabled", 0),("EntryWidth", EntryWidth),("LabelWidth", LabelWidth),("FontSize", FontSize)]),
-                                                                                                                               dict([("Name", "CurrentQuadraturePIgains_Ki_ToBeSet"),("Type", "float"),("StartingVal", self.IngeniaMotionController_MainDict[SlaveID_Int]["CurrentQuadraturePIgains_Ki_ToBeSet"]),("MinVal", -1000000.0),("MaxVal", 1000000.0),("EntryBlinkEnabled", 0),("EntryWidth", EntryWidth),("LabelWidth", LabelWidth),("FontSize", FontSize)])]
-
-            if self.IngeniaMotionController_MainDict[SlaveID_Int]["OperationMode"] == "CyclicVoltage":
-                self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_Variables_ListOfDicts"] = []
+            self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_Variables_ListOfDicts"] = [dict([("Name", "PositionPIDgains_Kp_ToBeSet"),("Type", "float"),("StartingVal", self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionPIDgains_Kp_ToBeSet"]),("MinVal", -1000000.0),("MaxVal", 1000000.0),("EntryBlinkEnabled", 0),("EntryWidth", EntryWidth),("LabelWidth", LabelWidth),("FontSize", FontSize)]),
+                                                                                                                            dict([("Name", "PositionPIDgains_Ki_ToBeSet"),("Type", "float"),("StartingVal", self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionPIDgains_Ki_ToBeSet"]),("MinVal", -1000000.0),("MaxVal", 1000000.0),("EntryBlinkEnabled", 0),("EntryWidth", EntryWidth),("LabelWidth", LabelWidth),("FontSize", FontSize)]),
+                                                                                                                            dict([("Name", "PositionPIDgains_Kd_ToBeSet"),("Type", "float"),("StartingVal", self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionPIDgains_Kd_ToBeSet"]),("MinVal", -1000000.0),("MaxVal", 1000000.0),("EntryBlinkEnabled", 0),("EntryWidth", EntryWidth),("LabelWidth", LabelWidth),("FontSize", FontSize)]),
+                                                                                                                            dict([("Name", "VelocityPIDgains_Kp_ToBeSet"),("Type", "float"),("StartingVal", self.IngeniaMotionController_MainDict[SlaveID_Int]["VelocityPIDgains_Kp_ToBeSet"]),("MinVal", -1000000.0),("MaxVal", 1000000.0),("EntryBlinkEnabled", 0),("EntryWidth", EntryWidth),("LabelWidth", LabelWidth),("FontSize", FontSize)]),
+                                                                                                                            dict([("Name", "VelocityPIDgains_Ki_ToBeSet"),("Type", "float"),("StartingVal", self.IngeniaMotionController_MainDict[SlaveID_Int]["VelocityPIDgains_Ki_ToBeSet"]),("MinVal", -1000000.0),("MaxVal", 1000000.0),("EntryBlinkEnabled", 0),("EntryWidth", EntryWidth),("LabelWidth", LabelWidth),("FontSize", FontSize)]),
+                                                                                                                            dict([("Name", "VelocityPIDgains_Kd_ToBeSet"),("Type", "float"),("StartingVal", self.IngeniaMotionController_MainDict[SlaveID_Int]["VelocityPIDgains_Kd_ToBeSet"]),("MinVal", -1000000.0),("MaxVal", 1000000.0),("EntryBlinkEnabled", 0),("EntryWidth", EntryWidth),("LabelWidth", LabelWidth),("FontSize", FontSize)]),
+                                                                                                                            dict([("Name", "CurrentQuadraturePIgains_Kp_ToBeSet"),("Type", "float"),("StartingVal", self.IngeniaMotionController_MainDict[SlaveID_Int]["CurrentQuadraturePIgains_Kp_ToBeSet"]),("MinVal", -1000000.0),("MaxVal", 1000000.0),("EntryBlinkEnabled", 0),("EntryWidth", EntryWidth),("LabelWidth", LabelWidth),("FontSize", FontSize)]),
+                                                                                                                            dict([("Name", "CurrentQuadraturePIgains_Ki_ToBeSet"),("Type", "float"),("StartingVal", self.IngeniaMotionController_MainDict[SlaveID_Int]["CurrentQuadraturePIgains_Ki_ToBeSet"]),("MinVal", -1000000.0),("MaxVal", 1000000.0),("EntryBlinkEnabled", 0),("EntryWidth", EntryWidth),("LabelWidth", LabelWidth),("FontSize", FontSize)]),
+                                                                                                                            dict([("Name", "MaxVelocity_ToBeSet"),("Type", "float"),("StartingVal", self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxVelocity_ToBeSet"]),("MinVal", -1000000.0),("MaxVal", 1000000.0),("EntryBlinkEnabled", 0),("EntryWidth", EntryWidth),("LabelWidth", LabelWidth),("FontSize", FontSize)]),
+                                                                                                                            dict([("Name", "MaxProfileVelocity_ToBeSet"),("Type", "float"),("StartingVal", self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxProfileVelocity_ToBeSet"]),("MinVal", -1000000.0),("MaxVal", 1000000.0),("EntryBlinkEnabled", 0),("EntryWidth", EntryWidth),("LabelWidth", LabelWidth),("FontSize", FontSize)]),
+                                                                                                                            dict([("Name", "MaxProfileAcceleration_ToBeSet"),("Type", "float"),("StartingVal", self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxProfileAcceleration_ToBeSet"]),("MinVal", -1000000.0),("MaxVal", 1000000.0),("EntryBlinkEnabled", 0),("EntryWidth", EntryWidth),("LabelWidth", LabelWidth),("FontSize", FontSize)])]
 
             self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_ReubenPython2and3ClassObject_SetupDict"] = dict([("GUIparametersDict", self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_ReubenPython2and3ClassObject_GUIparametersDict"]),
                                                                                                                                                   ("EntryListWithBlinking_Variables_ListOfDicts", self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_Variables_ListOfDicts"]),
@@ -5686,7 +5721,7 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
             ################################################# Scale
             self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorMotionSetpoint_GUIscale_Value"] = DoubleVar()
 
-            if self.IngeniaMotionController_MainDict[SlaveID_Int]["OperationMode"] == "CyclicPosition":
+            if self.IngeniaMotionController_MainDict[SlaveID_Int]["OperationMode"].lower().find("position") != -1:
 
                 GUIscale_ScaleObject_FROM = self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionMin_AllUnitsDict"]["EncoderTicks"]
                 GUIscale_ScaleObject_TO = self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionMax_AllUnitsDict"]["EncoderTicks"]
@@ -5858,7 +5893,7 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
         GUIscale_Value = self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorMotionSetpoint_GUIscale_ScaleObject"].get()
 
         ##########################################################################################################
-        if self.IngeniaMotionController_MainDict[SlaveID_Int]["OperationMode"] == "CyclicPosition":
+        if self.IngeniaMotionController_MainDict[SlaveID_Int]["OperationMode"].lower().find("position") != -1:
             self.LimitValue_ConvertUnits_And_SetVariable___PositionToBeSet(SlaveID_Int, GUIscale_Value, "EncoderTicks", PrintDebugFlag=0)
             #self.IngeniaMotionController_MainDict[SlaveID_Int]["Position_NeedsToBeSetFlag"] = 1 #Not needed when using TPDO
         ##########################################################################################################
@@ -5888,7 +5923,7 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
         SlaveID_Int = int(name)
 
         ##########################################################################################################
-        if self.IngeniaMotionController_MainDict[SlaveID_Int]["OperationMode"] == "CyclicPosition":
+        if self.IngeniaMotionController_MainDict[SlaveID_Int]["OperationMode"].lower().find("position") != -1:
             self.LimitValue_ConvertUnits_And_SetVariable___PositionToBeSet(SlaveID_Int, 0, "EncoderTicks", PrintDebugFlag=0)
             # self.IngeniaMotionController_MainDict[SlaveID_Int]["Position_NeedsToBeSetFlag"] = 1 #Not needed when using TPDO
         ##########################################################################################################
@@ -6027,6 +6062,7 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                                             ("HWoverCurrentFaultModeInt_Actual", self.IngeniaMotionController_MainDict[SlaveID_Int]["HWoverCurrentFaultModeInt_Actual"]),
                                             ("Current_Direct_Actual", self.IngeniaMotionController_MainDict[SlaveID_Int]["Current_Direct_Actual"]),
                                             ("Current_Quadrature_Actual", self.IngeniaMotionController_MainDict[SlaveID_Int]["Current_Quadrature_Actual"]),
+                                            ("MaxVelocity_Actual", self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxVelocity_Actual"]),
                                             ("MaxProfileVelocity_Actual", self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxProfileVelocity_Actual"]),
                                             ("MaxProfileAcceleration_Actual", self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxProfileAcceleration_Actual"]),
                                             ("PositionMin_EncoderTicks_Actual", self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionMin_EncoderTicks_Actual"]),
@@ -6053,25 +6089,42 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
 
                         #######################################################
                         self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfo_Label"]["text"] = self.ConvertDictToProperlyFormattedStringForPrinting(DictToDisplay,
-                                                                                                                                                                                NumberOfDecimalsPlaceToUse = 4,
-                                                                                                                                                                                NumberOfEntriesPerLine = self.DictToDisplay_NumberOfEntriesPerLine,
-                                                                                                                                                                                NumberOfTabsBetweenItems = 1)
+                                                                                                                                                                                NumberOfDecimalPlaces=4,
+                                                                                                                                                                                NumberOfEntriesPerLine=self.DictToDisplay_NumberOfEntriesPerLine,
+                                                                                                                                                                                NumberOfTabsBetweenItems=1,
+                                                                                                                                                                                NumberOfLeadingNumbers=0)
                         #######################################################
 
                         #######################################################
                         self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfo_Label"]["text"] = self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfo_Label"]["text"] +\
-                                                                self.ConvertDictToProperlyFormattedStringForPrinting(self.IngeniaMotionController_MainDict[SlaveID_Int]["StatusWordFlagStates_DictEnglishNameAsKey"], 0, 2, 2) + \
+                                                                self.ConvertDictToProperlyFormattedStringForPrinting(self.IngeniaMotionController_MainDict[SlaveID_Int]["StatusWordFlagStates_DictEnglishNameAsKey"],
+                                                                                                                    NumberOfDecimalPlaces=0,
+                                                                                                                    NumberOfEntriesPerLine=2,
+                                                                                                                    NumberOfTabsBetweenItems=2,
+                                                                                                                    NumberOfLeadingNumbers=0) + \
                                                                 "\n\n" + \
-                                                                self.ConvertDictToProperlyFormattedStringForPrinting(self.IngeniaMotionController_MainDict[SlaveID_Int]["STOstatusFlagStates_DictEnglishNameAsKey"], 0, 2, 2)
+                                                                self.ConvertDictToProperlyFormattedStringForPrinting(self.IngeniaMotionController_MainDict[SlaveID_Int]["STOstatusFlagStates_DictEnglishNameAsKey"],
+                                                                                                                    NumberOfDecimalPlaces=0,
+                                                                                                                    NumberOfEntriesPerLine=2,
+                                                                                                                    NumberOfTabsBetweenItems=2,
+                                                                                                                    NumberOfLeadingNumbers=0)
 
                         #######################################################
 
                         #######################################################
                         self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfo_Label"]["text"] = self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorInfo_Label"]["text"] + \
-                                                                                                                            "\nPosition ToBeSet: " + \
-                                                                                                                            self.ConvertDictToProperlyFormattedStringForPrinting(self.IngeniaMotionController_MainDict[SlaveID_Int]["Position_ToBeSet_AllUnitsDict"], 3, 1, 1) +\
                                                                                                                             "\nPosition Actual: " +\
-                                                                                                                            self.ConvertDictToProperlyFormattedStringForPrinting(self.IngeniaMotionController_MainDict[SlaveID_Int]["Position_Actual_AllUnitsDict"], 3, 1, 1) + \
+                                                                                                                            self.ConvertDictToProperlyFormattedStringForPrinting(self.IngeniaMotionController_MainDict[SlaveID_Int]["Position_Actual_AllUnitsDict"], 
+                                                                                                                                                                                 NumberOfDecimalPlaces=3, 
+                                                                                                                                                                                 NumberOfEntriesPerLine=1, 
+                                                                                                                                                                                 NumberOfTabsBetweenItems=1,
+                                                                                                                                                                                 NumberOfLeadingNumbers=0) + \
+                                                                                                                            "\nVelocity Actual: " + \
+                                                                                                                            self.ConvertDictToProperlyFormattedStringForPrinting(self.IngeniaMotionController_MainDict[SlaveID_Int]["Velocity_Actual_AllUnitsDict"], 
+                                                                                                                                                                                 NumberOfDecimalPlaces=3, 
+                                                                                                                                                                                 NumberOfEntriesPerLine=1, 
+                                                                                                                                                                                 NumberOfTabsBetweenItems=1,
+                                                                                                                                                                                 NumberOfLeadingNumbers=0) +\
                                                                                                                             "\nHallEffect Actual: " + \
                                                                                                                             str(self.IngeniaMotionController_MainDict[SlaveID_Int]["HallEffectValue_Actual_Int"])
                         #######################################################
@@ -6094,7 +6147,7 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                         if self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorMotionSetpoint_GUIscale_ScaleObject_ValueNeedsToBeUpdated"] == 1:
 
                             #######################################################
-                            if self.IngeniaMotionController_MainDict[SlaveID_Int]["OperationMode"] == "CyclicPosition":
+                            if self.IngeniaMotionController_MainDict[SlaveID_Int]["OperationMode"].lower().find("position") != -1:
                                 self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["IndividualMotorMotionSetpoint_GUIscale_ScaleObject"].set(self.IngeniaMotionController_MainDict[SlaveID_Int]["Position_ToBeSet_EncoderTicks"])
                             #######################################################
 
@@ -6119,17 +6172,20 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
                             #######################################################
                             if self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_ReubenPython2and3ClassObject_NeedsToBeUpdatedFromExternalSourceFlag"] == 1:
 
-                                if self.IngeniaMotionController_MainDict[SlaveID_Int]["OperationMode"] == "CyclicPosition":
-                                    self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_ReubenPython2and3ClassObject"].SetEntryValue("PositionPIDgains_Kp_ToBeSet", self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionPIDgains_Kp_ToBeSet"])
-                                    self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_ReubenPython2and3ClassObject"].SetEntryValue("PositionPIDgains_Ki_ToBeSet", self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionPIDgains_Ki_ToBeSet"])
-                                    self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_ReubenPython2and3ClassObject"].SetEntryValue("PositionPIDgains_Kd_ToBeSet", self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionPIDgains_Kd_ToBeSet"])
+                                self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_ReubenPython2and3ClassObject"].SetEntryValue("PositionPIDgains_Kp_ToBeSet", self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionPIDgains_Kp_ToBeSet"])
+                                self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_ReubenPython2and3ClassObject"].SetEntryValue("PositionPIDgains_Ki_ToBeSet", self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionPIDgains_Ki_ToBeSet"])
+                                self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_ReubenPython2and3ClassObject"].SetEntryValue("PositionPIDgains_Kd_ToBeSet", self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionPIDgains_Kd_ToBeSet"])
 
-                                if self.IngeniaMotionController_MainDict[SlaveID_Int]["OperationMode"] == "CyclicCurrent":
-                                    self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_ReubenPython2and3ClassObject"].SetEntryValue("CurrentQuadraturePIgains_Kp_ToBeSet", self.IngeniaMotionController_MainDict[SlaveID_Int]["CurrentQuadraturePIgains_Kp_ToBeSet"])
-                                    self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_ReubenPython2and3ClassObject"].SetEntryValue("CurrentQuadraturePIgains_Ki_ToBeSet", self.IngeniaMotionController_MainDict[SlaveID_Int]["CurrentQuadraturePIgains_Ki_ToBeSet"])
+                                self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_ReubenPython2and3ClassObject"].SetEntryValue("VelocityPIDgains_Kp_ToBeSet", self.IngeniaMotionController_MainDict[SlaveID_Int]["VelocityPIDgains_Kp_ToBeSet"])
+                                self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_ReubenPython2and3ClassObject"].SetEntryValue("VelocityPIDgains_Ki_ToBeSet", self.IngeniaMotionController_MainDict[SlaveID_Int]["VelocityPIDgains_Ki_ToBeSet"])
+                                self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_ReubenPython2and3ClassObject"].SetEntryValue("VelocityPIDgains_Kd_ToBeSet", self.IngeniaMotionController_MainDict[SlaveID_Int]["VelocityPIDgains_Kd_ToBeSet"])
 
-                                if self.IngeniaMotionController_MainDict[SlaveID_Int]["OperationMode"] == "CyclicVoltage":
-                                    pass
+                                self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_ReubenPython2and3ClassObject"].SetEntryValue("CurrentQuadraturePIgains_Kp_ToBeSet", self.IngeniaMotionController_MainDict[SlaveID_Int]["CurrentQuadraturePIgains_Kp_ToBeSet"])
+                                self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_ReubenPython2and3ClassObject"].SetEntryValue("CurrentQuadraturePIgains_Ki_ToBeSet", self.IngeniaMotionController_MainDict[SlaveID_Int]["CurrentQuadraturePIgains_Ki_ToBeSet"])
+
+                                self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_ReubenPython2and3ClassObject"].SetEntryValue("MaxVelocity_ToBeSet", self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxVelocity_ToBeSet"])
+                                self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_ReubenPython2and3ClassObject"].SetEntryValue("MaxProfileVelocity_ToBeSet", self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxProfileVelocity_ToBeSet"])
+                                self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_ReubenPython2and3ClassObject"].SetEntryValue("MaxProfileAcceleration_ToBeSet", self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxProfileAcceleration_ToBeSet"])
 
                                 self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_ReubenPython2and3ClassObject_NeedsToBeUpdatedFromExternalSourceFlag"] = 0
                             #######################################################
@@ -6146,19 +6202,29 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
 
                                 if self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_MostRecentDict_DataUpdateNumber"] >= 1:
 
-                                    if self.IngeniaMotionController_MainDict[SlaveID_Int]["OperationMode"] == "CyclicPosition":
-                                        self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionPIDgains_Kp_ToBeSet"] = float(self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_MostRecentDict"]["PositionPIDgains_Kp_ToBeSet"])
-                                        self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionPIDgains_Ki_ToBeSet"] = float(self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_MostRecentDict"]["PositionPIDgains_Ki_ToBeSet"])
-                                        self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionPIDgains_Kd_ToBeSet"] = float(self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_MostRecentDict"]["PositionPIDgains_Kd_ToBeSet"])
-                                        self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionPIDgains_NeedsToBeSetFlag"] = 1
-                                        
-                                    if self.IngeniaMotionController_MainDict[SlaveID_Int]["OperationMode"] == "CyclicCurrent":
-                                        self.IngeniaMotionController_MainDict[SlaveID_Int]["CurrentQuadraturePIgains_Kp_ToBeSet"] = float(self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_MostRecentDict"]["CurrentQuadraturePIgains_Kp_ToBeSet"])
-                                        self.IngeniaMotionController_MainDict[SlaveID_Int]["CurrentQuadraturePIgains_Ki_ToBeSet"] = float(self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_MostRecentDict"]["CurrentQuadraturePIgains_Ki_ToBeSet"])
-                                        self.IngeniaMotionController_MainDict[SlaveID_Int]["CurrentQuadraturePIgains_NeedsToBeSetFlag"] = 1
+                                    self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionPIDgains_Kp_ToBeSet"] = float(self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_MostRecentDict"]["PositionPIDgains_Kp_ToBeSet"])
+                                    self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionPIDgains_Ki_ToBeSet"] = float(self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_MostRecentDict"]["PositionPIDgains_Ki_ToBeSet"])
+                                    self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionPIDgains_Kd_ToBeSet"] = float(self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_MostRecentDict"]["PositionPIDgains_Kd_ToBeSet"])
+                                    self.IngeniaMotionController_MainDict[SlaveID_Int]["PositionPIDgains_NeedsToBeSetFlag"] = 1
+                                    
+                                    self.IngeniaMotionController_MainDict[SlaveID_Int]["VelocityPIDgains_Kp_ToBeSet"] = float(self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_MostRecentDict"]["VelocityPIDgains_Kp_ToBeSet"])
+                                    self.IngeniaMotionController_MainDict[SlaveID_Int]["VelocityPIDgains_Ki_ToBeSet"] = float(self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_MostRecentDict"]["VelocityPIDgains_Ki_ToBeSet"])
+                                    self.IngeniaMotionController_MainDict[SlaveID_Int]["VelocityPIDgains_Kd_ToBeSet"] = float(self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_MostRecentDict"]["VelocityPIDgains_Kd_ToBeSet"])
+                                    self.IngeniaMotionController_MainDict[SlaveID_Int]["VelocityPIDgains_NeedsToBeSetFlag"] = 1
+                                    
+                                    self.IngeniaMotionController_MainDict[SlaveID_Int]["CurrentQuadraturePIgains_Kp_ToBeSet"] = float(self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_MostRecentDict"]["CurrentQuadraturePIgains_Kp_ToBeSet"])
+                                    self.IngeniaMotionController_MainDict[SlaveID_Int]["CurrentQuadraturePIgains_Ki_ToBeSet"] = float(self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_MostRecentDict"]["CurrentQuadraturePIgains_Ki_ToBeSet"])
+                                    self.IngeniaMotionController_MainDict[SlaveID_Int]["CurrentQuadraturePIgains_NeedsToBeSetFlag"] = 1
 
-                                    if self.IngeniaMotionController_MainDict[SlaveID_Int]["OperationMode"] == "CyclicVoltage":
-                                        pass
+                                    self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxVelocity_ToBeSet"] = float(self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_MostRecentDict"]["MaxVelocity_ToBeSet"])
+                                    self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxVelocity_NeedsToBeSetFlag"] = 1
+
+                                    self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxProfileVelocity_ToBeSet"] = float(self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_MostRecentDict"]["MaxProfileVelocity_ToBeSet"])
+                                    self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxProfileVelocity_NeedsToBeSetFlag"] = 1
+
+                                    self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxProfileAcceleration_ToBeSet"] = float(self.IngeniaMotionController_GUIobjectsOnlyDict[SlaveID_Int]["EntryListWithBlinking_MostRecentDict"]["MaxProfileAcceleration_ToBeSet"])
+                                    self.IngeniaMotionController_MainDict[SlaveID_Int]["MaxProfileAcceleration_NeedsToBeSetFlag"] = 1
+
                             #######################################################
 
                             #######################################################
@@ -6251,213 +6317,248 @@ class IngeniaBLDC_ReubenPython3Class(Frame): #Subclass the Tkinter Frame
     ##########################################################################################################
     ##########################################################################################################
 
-    ##########################################################################################################
-    ##########################################################################################################
-    ##########################################################################################################
-    ##########################################################################################################
-    def ConvertFloatToStringWithNumberOfLeadingNumbersAndDecimalPlaces_NumberOrListInput(self, input, number_of_leading_numbers = 4, number_of_decimal_places = 3):
+    #######################################################################################################################
+    #######################################################################################################################
+    #######################################################################################################################
+    #######################################################################################################################
+    def ConvertFloatToStringWithNumberOfLeadingNumbersAndDecimalPlaces_NumberOrListInput(self, Input, NumberOfLeadingNumbers = 4, NumberOfDecimalPlaces = 3):
 
-        number_of_decimal_places = max(1, number_of_decimal_places) #Make sure we're above 1
+        ###################################################################################################################
+        ###################################################################################################################
+        ###################################################################################################################
+        NumberOfDecimalPlaces = int(max(0, NumberOfDecimalPlaces)) #Allow 0 decimal places
 
         ListOfStringsToJoin = []
+        ContainerStartString = ""
+        ContainerEndString = ""
+        ###################################################################################################################
+        ###################################################################################################################
+        ###################################################################################################################
 
-        ##########################################################################################################
-        ##########################################################################################################
-        ##########################################################################################################
-        if isinstance(input, str) == 1:
-            ListOfStringsToJoin.append(input)
-        ##########################################################################################################
-        ##########################################################################################################
-        ##########################################################################################################
+        ###################################################################################################################
+        ###################################################################################################################
+        ###################################################################################################################
+        if isinstance(Input, str) == 1:
+            return Input
+        ###################################################################################################################
+        ###################################################################################################################
+        ###################################################################################################################
 
-        ##########################################################################################################
-        ##########################################################################################################
-        ##########################################################################################################
-        elif isinstance(input, int) == 1 or isinstance(input, float) == 1:
-            element = float(input)
-            prefix_string = "{:." + str(number_of_decimal_places) + "f}"
-            element_as_string = prefix_string.format(element)
+        ###################################################################################################################
+        ###################################################################################################################
+        ###################################################################################################################
+        elif isinstance(Input, int) == 1 or isinstance(Input, float) == 1:
 
-            ##########################################################################################################
-            ##########################################################################################################
-            if element >= 0:
-                element_as_string = element_as_string.zfill(number_of_leading_numbers + number_of_decimal_places + 1 + 1)  # +1 for sign, +1 for decimal place
-                element_as_string = "+" + element_as_string  # So that our strings always have either + or - signs to maintain the same string length
+            ###############################################################################################################
+            ###############################################################################################################
+            Element = float(Input)
+
+            PrefixString = "{:." + str(NumberOfDecimalPlaces) + "f}"
+            ElementAsString = PrefixString.format(Element)
+
+            DecimalAndPointWidth = (1 + NumberOfDecimalPlaces) if NumberOfDecimalPlaces > 0 else 0
+            BodyMinWidth = int(max(0, NumberOfLeadingNumbers)) + DecimalAndPointWidth
+
+            if Element >= 0:
+                ElementAsString = ElementAsString.zfill(BodyMinWidth)
+                ElementAsString = "+" + ElementAsString
             else:
-                element_as_string = element_as_string.zfill(number_of_leading_numbers + number_of_decimal_places + 1 + 1 + 1)  # +1 for sign, +1 for decimal place
-            ##########################################################################################################
-            ##########################################################################################################
+                ElementAsString = ElementAsString.zfill(BodyMinWidth + 1)
 
-            ListOfStringsToJoin.append(element_as_string)
-        ##########################################################################################################
-        ##########################################################################################################
-        ##########################################################################################################
+            return ElementAsString
+            ###############################################################################################################
+            ###############################################################################################################
 
-        ##########################################################################################################
-        ##########################################################################################################
-        ##########################################################################################################
-        elif isinstance(input, list) == 1:
+        ###################################################################################################################
+        ###################################################################################################################
+        ###################################################################################################################
+        elif isinstance(Input, list) == 1:
 
-            if len(input) > 0:
-                for element in input: #RECURSION
-                    ListOfStringsToJoin.append(self.ConvertFloatToStringWithNumberOfLeadingNumbersAndDecimalPlaces_NumberOrListInput(element, number_of_leading_numbers, number_of_decimal_places))
+            ContainerStartString = "["
+            ContainerEndString = "]"
 
-            else: #Situation when we get a list() or []
-                ListOfStringsToJoin.append(str(input))
+            ###############################################################################################################
+            ###############################################################################################################
+            if len(Input) > 0:
 
-        ##########################################################################################################
-        ##########################################################################################################
-        ##########################################################################################################
+                ###########################################################################################################
+                for Element in Input:
+                    ListOfStringsToJoin.append(
+                        ConvertFloatToStringWithNumberOfLeadingNumbersAndDecimalPlaces_NumberOrListInput(
+                            Element, NumberOfLeadingNumbers, NumberOfDecimalPlaces
+                        )
+                    )
+                ###########################################################################################################
 
-        ##########################################################################################################
-        ##########################################################################################################
-        ##########################################################################################################
-        elif isinstance(input, tuple) == 1:
+            else:
+                return "[]"
+            ###############################################################################################################
+            ###############################################################################################################
 
-            if len(input) > 0:
-                for element in input: #RECURSION
-                    ListOfStringsToJoin.append("TUPLE" + self.ConvertFloatToStringWithNumberOfLeadingNumbersAndDecimalPlaces_NumberOrListInput(element, number_of_leading_numbers, number_of_decimal_places))
+        ###################################################################################################################
+        ###################################################################################################################
+        ###################################################################################################################
+        elif isinstance(Input, tuple) == 1:
 
-            else: #Situation when we get a list() or []
-                ListOfStringsToJoin.append(str(input))
+            ContainerStartString = "("
+            ContainerEndString = ")"
 
-        ##########################################################################################################
-        ##########################################################################################################
-        ##########################################################################################################
+            ###############################################################################################################
+            ###############################################################################################################
+            if len(Input) > 0:
 
-        ##########################################################################################################
-        ##########################################################################################################
-        ##########################################################################################################
-        elif isinstance(input, dict) == 1:
+                ###########################################################################################################
+                for Element in Input:
+                    ListOfStringsToJoin.append(
+                        ConvertFloatToStringWithNumberOfLeadingNumbersAndDecimalPlaces_NumberOrListInput(
+                            Element, NumberOfLeadingNumbers, NumberOfDecimalPlaces
+                        )
+                    )
+                ###########################################################################################################
 
-            if len(input) > 0:
-                for Key in input: #RECURSION
-                    ListOfStringsToJoin.append(str(Key) + ": " + self.ConvertFloatToStringWithNumberOfLeadingNumbersAndDecimalPlaces_NumberOrListInput(input[Key], number_of_leading_numbers, number_of_decimal_places))
+            else:
+                return "()"
+            ###############################################################################################################
+            ###############################################################################################################
 
-            else: #Situation when we get a dict()
-                ListOfStringsToJoin.append(str(input))
+        ###################################################################################################################
+        ###################################################################################################################
+        ###################################################################################################################
+        elif isinstance(Input, dict) == 1:
 
-        ##########################################################################################################
-        ##########################################################################################################
-        ##########################################################################################################
+            ContainerStartString = "{"
+            ContainerEndString = "}"
+
+            ###############################################################################################################
+            ###############################################################################################################
+            if len(Input) > 0:
+
+                ###########################################################################################################
+                for Key in Input:
+                    ListOfStringsToJoin.append(
+                        str(Key) + ": " +
+                        ConvertFloatToStringWithNumberOfLeadingNumbersAndDecimalPlaces_NumberOrListInput(
+                            Input[Key], NumberOfLeadingNumbers, NumberOfDecimalPlaces
+                        )
+                    )
+                ###########################################################################################################
+
+            else:
+                return "{}"
+            ###############################################################################################################
+            ###############################################################################################################
+
+        ###################################################################################################################
+        ###################################################################################################################
+        ###################################################################################################################
         else:
-            ListOfStringsToJoin.append(str(input))
-        ##########################################################################################################
-        ##########################################################################################################
-        ##########################################################################################################
+            return str(Input)
+        ###################################################################################################################
+        ###################################################################################################################
+        ###################################################################################################################
 
-        ##########################################################################################################
-        ##########################################################################################################
-        ##########################################################################################################
+        ###################################################################################################################
+        ###################################################################################################################
+        ###################################################################################################################
+        if len(ListOfStringsToJoin) > 0:
 
-        ##########################################################################################################
-        ##########################################################################################################
-        ##########################################################################################################
-        if len(ListOfStringsToJoin) > 1:
+            ###############################################################################################################
+            StringToReturn = ContainerStartString
 
-            ##########################################################################################################
-            ##########################################################################################################
-
-            ##########################################################################################################
-            StringToReturn = ""
             for Index, StringToProcess in enumerate(ListOfStringsToJoin):
-
-                ################################################
-                if Index == 0: #The first element
-                    if StringToProcess.find(":") != -1 and StringToProcess[0] != "{": #meaning that we're processing a dict()
-                        StringToReturn = "{"
-                    elif StringToProcess.find("TUPLE") != -1 and StringToProcess[0] != "(":  # meaning that we're processing a tuple
-                        StringToReturn = "("
-                    else:
-                        StringToReturn = "["
-
-                    StringToReturn = StringToReturn + StringToProcess.replace("TUPLE","") + ", "
-                ################################################
-
-                ################################################
-                elif Index < len(ListOfStringsToJoin) - 1: #The middle elements
-                    StringToReturn = StringToReturn + StringToProcess + ", "
-                ################################################
-
-                ################################################
-                else: #The last element
+                if Index == 0:
                     StringToReturn = StringToReturn + StringToProcess
+                else:
+                    StringToReturn = StringToReturn + ", " + StringToProcess
 
-                    if StringToProcess.find(":") != -1 and StringToProcess[-1] != "}":  # meaning that we're processing a dict()
-                        StringToReturn = StringToReturn + "}"
-                    elif StringToProcess.find("TUPLE") != -1 and StringToProcess[-1] != ")":  # meaning that we're processing a tuple
-                        StringToReturn = StringToReturn + ")"
-                    else:
-                        StringToReturn = StringToReturn + "]"
-
-                ################################################
-
-            ##########################################################################################################
-
-            ##########################################################################################################
-            ##########################################################################################################
-
-        elif len(ListOfStringsToJoin) == 1:
-            StringToReturn = ListOfStringsToJoin[0]
+            StringToReturn = StringToReturn + ContainerEndString
+            return StringToReturn
+            ###############################################################################################################
 
         else:
-            StringToReturn = ListOfStringsToJoin
+            return ContainerStartString + ContainerEndString
+        ###################################################################################################################
+        ###################################################################################################################
+        ###################################################################################################################
 
-        return StringToReturn
-        ##########################################################################################################
-        ##########################################################################################################
-        ##########################################################################################################
+    #######################################################################################################################
+    #######################################################################################################################
+    #######################################################################################################################
+    #######################################################################################################################
 
-    ##########################################################################################################
-    ##########################################################################################################
-    ##########################################################################################################
-    ##########################################################################################################
+    #######################################################################################################################
+    #######################################################################################################################
+    #######################################################################################################################
+    #######################################################################################################################
+    def ConvertDictToProperlyFormattedStringForPrinting(self, DictToPrint, NumberOfDecimalPlaces = 3, NumberOfEntriesPerLine = 1, NumberOfTabsBetweenItems = 3, NumberOfLeadingNumbers = 3):
 
-    ##########################################################################################################
-    ##########################################################################################################
-    def ConvertDictToProperlyFormattedStringForPrinting(self, DictToPrint, NumberOfDecimalsPlaceToUse = 3, NumberOfEntriesPerLine = 1, NumberOfTabsBetweenItems = 3):
-
+        #######################################################################################################################
+        #######################################################################################################################
+        #######################################################################################################################
         try:
             ProperlyFormattedStringForPrinting = ""
             ItemsPerLineCounter = 0
 
+            #######################################################################################################################
+            #######################################################################################################################
             for Key in DictToPrint:
 
-                ##########################################################################################################
+                #######################################################################################################################
                 if isinstance(DictToPrint[Key], dict): #RECURSION
                     ProperlyFormattedStringForPrinting = ProperlyFormattedStringForPrinting + \
                                                          str(Key) + ":\n" + \
-                                                         self.ConvertDictToProperlyFormattedStringForPrinting(DictToPrint[Key],
-                                                                                                              NumberOfDecimalsPlaceToUse,
-                                                                                                              NumberOfEntriesPerLine,
-                                                                                                              NumberOfTabsBetweenItems)
+                                                         self.ConvertDictToProperlyFormattedStringForPrinting(DictToPrint=DictToPrint[Key],
+                                                                                                              NumberOfDecimalPlaces=NumberOfDecimalPlaces,
+                                                                                                              NumberOfEntriesPerLine=NumberOfEntriesPerLine,
+                                                                                                              NumberOfTabsBetweenItems=NumberOfTabsBetweenItems,
+                                                                                                              NumberOfLeadingNumbers=NumberOfLeadingNumbers)
 
                 else:
                     ProperlyFormattedStringForPrinting = ProperlyFormattedStringForPrinting + \
                                                          str(Key) + ": " + \
-                                                         self.ConvertFloatToStringWithNumberOfLeadingNumbersAndDecimalPlaces_NumberOrListInput(DictToPrint[Key],
-                                                                                                                                               0,
-                                                                                                                                               NumberOfDecimalsPlaceToUse)
-                ##########################################################################################################
+                                                         self.ConvertFloatToStringWithNumberOfLeadingNumbersAndDecimalPlaces_NumberOrListInput(Input=DictToPrint[Key],
+                                                                                                                                               NumberOfLeadingNumbers=NumberOfLeadingNumbers,
+                                                                                                                                               NumberOfDecimalPlaces=NumberOfDecimalPlaces)
+                #######################################################################################################################
 
-                ##########################################################################################################
+                #######################################################################################################################
                 if ItemsPerLineCounter < NumberOfEntriesPerLine - 1:
                     ProperlyFormattedStringForPrinting = ProperlyFormattedStringForPrinting + "\t"*NumberOfTabsBetweenItems
                     ItemsPerLineCounter = ItemsPerLineCounter + 1
                 else:
                     ProperlyFormattedStringForPrinting = ProperlyFormattedStringForPrinting + "\n"
                     ItemsPerLineCounter = 0
-                ##########################################################################################################
+                #######################################################################################################################
 
+            #######################################################################################################################
+            #######################################################################################################################
+
+            #######################################################################################################################
+            #######################################################################################################################
             return ProperlyFormattedStringForPrinting
+            #######################################################################################################################
+            #######################################################################################################################
 
+        #######################################################################################################################
+        #######################################################################################################################
+        #######################################################################################################################
+
+        #######################################################################################################################
+        #######################################################################################################################
+        #######################################################################################################################
         except:
             exceptions = sys.exc_info()[0]
             print("ConvertDictToProperlyFormattedStringForPrinting, Exceptions: %s" % exceptions)
+            traceback.print_exc()
             return ""
-            #traceback.print_exc()
-    ##########################################################################################################
-    ##########################################################################################################
+        #######################################################################################################################
+        #######################################################################################################################
+        #######################################################################################################################
+
+    #######################################################################################################################
+    #######################################################################################################################
+    #######################################################################################################################
+    #######################################################################################################################
 
     ##########################################################################################################
     ##########################################################################################################
